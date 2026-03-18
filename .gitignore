@@ -1,4 +1,7 @@
-.claude/settings.local.json
+.agents/
+!.agents/*.md
+.claude/
+
 .DS_Store
 bin
 dist
