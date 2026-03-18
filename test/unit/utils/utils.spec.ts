@@ -21,7 +21,7 @@ describe('utils', () => {
         })
 
         it('should accept a custom cwd', () => {
-            const result = exec('pwd', root)
+            const result = exec('node -e "console.log(process.cwd())"', root)
             expect(result).toBeTruthy()
         })
     })

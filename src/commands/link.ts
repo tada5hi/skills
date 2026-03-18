@@ -1,4 +1,3 @@
-import { execSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, rmSync, symlinkSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { info, isWindows, log, root, success, warn } from '../utils.ts'
@@ -10,6 +9,11 @@ export function cmdLink(): void {
     const skillsTarget = join(root, '.claude', 'skills')
 
     if (!existsSync(skillsTarget)) mkdirSync(skillsTarget, { recursive: true })
+
+    if (!existsSync(skillsSource)) {
+        info('No skills directory found. Nothing to link.')
+        return
+    }
 
     const skillDirs = readdirSync(skillsSource, { withFileTypes: true })
         .filter(e => e.isDirectory() && existsSync(join(skillsSource, e.name, 'SKILL.md')))
@@ -38,10 +42,7 @@ export function cmdLink(): void {
 
         try {
             if (isWindows) {
-                execSync(
-                    `powershell.exe -Command "New-Item -ItemType Junction -Path '${target}' -Target '${source}'"`,
-                    { stdio: 'pipe' },
-                )
+                symlinkSync(source, target, 'junction')
             }
             else {
                 const rel = relative(skillsTarget, source)

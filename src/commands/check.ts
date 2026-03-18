@@ -24,7 +24,7 @@ export function cmdCheck(): void {
         const path = join(root, 'vendor', name)
         if (!existsSync(path)) continue
         const behind = execSafe('git rev-list HEAD..@{u} --count', path)
-        const count = behind ? parseInt(behind) : 0
+        const count = behind ? Number.parseInt(behind, 10) : 0
         if (count > 0) {
             const skillNames = Object.values(config.skills).join(', ')
             info(`${name} (${skillNames}): ${count} commit(s) behind`)

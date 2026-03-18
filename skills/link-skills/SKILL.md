@@ -39,4 +39,4 @@ This will:
 
 - `.claude/` is already in `.gitignore` — the links are local-only and will not be committed.
 - This skill is idempotent: running it multiple times is safe.
-- The underlying implementation is in `src/cli.ts` (the `link` command).
+- The underlying implementation is in `src/commands/link.ts` (the `link` command).
