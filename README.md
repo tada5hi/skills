@@ -1,33 +1,33 @@
-# @tada5hi/skills ⚡
+# @tada5hi/skills 🧩
 
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
 A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 
-**📋 Table of Contents**
+**Table of Contents**
 
-- [🧩 Skills](#-skills)
-- [🚀 Usage](#-usage)
-- [🛠️ CLI Manager](#%EF%B8%8F-cli-manager)
-- [📦 Vendor Skills](#-vendor-skills)
-- [📁 Structure](#-structure)
-- [➕ Adding New Skills](#-adding-new-skills)
-- [📄 License](#-license)
+- [Skills](#skills)
+- [Usage](#usage)
+- [CLI Manager](#cli-manager)
+- [Vendor Skills](#vendor-skills)
+- [Structure](#structure)
+- [Adding New Skills](#adding-new-skills)
+- [License](#license)
 
-## 🧩 Skills
+## Skills
 
 | Skill | Type | Description |
 |-------|------|-------------|
-| [🏗️ init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with AI agent documentation (CLAUDE.md, AGENTS.md, .agents/*.md) |
-| [🔍 investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
-| [🔗 link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
-| [🔄 update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
+| [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with AI agent documentation (CLAUDE.md, AGENTS.md, .agents/*.md) |
+| [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
+| [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
 
-## 🚀 Usage
+## Usage
 
 These skills follow the [Agent Skills](https://agentskills.io) open standard and are compatible with Claude Code, Cursor, VS Code Copilot, Gemini CLI, Goose, Roo Code, and other supporting tools.
 
-### 📦 Skills CLI
+### Skills CLI
 
 The easiest way to install skills is via the [skills CLI](https://github.com/vercel-labs/skills):
 
@@ -44,16 +44,15 @@ npx skills add tada5hi/skills --skill='*' -g
 
 Learn more about the CLI usage at [vercel-labs/skills](https://github.com/vercel-labs/skills).
 
-### 🔧 Setup (for contributors)
+## CLI Manager
+
+The project includes a CLI tool (`src/cli.ts`) for managing vendor skills and local development. To get started:
 
 ```bash
 npm install
-npm run skills:link   # Link skills into .claude/skills/ for local discovery
 ```
 
-## 🛠️ CLI Manager
-
-The project includes a CLI tool (`src/cli.ts`) for managing skills. All commands are available as npm scripts:
+All commands are available as npm scripts:
 
 | Command | Description |
 |---------|-------------|
@@ -64,7 +63,7 @@ The project includes a CLI tool (`src/cli.ts`) for managing skills. All commands
 | `npm run skills:cleanup` | Remove submodules and skills not listed in `src/meta.ts` |
 | `npm run skills:link` | Create `.claude/skills/` links for Claude Code discovery |
 
-### ⚙️ How It Works
+### How It Works
 
 The CLI reads `src/meta.ts` as its single source of truth. This file declares:
 
@@ -73,7 +72,7 @@ The CLI reads `src/meta.ts` as its single source of truth. This file declares:
 
 Every skill directory under `skills/` must be listed in one of these two registries. Running `skills:cleanup` will flag and remove any that aren't.
 
-## 📦 Vendor Skills
+## Vendor Skills
 
 Vendor skills are sourced from external repositories via git submodules. They are cloned into `vendor/` and synced into `skills/` by the CLI.
 
@@ -115,13 +114,13 @@ npm run skills:check   # See what's outdated
 npm run skills:sync    # Pull latest and re-sync
 ```
 
-## 📁 Structure
+## Structure
 
-```
+```text
 skills/
 ├── src/
-│   ├── cli.ts                     # 🛠️ CLI entry point
-│   ├── meta.ts                    # ⚙️ Skill registry (single source of truth)
+│   ├── cli.ts                     # CLI entry point
+│   ├── meta.ts                    # Skill registry (single source of truth)
 │   ├── registry.ts                # Skill name resolution
 │   ├── submodule.ts               # Git submodule helpers
 │   ├── utils.ts                   # Shared utilities
@@ -132,7 +131,7 @@ skills/
 │       ├── cleanup.ts
 │       └── link.ts
 ├── skills/
-│   ├── init-agent-docs/           # 🏗️ Project initialization skill
+│   ├── init-agent-docs/           # Project initialization skill
 │   │   ├── SKILL.md
 │   │   └── templates/
 │   │       ├── CLAUDE.md
@@ -142,24 +141,26 @@ skills/
 │   │           ├── architecture.md
 │   │           ├── testing.md
 │   │           └── conventions.md
-│   ├── update-agent-docs/         # 🔄 Template feedback loop skill
+│   ├── investigate-pr-comments/   # PR review comment handler
 │   │   └── SKILL.md
-│   └── link-skills/               # 🔗 Skill discovery linker
+│   ├── update-agent-docs/         # Template feedback loop skill
+│   │   └── SKILL.md
+│   └── link-skills/               # Skill discovery linker
 │       └── SKILL.md
 ├── test/
-│   ├── vitest.config.ts           # 🧪 Vitest configuration
+│   ├── vitest.config.ts           # Vitest configuration
 │   └── unit/                      # Unit tests (mirrors src/ structure)
-├── vendor/                        # 📦 Vendored external repos (git submodules)
+├── vendor/                        # Vendored external repos (git submodules)
 ├── .github/
-│   ├── dependabot.yml             # 🔄 Automated dependency updates
-│   └── workflows/ci.yml           # ✅ CI pipeline (lint, test, validate)
+│   ├── dependabot.yml             # Automated dependency updates
+│   └── workflows/ci.yml           # CI pipeline (lint, test, validate)
 ├── package.json
 ├── tsconfig.json
 ├── eslint.config.js
 └── README.md
 ```
 
-## ➕ Adding New Skills
+## Adding New Skills
 
 ### Manual Skills
 
@@ -171,13 +172,13 @@ skills/
 
 ### Vendored Skills
 
-See [📦 Vendor Skills](#-vendor-skills) above.
+See [Vendor Skills](#vendor-skills) above.
 
 ### References Pattern
 
 For skills that grow large, use a `references/` subdirectory with one markdown file per concept:
 
-```
+```text
 skills/my-skill/
 ├── SKILL.md                # Index listing all references
 └── references/
@@ -188,7 +189,7 @@ skills/my-skill/
 
 Prefix reference files with their category (`core-`, `features-`, `best-practices-`, `advanced-`) to keep things organized.
 
-## 📄 License
+## License
 
 Made with 💚
 
