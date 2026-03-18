@@ -21,8 +21,9 @@ export interface VendorSkillMeta {
  */
 export const manual: string[] = [
     'init-agent-docs',
-    'update-agent-docs',
+    'investigate-pr-comments',
     'link-skills',
+    'update-agent-docs',
 ]
 
 /**

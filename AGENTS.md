@@ -36,8 +36,9 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | Skill | Type | Description |
 |-------|------|-------------|
 | [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with structured AI agent documentation |
-| [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
+| [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 
 ## Detailed Guides
 

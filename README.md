@@ -19,8 +19,9 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 | Skill | Type | Description |
 |-------|------|-------------|
 | [🏗️ init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with AI agent documentation (CLAUDE.md, AGENTS.md, .agents/*.md) |
-| [🔄 update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
+| [🔍 investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [🔗 link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [🔄 update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
 
 ## 🚀 Usage
 
