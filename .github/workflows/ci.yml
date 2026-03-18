@@ -1,0 +1,126 @@
+name: CI
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        types: [opened, synchronize]
+
+env:
+    NODE_VERSION: 22
+
+permissions:
+    contents: read
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install
+              run: npm ci
+
+            - name: Lint
+              run: npm run lint
+
+    test:
+        name: Test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install
+              run: npm ci
+
+            - name: Test
+              run: npm test
+
+    validate-skills:
+        name: Validate Skills
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Check SKILL.md exists for each skill
+              run: |
+                  status=0
+                  for dir in skills/*/; do
+                      if [ ! -f "${dir}SKILL.md" ]; then
+                          echo "::error::Missing SKILL.md in ${dir}"
+                          status=1
+                      fi
+                  done
+                  exit $status
+
+            - name: Check frontmatter consistency
+              run: |
+                  status=0
+                  for skill_file in skills/*/SKILL.md; do
+                      dir_name=$(basename "$(dirname "$skill_file")")
+                      name_field=$(sed -n 's/^name: *//p' "$skill_file" | head -1)
+                      if [ "$dir_name" != "$name_field" ]; then
+                          echo "::error::Skill name mismatch in ${skill_file}: directory='${dir_name}' name='${name_field}'"
+                          status=1
+                      fi
+                  done
+                  exit $status
+
+    validate-meta:
+        name: Validate Meta Registry
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install
+              run: npm ci
+
+            - name: Check all skills are registered in meta.ts
+              run: |
+                  npx tsx -e "
+                  import { manual, vendors } from './src/meta.ts';
+                  import { readdirSync } from 'fs';
+                  const registered = new Set([
+                      ...manual,
+                      ...Object.values(vendors).flatMap(v => Object.values(v.skills)),
+                  ]);
+                  const dirs = readdirSync('skills', { withFileTypes: true })
+                      .filter(e => e.isDirectory())
+                      .map(e => e.name);
+                  let ok = true;
+                  for (const d of dirs) {
+                      if (!registered.has(d)) {
+                          console.error('Not registered in meta.ts:', d);
+                          ok = false;
+                      }
+                  }
+                  if (!ok) process.exit(1);
+                  console.log('All skills registered.');
+                  "

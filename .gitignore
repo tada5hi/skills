@@ -1,5 +1,3 @@
-.agents/
-!.agents/*.md
 .claude/
 
 .DS_Store

@@ -1,0 +1,5 @@
+export { cmdCheck } from './check.ts'
+export { cmdCleanup } from './cleanup.ts'
+export { cmdInit } from './init.ts'
+export { cmdLink } from './link.ts'
+export { cmdSync } from './sync.ts'

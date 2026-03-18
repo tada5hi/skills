@@ -1,0 +1,28 @@
+version: 2
+updates:
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "daily"
+
+    - package-ecosystem: "npm"
+      target-branch: "master"
+      directory: "/"
+      schedule:
+          interval: "daily"
+      versioning-strategy: "increase"
+      open-pull-requests-limit: 10
+      commit-message:
+          prefix: "fix"
+          prefix-development: "build"
+          include: "scope"
+      groups:
+          major:
+              applies-to: version-updates
+              update-types:
+                  - "major"
+          minorAndPatch:
+              applies-to: version-updates
+              update-types:
+                  - "patch"
+                  - "minor"

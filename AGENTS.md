@@ -15,21 +15,32 @@ npm run lint
 
 # Lint with auto-fix
 npm run lint:fix
+
+# Skills CLI
+npm run skills            # Show available commands
+npm run skills:init       # Add vendor submodules from meta.ts
+npm run skills:sync       # Pull latest vendor changes
+npm run skills:check      # Check for upstream updates
+npm run skills:cleanup    # Remove stale submodules/skills
+npm run skills:link       # Link skills for Claude Code discovery
 ```
 
 - **Node.js**: >= 22.0.0
 - **Package manager**: npm
+- **Skill registry**: `src/meta.ts` (single source of truth for all skills)
 
 ## Skills
 
-Each skill is a self-contained directory under `skills/` with a `SKILL.md` definition and optional `templates/` directory.
+Each skill is a self-contained directory under `skills/` with a `SKILL.md` definition and optional `templates/` or `references/` directory. All skills must be registered in `src/meta.ts`.
 
-| Skill | Description |
-|-------|-------------|
-| [init-agent-docs](skills/init-agent-docs/) | Initialize a project with structured AI agent documentation |
-| [update-agent-docs](skills/update-agent-docs/) | Propose template improvements back to this repository via PR |
+| Skill | Type | Description |
+|-------|------|-------------|
+| [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with structured AI agent documentation |
+| [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
+| [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 
 ## Detailed Guides
 
-- **[Project Structure](.agents/structure.md)** — Directory layout, skill anatomy, and module responsibilities
+- **[Project Structure](.agents/structure.md)** — Directory layout, skill anatomy, module responsibilities, and skill types
 - **[Conventions](.agents/conventions.md)** — Code style, tooling, commit conventions, and workflow rules
