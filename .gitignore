@@ -1,0 +1,16 @@
+.claude/settings.local.json
+.DS_Store
+bin
+dist
+doc
+node_modules
+.vscode
+.nyc_output
+coverage
+*.log
+npm-debug.log*
+.idea
+reports
+db.sqlite
+.env
+cache
