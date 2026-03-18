@@ -27,15 +27,24 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 
 These skills follow the [Agent Skills](https://agentskills.io) open standard and are compatible with Claude Code, Cursor, VS Code Copilot, Gemini CLI, Goose, Roo Code, and other supporting tools.
 
-### 🤖 Claude Code
+### 📦 Skills CLI
 
-Reference a skill in your `CLAUDE.md`:
+The easiest way to install skills is via the [skills CLI](https://github.com/vercel-labs/skills):
 
-```markdown
-@/path/to/skills/skills/init-agent-docs/SKILL.md
+```bash
+# Install all skills
+npx skills add tada5hi/skills --skill='*'
+
+# Install a specific skill
+npx skills add tada5hi/skills --skill='init-agent-docs'
+
+# Install globally (available across all projects)
+npx skills add tada5hi/skills --skill='*' -g
 ```
 
-### 🔧 Setup
+Learn more about the CLI usage at [vercel-labs/skills](https://github.com/vercel-labs/skills).
+
+### 🔧 Setup (for contributors)
 
 ```bash
 npm install
