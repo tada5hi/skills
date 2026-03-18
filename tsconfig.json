@@ -1,0 +1,8 @@
+{
+    "extends": "@tada5hi/tsconfig",
+    "compilerOptions": {
+        "noEmit": true,
+        "allowImportingTsExtensions": true
+    },
+    "include": ["src/**/*.ts"]
+}
