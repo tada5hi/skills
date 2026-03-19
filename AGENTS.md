@@ -39,6 +39,13 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
+| [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
+| [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
+| [prd-to-issues](skills/prd-to-issues/) | Vendor | Break PRDs into independently-grabbable GitHub issues |
+| [prd-to-plan](skills/prd-to-plan/) | Vendor | Convert PRDs into multi-phase implementation plans |
+| [tdd](skills/tdd/) | Vendor | Test-driven development with red-green-refactor loops |
+| [triage-issue](skills/triage-issue/) | Vendor | Investigate bugs, identify root causes, and file issues with fix plans |
+| [write-a-prd](skills/write-a-prd/) | Vendor | Create a PRD through interactive interview and codebase exploration |
 
 ## Detailed Guides
 

@@ -8,8 +8,13 @@ export interface VendorSkillMeta {
      */
     source: string
     /**
+     * Subdirectory within the vendor repo that contains skill directories.
+     * Defaults to `'skills'`. Use `'.'` for repos where skills are at the root.
+     */
+    skillsPath?: string
+    /**
      * Map of source skill name → output skill name.
-     * Source skills are read from `vendor/<key>/skills/<sourceSkillName>/`.
+     * Source skills are read from `vendor/<key>/<skillsPath>/<sourceSkillName>/`.
      * Output skills are written to `skills/<outputSkillName>/`.
      */
     skills: Record<string, string>
@@ -31,12 +36,17 @@ export const manual: string[] = [
  * Cloned as submodules under `vendor/<key>/` and synced into `skills/`.
  */
 export const vendors: Record<string, VendorSkillMeta> = {
-    // Example:
-    // 'some-project': {
-    //     official: true,
-    //     source: 'https://github.com/org/some-project',
-    //     skills: {
-    //         'source-skill-name': 'output-skill-name',
-    //     },
-    // },
+    'mattpocock-skills': {
+        source: 'https://github.com/mattpocock/skills',
+        skillsPath: '.',
+        skills: {
+            'tdd': 'tdd',
+            'triage-issue': 'triage-issue',
+            'write-a-prd': 'write-a-prd',
+            'prd-to-plan': 'prd-to-plan',
+            'prd-to-issues': 'prd-to-issues',
+            'grill-me': 'grill-me',
+            'improve-codebase-architecture': 'improve-codebase-architecture',
+        },
+    },
 }

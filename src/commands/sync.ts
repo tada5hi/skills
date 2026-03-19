@@ -29,14 +29,15 @@ export function cmdSync(): void {
 
     for (const [vendorName, config] of Object.entries(vendors)) {
         const vendorPath = join(root, 'vendor', vendorName)
-        const vendorSkillsPath = join(vendorPath, 'skills')
+        const skillsSubdir = config.skillsPath ?? 'skills'
+        const vendorSkillsPath = join(vendorPath, skillsSubdir)
 
         if (!existsSync(vendorPath)) {
             warn(`Vendor submodule not found: ${vendorName}. Run init first.`)
             continue
         }
         if (!existsSync(vendorSkillsPath)) {
-            warn(`No skills/ directory in vendor/${vendorName}/`)
+            warn(`No ${skillsSubdir === '.' ? 'vendor' : skillsSubdir + '/'} directory in vendor/${vendorName}/`)
             continue
         }
 
