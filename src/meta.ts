@@ -47,6 +47,7 @@ export const vendors: Record<string, VendorSkillMeta> = {
             'prd-to-issues': 'prd-to-issues',
             'grill-me': 'grill-me',
             'improve-codebase-architecture': 'improve-codebase-architecture',
+            'request-refactor-plan': 'request-refactor-plan',
         },
     },
 }

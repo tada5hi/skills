@@ -26,6 +26,7 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
 | [prd-to-issues](skills/prd-to-issues/) | Vendor | Break PRDs into independently-grabbable GitHub issues |
 | [prd-to-plan](skills/prd-to-plan/) | Vendor | Convert PRDs into multi-phase implementation plans |
+| [request-refactor-plan](skills/request-refactor-plan/) | Vendor | Create detailed refactor plans with tiny commits via user interview |
 | [tdd](skills/tdd/) | Vendor | Test-driven development with red-green-refactor loops |
 | [triage-issue](skills/triage-issue/) | Vendor | Investigate bugs, identify root causes, and file issues with fix plans |
 | [write-a-prd](skills/write-a-prd/) | Vendor | Create a PRD through interactive interview and codebase exploration |
