@@ -25,6 +25,7 @@ export interface VendorSkillMeta {
  * Each entry must match a directory under `skills/`.
  */
 export const manual: string[] = [
+    'generate-commit-message',
     'init-agent-docs',
     'investigate-pr-comments',
     'link-skills',
