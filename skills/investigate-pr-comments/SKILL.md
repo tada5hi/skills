@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
 metadata:
   author: tada5hi
-  version: "2026.03.18"
-allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent
+  version: "2026.03.23"
+allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
 # investigate-pr-comments
@@ -15,20 +15,84 @@ allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agen
 
 ## Step 1: Fetch PR comments
 
-Fetch comments using `gh api` and `node -e` for JSON parsing.
+Fetch comments using `gh api` and write full output to temp files for processing.
 
-**Important:** `jq` may not be available. Use `node -e` for JSON parsing. On Windows (MINGW), `gh api` paths must NOT start with `/` (MINGW rewrites them to filesystem paths).
+**Important:**
+- `jq` may not be available. Use `node -e` for JSON parsing.
+- On Windows (MINGW), `gh api` paths must NOT start with `/` (MINGW rewrites them to filesystem paths).
+- **Never truncate comment bodies** (e.g. `.substring(0, 200)`). Reviewers embed suggested diffs, reasoning, and fixes in the body — truncation destroys actionable content.
+- On Windows, `/dev/stdin` does not work with `node -e`. Use `process.stdin` piping or read from a temp file instead.
+
+### 1a. Get PR metadata
 
 ```bash
-# Get PR number
 gh pr view --json number,headRepository
-
-# Get PR-level comments (skip bot summaries)
-gh api repos/{owner}/{repo}/issues/{number}/comments | node -e "..."
-
-# Get review comments with file/line context
-gh api repos/{owner}/{repo}/pulls/{number}/comments | node -e "..."
 ```
+
+### 1b. Fetch and save full comments to temp files
+
+Save raw JSON to temp files first, then parse. This avoids terminal overflow on PRs with many or long comments.
+
+```bash
+# Save PR-level comments (issue comments)
+gh api repos/{owner}/{repo}/issues/{number}/comments > /tmp/pr-issue-comments.json
+
+# Save review comments (inline comments with file/line context)
+gh api repos/{owner}/{repo}/pulls/{number}/comments > /tmp/pr-review-comments.json
+```
+
+### 1c. Parse comments with full bodies
+
+Process the saved JSON files with `node -e`, reading from the file path (not stdin):
+
+```bash
+node -e "
+const fs = require('fs');
+const comments = JSON.parse(fs.readFileSync('/tmp/pr-review-comments.json', 'utf8'));
+const parsed = comments
+  .filter(c => c.user.type !== 'Bot' || c.body.includes('suggestion'))
+  .map(c => ({
+    id: c.id,
+    user: c.user.login,
+    path: c.path || null,
+    line: c.line || c.original_line || null,
+    body: c.body
+  }));
+console.log(JSON.stringify(parsed, null, 2));
+"
+```
+
+### 1d. Extract structured fields (optional)
+
+For AI reviewer comments (e.g. CodeRabbit) that use severity labels, extract structured sections:
+
+```bash
+node -e "
+const fs = require('fs');
+const comments = JSON.parse(fs.readFileSync('/tmp/pr-review-comments.json', 'utf8'));
+const parsed = comments.map(c => {
+  const severityMatch = c.body.match(/\[([Cc]ritical|[Mm]ajor|[Mm]inor|[Nn]it)\]/);
+  const suggestionMatch = c.body.match(/\`\`\`suggestion\n([\s\S]*?)\`\`\`/);
+  return {
+    id: c.id,
+    path: c.path || null,
+    line: c.line || c.original_line || null,
+    severity: severityMatch ? severityMatch[1].toLowerCase() : null,
+    hasSuggestion: !!suggestionMatch,
+    suggestion: suggestionMatch ? suggestionMatch[1] : null,
+    body: c.body
+  };
+});
+console.log(JSON.stringify(parsed, null, 2));
+"
+```
+
+### Batch processing for large PRs
+
+For PRs with many comments (20+), process in batches to keep context manageable:
+1. Parse all comments and save structured output to `/tmp/pr-comments-parsed.json`.
+2. Sort by severity (critical > major > minor > nit) and by file path.
+3. Investigate one file at a time in Step 2, reading the parsed comments for that file.
 
 ## Step 2: Investigate each comment
 
@@ -44,6 +108,9 @@ For each review comment (skip bot summaries, walkthrough comments, and pure mark
    - **Already fixed** — the issue was addressed in a subsequent commit
    - **Invalid** — the reviewer misunderstood the design, constraints, or context
    - **Stylistic** — valid but not worth changing (consistency, preference)
+   - **Uncertain** — you cannot confidently classify the comment
+
+4. **If uncertain, ask the user.** When the code context is ambiguous, the reviewer's concern involves a design trade-off, or you lack domain knowledge to judge correctness — do NOT guess. Present the comment, the relevant code, your analysis so far, and ask the user to decide. Only proceed with a fix or dismissal after the user confirms.
 
 ### Context to consider when evaluating
 
