@@ -25,10 +25,13 @@ export interface VendorSkillMeta {
  * Each entry must match a directory under `skills/`.
  */
 export const manual: string[] = [
+    'audit-type-boundaries',
     'generate-commit-message',
+    'impact-analysis',
     'init-agent-docs',
     'investigate-pr-comments',
     'link-skills',
+    'plan-status',
     'update-agent-docs',
 ]
 

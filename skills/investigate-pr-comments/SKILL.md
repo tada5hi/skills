@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
 metadata:
   author: tada5hi
-  version: "2026.03.23"
+  version: "2026.03.26"
 allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
@@ -105,9 +105,10 @@ For each review comment (skip bot summaries, walkthrough comments, and pure mark
    - Does the suggested fix make sense, or does it misunderstand the design?
 3. **Classify** the comment:
    - **Real issue** — the code has a bug, security flaw, or correctness problem
+   - **Pre-existing issue** — a valid concern (bug, flaw, or pattern) that existed before this PR and was not introduced by it
    - **Already fixed** — the issue was addressed in a subsequent commit
    - **Invalid** — the reviewer misunderstood the design, constraints, or context
-   - **Stylistic** — valid but not worth changing (consistency, preference)
+   - **Stylistic** — a genuine style preference or formatting choice, not a correctness concern. Never classify a valid bug or design flaw as Stylistic solely because it is pre-existing — use **Pre-existing issue** instead
    - **Uncertain** — you cannot confidently classify the comment
 
 4. **If uncertain, ask the user.** When the code context is ambiguous, the reviewer's concern involves a design trade-off, or you lack domain knowledge to judge correctness — do NOT guess. Present the comment, the relevant code, your analysis so far, and ask the user to decide. Only proceed with a fix or dismissal after the user confirms.
@@ -117,13 +118,34 @@ For each review comment (skip bot summaries, walkthrough comments, and pure mark
 - Check `.agents/*.md` and `CLAUDE.md` for architectural decisions and constraints that may explain the code.
 - Plan files in `.agents/plans/` are working documents, not shipped code.
 
-## Step 3: Fix real issues
+## Step 3: Fix real issues and handle pre-existing issues
 
 For each comment classified as a **real issue**:
 
 1. Apply the fix.
 2. Run the project linter on changed files.
 3. Run relevant tests to verify the fix.
+
+For each comment classified as a **pre-existing issue**, choose one of the following based on scope:
+
+1. **Small, scoped fix** — if the fix is small (a few lines), localized to files already touched by this PR, and unlikely to cause regressions, fix it directly in the current PR. Apply the fix, lint, and test as with real issues.
+2. **Larger or out-of-scope fix** — if the fix is non-trivial, touches files outside the PR's scope, or carries regression risk, create a GitHub issue instead:
+   ```bash
+   gh issue create --title "<concise description of the pre-existing issue>" --body "$(cat <<'EOF'
+   ## Pre-existing issue found during PR review
+
+   **Reported in:** PR #<number>, review comment by @<user>
+   **File:** `<path>#<line>`
+
+   ## Description
+   <explain the issue and why it matters>
+
+   ## Suggested fix
+   <outline the fix approach>
+   EOF
+   )"
+   ```
+3. **Related to an ongoing plan** — if the issue relates to a plan file in `.agents/plans/`, append a note to the relevant plan file linking to the review comment and describing the concern. This ensures the issue is tracked in context.
 
 ## Step 4: Resolve fixed threads on GitHub
 
@@ -155,7 +177,7 @@ For each comment classified as **Real issue** that was successfully fixed, resol
    gh api graphql -f query='mutation { resolveReviewThread(input: { threadId: "<thread_id>" }) { thread { isResolved } } }'
    ```
 
-Do NOT resolve threads for comments classified as Invalid, Stylistic, or Already fixed — only resolve threads where a code fix was applied.
+Do NOT resolve threads for comments classified as Invalid, Stylistic, or Already fixed — only resolve threads where a code fix was applied. For pre-existing issues fixed in the current PR, resolve the thread. For pre-existing issues where a GitHub issue was created, do NOT resolve the thread.
 
 ## Step 5: Report
 
@@ -163,6 +185,6 @@ Present a summary table of all comments:
 
 | Comment | File | Verdict | Action |
 |---------|------|---------|--------|
-| Short description | `path#line` | Real issue / Already fixed / Invalid / Stylistic | Fixed + Resolved / Fixed / None |
+| Short description | `path#line` | Real issue / Pre-existing issue / Already fixed / Invalid / Stylistic | Fixed + Resolved / Fixed / Issue #N created / Note added to plan / None |
 
 If `--dry-run` was passed as `$ARGUMENTS`, skip Steps 3–4 and only report the classification without making changes or resolving threads.
