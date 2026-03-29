@@ -32,6 +32,23 @@
 - **Line endings**: {{line_endings}}
 - **Linting**: {{linting_config}}
 
+## Naming Conventions
+
+<!-- Document naming patterns that agents should follow when writing new code. Remove sections that don't apply. Common patterns to document: -->
+<!-- - Type/interface naming: prefix conventions (I for interfaces?), suffix conventions (Options vs Context vs Config) -->
+<!-- - Function naming: verb prefixes (get, set, create, resolve, handle) -->
+<!-- - File naming: kebab-case, PascalCase, matching export names -->
+<!-- - Variable naming: boolean prefixes (is, has, should), collections (plural), constants (UPPER_SNAKE_CASE) -->
+
+<!-- Example pattern: -->
+<!-- | Suffix | When to use | Examples | -->
+<!-- |--------|-------------|----------| -->
+<!-- | `*Options` | Plain scalars, simple config | `SetupOptions { resolveCache?: boolean }` | -->
+<!-- | `*Context` | Class instances, Maps, functions | `ApplicationContext { container?: IContainer }` | -->
+<!-- | `*Config` | Static configuration loaded from files/env | `DatabaseConfig { host: string; port: number }` | -->
+
+{{naming_conventions}}
+
 ## File Organization
 
 <!-- Describe where types, constants, utils, and barrel exports live. -->

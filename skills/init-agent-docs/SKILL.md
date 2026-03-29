@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.03.18"
+  version: "2026.03.29"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
