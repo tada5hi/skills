@@ -68,6 +68,16 @@ Apps:
 |------------------|----------------------------------------------|
 | `{{dep_name}}`   | {{dep_description}}                          |
 
+## Package Exports
+
+<!-- For libraries/packages: document the package.json exports field so agents understand what is public API vs internal. Remove this section for applications that aren't consumed as packages. -->
+
+```json
+{{package_exports}}
+```
+
+<!-- If the public API is controlled via a barrel index file, note which types/functions are re-exported vs internal. -->
+
 ## Separation of Concerns
 
 <!-- Summarize which packages/modules own which responsibilities. -->

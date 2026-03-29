@@ -31,6 +31,8 @@
 
 ## Detailed Guides
 
+<!-- Customize each description below to reflect the project's actual content. Specific descriptions (e.g. "Orchestrator pattern, topological sort, and DI integration") are more useful to agents than generic ones (e.g. "Design patterns"). -->
+
 - **[Project Structure](.agents/structure.md)** — Source layout, modules, and dependency layers
 <!-- Include only guides that were created: -->
 <!-- - **[Architecture](.agents/architecture.md)** — Design patterns, data flow, and key abstractions -->
