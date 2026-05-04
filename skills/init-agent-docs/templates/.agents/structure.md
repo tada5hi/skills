@@ -78,6 +78,30 @@ Apps:
 
 <!-- If the public API is controlled via a barrel index file, note which types/functions are re-exported vs internal. -->
 
+## Per-Application Directory Layout
+
+<!-- For monorepos: show the internal directory structure of each application, especially services with notable architectural patterns (e.g. hexagonal layout). This helps agents navigate individual apps. Repeat this section per app. -->
+
+```
+apps/{{app_name}}/src/
+├── core/                          # Domain logic
+│   ├── entities/                  # Entity ports, services, validators
+│   │   └── <entity>/
+│   │       ├── types.ts           # Port interfaces
+│   │       ├── service.ts         # Business logic
+│   │       └── validator.ts       # Input validation
+│   └── services/                  # Cross-entity business services
+├── adapters/                      # External system implementations
+│   ├── database/                  # TypeORM entities, subscribers, migrations
+│   └── http/                      # Controllers, request helpers
+└── app/                           # Orchestration & DI wiring
+    ├── builder.ts                 # Application builder
+    ├── factory.ts                 # createApplication()
+    └── modules/                   # DI modules
+```
+
+<!-- Customize the tree above per application. Remove layers that don't apply (e.g. a CLI app may not have adapters/http/). Include comments explaining the purpose of each directory. -->
+
 ## Separation of Concerns
 
 <!-- Summarize which packages/modules own which responsibilities. -->

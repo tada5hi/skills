@@ -64,6 +64,17 @@
 - Boolean feature toggles: {{boolean_naming_convention}}
 - Environment variables: {{env_var_naming_convention}}
 
+## Pre-commit Hooks
+
+<!-- Remove if no hooks are configured. Describe what runs on commit: linting, formatting, commit message validation. -->
+
+<!-- Example: -->
+<!-- Husky runs on every commit: -->
+<!-- 1. **lint-staged** — ESLint with fix on `*.{vue,js,ts}` -->
+<!-- 2. **commitlint** — Validates commit message format -->
+
+{{pre_commit_hooks_description}}
+
 ## Commit Convention
 
 <!-- Describe the commit message format and any enforcement tooling. -->
@@ -73,6 +84,18 @@ Commits follow **{{commit_convention}}**:
 ```
 {{commit_format}}
 ```
+
+## TypeScript
+
+<!-- Remove if not using TypeScript or if config is standard. Document notable TS config decisions: strict mode, decorator support, module resolution, target. -->
+
+<!-- Example: -->
+<!-- - Target: ES2022, Module: ESNext, ModuleResolution: bundler -->
+<!-- - `strict: false` (migration planned) -->
+<!-- - Decorators enabled (required for TypeORM) -->
+<!-- - All packages use `"type": "module"` (ESM-only) -->
+
+{{typescript_config_description}}
 
 ## Build Output
 
@@ -91,6 +114,65 @@ Commits follow **{{commit_convention}}**:
 <!-- Describe CI/CD pipelines: what triggers them, what they do. -->
 
 - {{ci_cd_description}}
+
+## Docker
+
+<!-- Remove if the project doesn't use Docker. Describe the Docker setup: Dockerfile, docker-compose for local dev, entrypoints. -->
+
+<!-- Example: -->
+<!-- Multi-service Dockerfile builds the entire monorepo. docker-compose.yml provides local dev services (MySQL, Postgres, Redis). -->
+
+{{docker_description}}
+
+## Documentation Site
+
+<!-- Remove if no docs site exists. Describe what changes require docs updates and where to find the docs structure. See also the Documentation section in AGENTS.md. -->
+
+<!-- Example table: -->
+<!-- | Change | Docs to update | -->
+<!-- |--------|---------------| -->
+<!-- | Service env vars | `docs/src/reference/<service>/index.md` | -->
+<!-- | New API endpoints | `docs/src/reference/<service>/index.md` | -->
+
+{{docs_sync_description}}
+
+## Architecture Conventions
+
+<!-- Remove if no specific architecture conventions apply. Document conventions for the architectural pattern used (hexagonal, MVC, etc.): dependency rules, layer conventions, module patterns. -->
+
+<!-- Example for hexagonal: -->
+<!-- - core/ → no imports from adapters/ or app/ -->
+<!-- - adapters/ → may import core/ and app/ -->
+<!-- - app/ → wires core/ and adapters/ together -->
+<!-- - Controllers are thin: extract request → delegate to service → send response -->
+<!-- - Subscribers are pre-instantiated in modules, not auto-discovered -->
+
+{{architecture_conventions_description}}
+
+## DI Modules
+
+<!-- Remove if no dependency injection is used. Document the DI module structure, injection keys, and module inventory. -->
+
+<!-- Example: -->
+<!-- Each DI module lives in `app/modules/<name>/` with: constants.ts (injection keys), types.ts, module.ts, index.ts -->
+
+<!-- Include a module inventory table per service: -->
+<!-- | Module | Dependencies | Registers | -->
+<!-- |--------|-------------|----------| -->
+
+{{di_modules_description}}
+
+## References
+
+<!-- Remove if the project doesn't depend on external projects that agents may need to cross-reference. Use `.agents/references/` to build a cumulative mapping between external project code and this project's code. -->
+
+External project references live in `.agents/references/`. When looking up source code in a referenced project (e.g., {{referenced_project_names}}), update the corresponding reference file with:
+
+- The source file path / function name in the external project
+- The corresponding file path / function name in this project
+- Any behavioral differences between the implementations
+
+<!-- This builds a cumulative mapping over time so future work can quickly find corresponding code without re-searching. -->
 
 ## Best Practices
 

@@ -1,5 +1,13 @@
 # Architecture
 
+## System Overview
+
+<!-- For multi-service projects: show an ASCII diagram of how services connect (HTTP, message queues, external systems). This gives agents an at-a-glance view of the system topology. Remove for single-service projects. -->
+
+```
+{{system_diagram}}
+```
+
 ## Overview
 
 <!-- Describe the high-level architecture pattern (pipeline, hexagonal, MVC, event-driven, etc.) and why it was chosen. -->
@@ -78,3 +86,27 @@ Output:
 ```text
 {{file_structure_mapping}}
 ```
+
+## Authentication
+
+<!-- Remove this section if authentication is not a concern. Describe how authentication/authorization is integrated: middleware, token validation, permission checking, realm scoping. -->
+
+- {{auth_description}}
+
+## Per-Service Architecture
+
+<!-- For monorepos with multiple services: document service-specific architectural details that don't fit in the general patterns above. Include each service's unique adapters, modules, and wiring. Remove for single-service projects. -->
+
+### {{service_name}}
+
+<!-- Describe the service's purpose, unique modules, and any special architectural concerns. -->
+
+{{service_architecture_description}}
+
+## Configuration
+
+<!-- Describe the configuration approach: env vars, config files, typed config modules. List key environment variables that agents need to know about. -->
+
+| Variable        | Purpose                           |
+|-----------------|-----------------------------------|
+| `{{env_var}}`   | {{env_var_purpose}}               |

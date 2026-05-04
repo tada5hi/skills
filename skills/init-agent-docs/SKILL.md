@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.03.29"
+  version: "2026.05.04"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -63,3 +63,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **Include code examples in architecture.md** when documenting design patterns. Show actual interfaces and implementations so agents can follow the patterns when writing new code.
 - **Document dependency layers for monorepos.** This is critical for agents to understand build order and impact of changes.
 - **Add the NOTE comment** at the top of AGENTS.md reminding to keep docs updated as the project evolves.
+- **Document per-application layouts for monorepos** in structure.md. Show the internal directory tree of each service/app, especially when they follow a specific architecture pattern (hexagonal, MVC, etc.).
+- **Prefer fakes over mocks** in testing.md when the project uses hexagonal architecture or dependency inversion. Guide agents toward fake implementations of port interfaces rather than `vi.fn()`/`vi.mock()`.
+- **Include a References section** in conventions.md when the project depends on external projects that agents may need to cross-reference. Use `.agents/references/` to build cumulative code mappings.
+- **Add Plans and Commits sections** to AGENTS.md when the project has ongoing modernization work or commit rules that override default agent behavior.
