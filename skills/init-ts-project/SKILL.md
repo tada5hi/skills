@@ -41,8 +41,12 @@ Collect these from the user before starting. If any are missing, ask once and pr
 | `keywords` | No | `[]` | Comma-separated list inserted into `package.json#keywords`. |
 | `target` | No | `./<name>` | Target directory. Must not exist or must be empty. |
 | `template` | No | `https://github.com/tada5hi/typescript-template` | Source template repository. |
-| `org` | No | `tada5hi` | GitHub organization for repository URL and badges. |
+| `org` | No | `tada5hi` | GitHub organization for repository URL and badges. May be supplied in any case (e.g. `Tada5hi`). |
 | `license` | No | `MIT` | SPDX identifier written to `package.json#license`. |
+
+**Derived values:**
+
+- `<org-lowercase>` — `org` lowercased. Used wherever GitHub paths must be lowercase (npm-style URLs, badge slugs, `repository.url`). `<org>` preserves the user-supplied casing for human-facing strings (e.g. README badge alt text).
 
 ## Process
 
