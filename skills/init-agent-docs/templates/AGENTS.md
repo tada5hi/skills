@@ -38,3 +38,7 @@
 <!-- - **[Architecture](.agents/architecture.md)** — Design patterns, data flow, and key abstractions -->
 <!-- - **[Testing](.agents/testing.md)** — Test runner, conventions, and infrastructure -->
 <!-- - **[Conventions](.agents/conventions.md)** — Best practices, tooling, validation, and error handling -->
+
+## Commits
+
+- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
