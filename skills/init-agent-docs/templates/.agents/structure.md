@@ -92,7 +92,7 @@ apps/{{app_name}}/src/
 │   │       └── validator.ts       # Input validation
 │   └── services/                  # Cross-entity business services
 ├── adapters/                      # External system implementations
-│   ├── database/                  # TypeORM entities, subscribers, migrations
+│   ├── database/                  # ORM entities/models, subscribers, migrations
 │   └── http/                      # Controllers, request helpers
 └── app/                           # Orchestration & DI wiring
     ├── builder.ts                 # Application builder

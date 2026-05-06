@@ -57,17 +57,17 @@ Tests should assert *expected* behavior based on the service contract and archit
 
 ### Fakes Over Mocks
 
-<!-- Remove if not applicable. Both projects using hexagonal architecture strongly prefer fake implementations over vi.fn()/vi.mock(). This section guides agents to use the right testing approach. -->
+<!-- Remove if not applicable. Projects using hexagonal architecture commonly prefer fake implementations over spy-function stubs (e.g. vi.fn(), jest.fn(), sinon stubs). Adapt the example below to the project's test runner. This section guides agents to use the right testing approach. -->
 
-**Prefer fake implementations over `vi.fn()` / `vi.mock()`.** When using hexagonal architecture with dependency inversion, every dependency is injectable via a port interface — write a class implementing the port with in-memory behavior and call-recording helpers.
+**Prefer fake implementations over spy-function stubs (e.g. `{{spy_function}}` / `{{module_mock}}`).** When using hexagonal architecture with dependency inversion, every dependency is injectable via a port interface — write a class implementing the port with in-memory behavior and call-recording helpers.
 
 ```typescript
-// Good — fake implements the port interface
+// Good — fake provides realistic in-memory behavior and state
 const repository = new FakeEntityRepository();
 const service = new EntityService({ repository });
 
-// Bad — vi.fn() stubs bypass the interface contract
-const repository = { findMany: vi.fn(), save: vi.fn() };
+// Bad — spy-function stubs lack realistic behavior and couple tests to implementation details
+const repository = { findMany: {{spy_function}}, save: {{spy_function}} };
 ```
 
 ## Code Coverage

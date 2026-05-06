@@ -36,6 +36,11 @@
 
 The `{{docs_directory}}` directory contains the project documentation site. When making changes that affect user-facing behavior, configuration, APIs, or service architecture, **update the corresponding docs pages**.
 
+```bash
+{{docs_dev_command}}                          # run the docs site locally
+{{docs_build_command}}                        # build the docs site for production
+```
+
 ## Detailed Guides
 
 <!-- Customize each description below to reflect the project's actual content. Specific descriptions (e.g. "Orchestrator pattern, topological sort, and DI integration") are more useful to agents than generic ones (e.g. "Design patterns"). -->

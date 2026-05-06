@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.05.04"
+  version: "2026.05.06"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -20,6 +20,8 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **`CLAUDE.md`** — Manifest file that references all agent guides (loaded by Claude Code on startup)
 - **`AGENTS.md`** — Main entry point with project overview, setup commands, and links to detailed guides
 - **`.agents/*.md`** — Detailed guides covering structure, architecture, testing, and conventions
+- **`.agents/references/`** *(optional)* — One Markdown file per external project the codebase cross-references; only create when `conventions.md` keeps its References section
+- **`.agents/plans/`** *(optional)* — Phased plan files for ongoing modernization or migration work; only create when `AGENTS.md` keeps its Plans section
 
 ## When to Use
 
@@ -39,7 +41,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
    - **Monorepos**: Use Applications/Packages tables, Dependency Layers, workspace-specific test commands
    - **Single packages**: Use Directory Layout, Module Responsibilities, Key Dependencies
 4. **Generate from templates** — Use the templates in [templates/](templates/) as starting points. Replace all `{{placeholders}}` with project-specific information. Remove HTML comments and unused sections. Add project-specific sections as needed (e.g., design patterns with code examples).
-5. **Write the files** — Create `CLAUDE.md`, `AGENTS.md`, and the selected `.agents/*.md` files in the project root.
+5. **Write the files** — Create `CLAUDE.md`, `AGENTS.md`, and the selected `.agents/*.md` files in the project root. If `conventions.md` keeps its References section, create `.agents/references/` (and seed one file per external project). If `AGENTS.md` keeps its Plans section, create `.agents/plans/` (and add the phased plan files it links to).
 
 ## Available Templates
 

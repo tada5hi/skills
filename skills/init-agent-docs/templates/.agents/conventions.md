@@ -166,7 +166,7 @@ Commits follow **{{commit_convention}}**:
 
 <!-- Remove if the project doesn't depend on external projects that agents may need to cross-reference. Use `.agents/references/` to build a cumulative mapping between external project code and this project's code. -->
 
-External project references live in `.agents/references/`. When looking up source code in a referenced project (e.g., {{referenced_project_names}}), update the corresponding reference file with:
+External project references live in `.agents/references/`. **If you keep this section, create the `.agents/references/` directory** and add one Markdown file per external project (e.g. `.agents/references/{{referenced_project_slug}}.md`). When looking up source code in a referenced project (e.g., {{referenced_project_names}}), update the corresponding reference file with:
 
 - The source file path / function name in the external project
 - The corresponding file path / function name in this project
