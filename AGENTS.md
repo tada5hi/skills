@@ -39,6 +39,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [generate-commit-message](skills/generate-commit-message/) | Manual | Generate a Conventional Commits message for uncommitted changes |
 | [impact-analysis](skills/impact-analysis/) | Manual | Cross-package impact analysis for TypeScript monorepo symbols |
 | [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with structured AI agent documentation |
+| [init-ts-project](skills/init-ts-project/) | Manual | Scaffold a new TypeScript project from `tada5hi/typescript-template` |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
 | [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |

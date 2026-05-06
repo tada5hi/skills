@@ -29,6 +29,7 @@ export const manual: string[] = [
     'generate-commit-message',
     'impact-analysis',
     'init-agent-docs',
+    'init-ts-project',
     'investigate-pr-comments',
     'link-skills',
     'plan-status',
