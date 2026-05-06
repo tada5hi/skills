@@ -56,3 +56,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 
 - **[Project Structure](.agents/structure.md)** — Directory layout, skill anatomy, module responsibilities, and skill types
 - **[Conventions](.agents/conventions.md)** — Code style, tooling, commit conventions, and workflow rules
+
+## Commits
+
+- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.

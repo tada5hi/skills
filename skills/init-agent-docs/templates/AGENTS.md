@@ -61,7 +61,4 @@ The `{{docs_directory}}` directory contains the project documentation site. When
 
 ## Commits
 
-<!-- Remove this section if there are no project-specific commit rules beyond the convention in conventions.md. Use this for rules that override default agent/tooling behavior. -->
-
-<!-- Example: -->
-<!-- - Do **not** add a `Co-Authored-By: Claude ...` trailer to commit messages. -->
+- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
