@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
 metadata:
   author: tada5hi
-  version: "2026.03.26"
+  version: "2026.04.06"
 allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
@@ -13,15 +13,25 @@ allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agen
 
 > Fetch all review comments on the current PR, investigate each one against the actual code, and fix real issues.
 
+## Re-invocation behaviour
+
+When this skill is run more than once on the same PR (e.g. after a follow-up review), always:
+
+1. Re-fetch all comments from scratch — do not rely on prior parsed output.
+2. Fetch the current state of review threads and **filter out already-resolved threads** before investigating (see Step 1e).
+3. Only investigate comments whose threads are still unresolved. This avoids re-litigating fixes that were already applied and resolved in a previous run.
+
 ## Step 1: Fetch PR comments
 
 Fetch comments using `gh api` and write full output to temp files for processing.
 
 **Important:**
+- Always pass `--paginate` to `gh api` calls. Without it, only the first page (30 items by default) is returned, silently dropping comments on PRs with many reviews.
 - `jq` may not be available. Use `node -e` for JSON parsing.
 - On Windows (MINGW), `gh api` paths must NOT start with `/` (MINGW rewrites them to filesystem paths).
 - **Never truncate comment bodies** (e.g. `.substring(0, 200)`). Reviewers embed suggested diffs, reasoning, and fixes in the body — truncation destroys actionable content.
 - On Windows, `/dev/stdin` does not work with `node -e`. Use `process.stdin` piping or read from a temp file instead.
+- Use a portable temp directory: `${TMPDIR:-${TEMP:-/tmp}}` in shell, and `process.env.TMPDIR || process.env.TEMP || '/tmp'` in Node. Hardcoding `/tmp` breaks on Windows.
 
 ### 1a. Get PR metadata
 
@@ -31,24 +41,28 @@ gh pr view --json number,headRepository
 
 ### 1b. Fetch and save full comments to temp files
 
-Save raw JSON to temp files first, then parse. This avoids terminal overflow on PRs with many or long comments.
+Save raw JSON to temp files first, then parse. This avoids terminal overflow on PRs with many or long comments. `--paginate` ensures all pages are fetched.
 
 ```bash
+TMP="${TMPDIR:-${TEMP:-/tmp}}"
+
 # Save PR-level comments (issue comments)
-gh api repos/{owner}/{repo}/issues/{number}/comments > /tmp/pr-issue-comments.json
+gh api --paginate repos/{owner}/{repo}/issues/{number}/comments > "$TMP/pr-issue-comments.json"
 
 # Save review comments (inline comments with file/line context)
-gh api repos/{owner}/{repo}/pulls/{number}/comments > /tmp/pr-review-comments.json
+gh api --paginate repos/{owner}/{repo}/pulls/{number}/comments > "$TMP/pr-review-comments.json"
 ```
 
 ### 1c. Parse comments with full bodies
 
-Process the saved JSON files with `node -e`, reading from the file path (not stdin):
+Process the saved JSON files with `node -e`, reading from the file path (not stdin). Persist the parsed output to a temp file so later steps can re-read it without re-parsing:
 
 ```bash
 node -e "
 const fs = require('fs');
-const comments = JSON.parse(fs.readFileSync('/tmp/pr-review-comments.json', 'utf8'));
+const path = require('path');
+const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
+const comments = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-review-comments.json'), 'utf8'));
 const parsed = comments
   .filter(c => c.user.type !== 'Bot' || c.body.includes('suggestion'))
   .map(c => ({
@@ -56,11 +70,15 @@ const parsed = comments
     user: c.user.login,
     path: c.path || null,
     line: c.line || c.original_line || null,
+    createdAt: c.created_at,
     body: c.body
   }));
+fs.writeFileSync(path.join(tmp, 'pr-comments-parsed.json'), JSON.stringify(parsed, null, 2));
 console.log(JSON.stringify(parsed, null, 2));
 "
 ```
+
+`createdAt` lets you distinguish new comments from a follow-up review against ones that were present in earlier runs.
 
 ### 1d. Extract structured fields (optional)
 
@@ -69,7 +87,9 @@ For AI reviewer comments (e.g. CodeRabbit) that use severity labels, extract str
 ```bash
 node -e "
 const fs = require('fs');
-const comments = JSON.parse(fs.readFileSync('/tmp/pr-review-comments.json', 'utf8'));
+const path = require('path');
+const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
+const comments = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-review-comments.json'), 'utf8'));
 const parsed = comments.map(c => {
   const severityMatch = c.body.match(/\[([Cc]ritical|[Mm]ajor|[Mm]inor|[Nn]it)\]/);
   const suggestionMatch = c.body.match(/\`\`\`suggestion\n([\s\S]*?)\`\`\`/);
@@ -77,20 +97,74 @@ const parsed = comments.map(c => {
     id: c.id,
     path: c.path || null,
     line: c.line || c.original_line || null,
+    createdAt: c.created_at,
     severity: severityMatch ? severityMatch[1].toLowerCase() : null,
     hasSuggestion: !!suggestionMatch,
     suggestion: suggestionMatch ? suggestionMatch[1] : null,
     body: c.body
   };
 });
+fs.writeFileSync(path.join(tmp, 'pr-comments-parsed.json'), JSON.stringify(parsed, null, 2));
 console.log(JSON.stringify(parsed, null, 2));
 "
 ```
 
+### 1e. Filter out already-resolved threads
+
+Before investigating, drop comments whose review thread is already resolved. This is essential on re-invocation: previously fixed-and-resolved comments must not be re-investigated.
+
+1. Fetch review threads with their resolution state and the comment IDs they contain:
+
+   ```bash
+   gh api graphql --paginate -f query='
+     query($owner: String!, $repo: String!, $number: Int!, $endCursor: String) {
+       repository(owner: $owner, name: $repo) {
+         pullRequest(number: $number) {
+           reviewThreads(first: 100, after: $endCursor) {
+             pageInfo { hasNextPage endCursor }
+             nodes {
+               id
+               isResolved
+               comments(first: 100) {
+                 nodes { databaseId }
+               }
+             }
+           }
+         }
+       }
+     }
+   ' -F owner=<owner> -F repo=<repo> -F number=<number> > "$TMP/pr-review-threads.json"
+   ```
+
+2. Build a set of resolved comment IDs and filter `pr-comments-parsed.json`:
+
+   ```bash
+   node -e "
+   const fs = require('fs');
+   const path = require('path');
+   const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
+   const threadsRaw = fs.readFileSync(path.join(tmp, 'pr-review-threads.json'), 'utf8');
+   // gh --paginate concatenates JSON objects; split and parse each
+   const threadDocs = threadsRaw.trim().split(/(?<=})\s*(?={)/).map(s => JSON.parse(s));
+   const resolvedIds = new Set();
+   for (const doc of threadDocs) {
+     for (const t of doc.data.repository.pullRequest.reviewThreads.nodes) {
+       if (t.isResolved) for (const c of t.comments.nodes) resolvedIds.add(c.databaseId);
+     }
+   }
+   const parsed = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-comments-parsed.json'), 'utf8'));
+   const unresolved = parsed.filter(c => !resolvedIds.has(c.id));
+   fs.writeFileSync(path.join(tmp, 'pr-comments-unresolved.json'), JSON.stringify(unresolved, null, 2));
+   console.log(\`Total: \${parsed.length}, resolved: \${parsed.length - unresolved.length}, to investigate: \${unresolved.length}\`);
+   "
+   ```
+
+Investigate only the comments in `pr-comments-unresolved.json`.
+
 ### Batch processing for large PRs
 
 For PRs with many comments (20+), process in batches to keep context manageable:
-1. Parse all comments and save structured output to `/tmp/pr-comments-parsed.json`.
+1. Use the parsed output saved at `${TMPDIR:-${TEMP:-/tmp}}/pr-comments-unresolved.json`.
 2. Sort by severity (critical > major > minor > nit) and by file path.
 3. Investigate one file at a time in Step 2, reading the parsed comments for that file.
 
@@ -151,23 +225,26 @@ For each comment classified as a **pre-existing issue**, choose one of the follo
 
 For each comment classified as **Real issue** that was successfully fixed, resolve the review thread on GitHub:
 
-1. Fetch all review thread IDs via GraphQL:
+1. Fetch all review thread IDs via GraphQL (`first: 100` and `--paginate` to cover PRs with many threads):
    ```bash
-   gh api graphql -f query='{
-     repository(owner: "<owner>", name: "<repo>") {
-       pullRequest(number: <number>) {
-         reviewThreads(first: 50) {
-           nodes {
-             id
-             isResolved
-             comments(first: 1) {
-               nodes { body path }
+   gh api graphql --paginate -f query='
+     query($owner: String!, $repo: String!, $number: Int!, $endCursor: String) {
+       repository(owner: $owner, name: $repo) {
+         pullRequest(number: $number) {
+           reviewThreads(first: 100, after: $endCursor) {
+             pageInfo { hasNextPage endCursor }
+             nodes {
+               id
+               isResolved
+               comments(first: 1) {
+                 nodes { body path }
+               }
              }
            }
          }
        }
      }
-   }'
+   ' -F owner=<owner> -F repo=<repo> -F number=<number>
    ```
 
 2. Match each fixed comment to its thread by `path` and body content.
