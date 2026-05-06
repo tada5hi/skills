@@ -81,7 +81,7 @@ Apply these replacements across all text files in the target (skip `node_modules
 | `Tada5hi/typescript-template` | `<org>/<name>` |
 | `tada5hi/typescript-template` | `<org-lowercase>/<name>` |
 
-Use `Edit` per file (preferred) or, if the surface is large, a `find … -exec sed -i …` invocation that excludes binary paths. Always verify the diff before continuing.
+Use `Edit` per file. For larger surfaces, locate occurrences with `Grep` (excluding binary paths) and apply repeated `Edit` operations — never shell out to `sed`/`find`, which are not in `allowed-tools`. Always verify the diff before continuing.
 
 ### 4. Update `package.json`
 
