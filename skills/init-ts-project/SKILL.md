@@ -77,13 +77,13 @@ Do **not** copy the template's tags or remotes.
 
 ### 3. Rewrite template references
 
-Apply these replacements across all text files in the target (skip `node_modules`, `dist`, `.git`):
+Apply these replacements across all text files in the target (skip `node_modules`, `dist`, `.git`). **Apply rules in the listed order** — the namespaced patterns must match before the bare `typescript-template` rule, otherwise the slash-prefixed variants will already be partially rewritten and won't match:
 
 | Find | Replace with |
 |------|--------------|
-| `typescript-template` | `<name>` |
 | `Tada5hi/typescript-template` | `<org>/<name>` |
 | `tada5hi/typescript-template` | `<org-lowercase>/<name>` |
+| `typescript-template` | `<name>` |
 
 Use `Edit` per file. For larger surfaces, locate occurrences with `Grep` (excluding binary paths) and apply repeated `Edit` operations — never shell out to `sed`/`find`, which are not in `allowed-tools`. Always verify the diff before continuing.
 
