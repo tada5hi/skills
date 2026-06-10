@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git and gh CLI authenticated with permissions to fork/push to tada5hi/skills.
 metadata:
   author: tada5hi
-  version: "2026.03.18"
+  version: "2026.06.10"
 allowed-tools: Read Write Bash(git:*) Bash(gh:*) Bash(ls:*) Bash(mkdir:*) Bash(cp:*) Glob Grep
 ---
 
@@ -111,10 +111,6 @@ Template improvements based on real-world usage in `{{project_name}}`.
 ### Motivation
 
 <why these changes improve the templates for future projects>
-
----
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```
@@ -125,5 +121,6 @@ EOF
 - **Preserve backward compatibility.** Don't remove existing placeholders or sections unless they are truly broken. Other projects may depend on the current template structure.
 - **One concern per PR.** If you find multiple unrelated improvements, prefer separate PRs so they can be reviewed independently. Bundle related changes (e.g., adding a new section + its guidance comments) into one PR.
 - **Explain the "why".** The PR description should explain which project surfaced the improvement and why it benefits other projects, not just what changed.
+- **No AI attribution.** Do not add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages, and do not add AI-attribution lines (e.g. `🤖 Generated with ...`) to PR titles, bodies, or comments.
 - **Bump the version.** Update `metadata.version` in `SKILL.md` to today's date (format: `"YYYY.MM.DD"`).
 - **Check SKILL.md too.** If new templates, placeholders, or guidelines were added, update the SKILL.md's placeholder table, template table, and guidelines section accordingly.

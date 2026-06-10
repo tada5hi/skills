@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with uncommitted changes.
 metadata:
   author: tada5hi
-  version: "2026.03.23"
+  version: "2026.06.10"
 allowed-tools: Bash(git:*) Read Glob Grep Agent
 ---
 
@@ -90,6 +90,7 @@ Follow these rules:
 - **Scope**: Use a noun describing the affected area (e.g., `parser`, `auth`, `cli`, `deps`). Omit if changes are broad.
 - **Body**: Include only if the description alone doesn't convey the full picture. Separate from description with a blank line. Wrap at 72 characters. Explain *what* and *why*, not *how*.
 - **Footer**: Use for breaking changes (`BREAKING CHANGE: ...`), issue references (`Closes #123`), or co-authors.
+- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer.
 - Match the style and conventions of recent commits in the repository.
 
 ## Step 4: Present to the user
