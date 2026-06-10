@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git, Node.js >= 22, npm, and network access to fetch the template.
 metadata:
   author: tada5hi
-  version: "2026.05.06"
+  version: "2026.06.10"
 allowed-tools: Read Write Edit Bash(git:*) Bash(npm:*) Bash(mkdir:*) Bash(ls:*) Bash(rm:*) Bash(mv:*) Glob Grep
 ---
 
@@ -133,7 +133,7 @@ git -C "$TARGET" add -A
 git -C "$TARGET" commit -m "chore: initial commit from typescript-template"
 ```
 
-Do **not** add a `Co-Authored-By` trailer.
+Do **not** add a `Co-Authored-By` trailer or any other AI-attribution to the commit message.
 
 ### 9. Report
 

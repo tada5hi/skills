@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
 metadata:
   author: tada5hi
-  version: "2026.04.06"
+  version: "2026.06.10"
 allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
@@ -216,6 +216,7 @@ For each comment classified as a **pre-existing issue**, choose one of the follo
    EOF
    )"
    ```
+   Do **not** add AI-attribution lines (e.g. `🤖 Generated with ...`) to issue titles or bodies.
 3. **Related to an ongoing plan** — if the issue relates to a plan file in `.agents/plans/`, append a note to the relevant plan file linking to the review comment and describing the concern. This ensures the issue is tracked in context.
 
 ## Step 4: Resolve fixed threads on GitHub

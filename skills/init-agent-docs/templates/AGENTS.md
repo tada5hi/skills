@@ -59,6 +59,7 @@ The `{{docs_directory}}` directory contains the project documentation site. When
 <!-- 1. ~~Tooling Modernization~~ — Complete (#123) -->
 <!-- 2. [Hexagonal Migration](.agents/plans/002-hexagonal.md) — In progress -->
 
-## Commits
+## Commits, Issues & Pull Requests
 
 - Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
+- Do **not** add AI-attribution lines (e.g. `🤖 Generated with [Claude Code](...)`) to issue or pull request titles, bodies, or comments.
