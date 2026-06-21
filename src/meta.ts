@@ -55,4 +55,10 @@ export const vendors: Record<string, VendorSkillMeta> = {
             'request-refactor-plan': 'request-refactor-plan',
         },
     },
+    'dietrichgebert-ponytail': {
+        source: 'https://github.com/DietrichGebert/ponytail',
+        skills: {
+            ponytail: 'ponytail',
+        },
+    },
 }
