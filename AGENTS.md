@@ -46,6 +46,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
+| [ponytail](skills/ponytail/) | Vendor | Force the laziest solution that actually works — YAGNI, stdlib-first, minimal code |
 | [prd-to-issues](skills/prd-to-issues/) | Vendor | Break PRDs into independently-grabbable GitHub issues |
 | [prd-to-plan](skills/prd-to-plan/) | Vendor | Convert PRDs into multi-phase implementation plans |
 | [request-refactor-plan](skills/request-refactor-plan/) | Vendor | Create detailed refactor plans with tiny commits via user interview |
