@@ -28,10 +28,10 @@
     "devDependencies": {
         "@tada5hi/tsconfig": "^0.7.2",
         "@types/node": "^25.9.2",
-        "@typescript-eslint/eslint-plugin": "^8.61.1",
+        "@typescript-eslint/eslint-plugin": "^8.62.1",
         "@typescript-eslint/parser": "^8.61.0",
-        "eslint": "^10.5.0",
-        "tsx": "^4.22.4",
+        "eslint": "^10.6.0",
+        "tsx": "^4.22.5",
         "typescript": "^6.0.3",
         "vitest": "^4.1.9"
     },
