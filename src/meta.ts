@@ -33,6 +33,7 @@ export const manual: string[] = [
     'investigate-pr-comments',
     'link-skills',
     'plan-status',
+    'query-api',
     'update-agent-docs',
 ]
 

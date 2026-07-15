@@ -21,6 +21,7 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 | [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with AI agent documentation (CLAUDE.md, AGENTS.md, .agents/*.md) |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
 | [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |

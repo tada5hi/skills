@@ -43,6 +43,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
 | [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |
+| [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
