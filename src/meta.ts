@@ -35,6 +35,7 @@ export const manual: string[] = [
     'plan-status',
     'query-api',
     'update-agent-docs',
+    'write-release-notes',
 ]
 
 /**
