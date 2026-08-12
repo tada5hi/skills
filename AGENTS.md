@@ -45,6 +45,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |
 | [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
+| [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
 | [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
 | [ponytail](skills/ponytail/) | Vendor | Force the laziest solution that actually works — YAGNI, stdlib-first, minimal code |
