@@ -57,6 +57,8 @@ git log --oneline <last-stable>..<tag>
 gh pr view <number> --json title,body --jq '.title + "\n\n" + .body'
 ```
 
+A tag can exist without a release object, and `gh release view` answers `release not found` for it. Fall back to `git log <previous-tag>..<tag>` there.
+
 Pull request descriptions are the best source for a highlight: they carry the motivation and the failure mode. Commit subjects only carry the what.
 
 ## Step 3: Read the code and docs at the tag, not in the working tree
@@ -116,13 +118,30 @@ When a release bot owns `CHANGELOG.md` (release-please, changesets, semantic-rel
 
 ## Step 8: Verify, then publish
 
-```bash
-# every documentation link must resolve
-curl -s -o /dev/null -w "%{http_code}\n" https://example.tada5hi.net/guide/page.html
+Every link in the body has to resolve, and a link with a fragment has to land on an anchor that exists. Check the links in the file, not one example URL:
 
-# publish, and re-publish the same way after an edit
-gh release edit <tag> --notes-file notes.md
+```bash
+page=$(mktemp)
+grep -oE 'https?://[^)"[:space:]]+' notes.md | sort -u | while read -r url; do
+    code=$(curl -sSL -o "$page" -w '%{http_code}' "${url%%#*}")
+    case "$url" in
+        *#*) grep -qF "id=\"${url##*#}\"" "$page" || code="$code anchor-missing" ;;
+    esac
+    printf '%s  %s\n' "$code" "$url"
+done
 ```
+
+Anything other than `200` on a line, or an `anchor-missing`, has to be fixed before publishing.
+
+Then publish. `gh release edit` needs an existing release object, so pick the command from what the tag already has:
+
+```bash
+gh release view <tag> >/dev/null 2>&1 \
+    && gh release edit <tag> --notes-file notes.md \
+    || gh release create <tag> --notes-file notes.md --title <tag>
+```
+
+Release bots (release-please, semantic-release) create the release object themselves, so their tags take the `edit` branch, now and for every follow-up change. A tag pushed by hand takes the `create` branch once.
 
 Write the body to a file first, keep it there, and edit that file for follow-up changes. A release page is public: show the draft and confirm before the first publish unless the user already asked for it to go out.
 
