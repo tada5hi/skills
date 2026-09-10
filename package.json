@@ -33,7 +33,7 @@
         "eslint": "^10.5.0",
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.9"
+        "vitest": "^4.1.11"
     },
     "lint-staged": {
         "*.{js,ts,mjs,mts}": "eslint --fix"
