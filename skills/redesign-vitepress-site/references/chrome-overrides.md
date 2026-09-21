@@ -49,7 +49,11 @@ Replace `k-home` with whatever `pageClass` the landing page sets, and `--k-dark-
 
 /* Re-scope the text variables on the bar's OWN items only. Setting them on
  * `.VPNavBar` looks identical at the top of the page and then paints the
- * flyout dropdown's text light-on-white when someone opens it. */
+ * flyout dropdown's text light-on-white when someone opens it.
+ *
+ * Careful: `.VPNavBarMenu` CONTAINS `.VPNavBarMenuGroup` (the flyout root) when
+ * the nav has dropdown entries. See "Literal-value leaks" below — variable
+ * scoping alone does not close that path. */
 .Layout.k-home .VPNavBar.top:not(.screen-open) :is(
     .VPNavBarTitle,
     .VPNavBarMenu,
@@ -90,6 +94,40 @@ Expected behavior, and what to assert in the browser:
 
 The current-page link stays `--vp-c-brand-1` (VitePress's active-link styling). That is correct — just
 check it is legible against the hero.
+
+## Literal-value leaks (the trap behind the trap)
+
+Re-scoping variables on the nav's own items closes the *variable* path. It does not close this one: the
+default theme also sets **concrete, already-resolved** colours on ancestors in some states, and a
+descendant-only reset cannot undo a value that was computed one level up and now inherits down.
+
+The one that bites: `VPFlyout.vue` ships, unlayered,
+
+```css
+.VPFlyout:hover { color: var(--vp-c-brand-1); }
+```
+
+`.VPNavBarMenuGroup` (the flyout root) sits *inside* `.VPNavBarMenu`, so if your rescoping block covers
+`.VPNavBarMenu`, the root resolves your hero accent into a literal colour — and since `VPFlyout` opens on
+`mouseenter`, `:hover` is true the whole time a mouse user has the dropdown open. Result: hero-coloured
+text on the dropdown's own opaque background. Measured on one site: ~2.1:1 contrast in light mode, an
+outright WCAG AA failure, on the landing page's primary nav.
+
+Neutralise it on the ancestor, not inside the menu:
+
+```css
+.Layout.k-home .VPNavBar.top:not(.screen-open) .VPNavBarMenuGroup:hover,
+.Layout.k-home .VPNavBar.top:not(.screen-open) .VPNavBarExtra:hover {
+    color: var(--k-dark-fg);
+}
+```
+
+Then check the other concrete-colour states the same way: `.VPFlyout.active .text`, `.VPNavBarMenuLink.active`.
+
+**Verify it with a real pointer.** `element.click()`, dispatching a synthetic event, or toggling the
+component's open state does **not** engage CSS `:hover`, so a scripted check passes with the bug present.
+Move the actual cursor onto the trigger, leave it there, and only then read `getComputedStyle` on a link
+inside the open dropdown — in both colour modes, on every dropdown the nav has.
 
 ## Site-wide footer
 

@@ -102,10 +102,15 @@ const f = document.querySelector('.k-footer');
 scrollTo(0, document.body.scrollHeight);
 f.contains(document.elementFromPoint(40, f.getBoundingClientRect().bottom - 30));  // must be true
 
-// the flyout trap: the overflow menu's button follows the hero, its dropdown does not
-document.querySelector('.VPNavBarExtra .button').click();
-getComputedStyle(document.querySelector('.VPMenu')).color;  // normal theme text, not hero text
+// the flyout trap: the overflow menu's button follows the hero, its dropdown does not.
+// `.click()` does NOT engage CSS :hover, and VitePress's flyouts open on mouseenter and
+// colour themselves from `.VPFlyout:hover` — so a scripted click passes with the bug present.
+// Move the real cursor onto the trigger, leave it there, then read the open menu:
+getComputedStyle(document.querySelector('.VPMenu .VPLink')).color;  // normal theme text, not hero text
 ```
+
+Any `:hover`-driven behaviour needs a real pointer. This is a general browser-automation pitfall, not a
+VitePress one: synthetic clicks and programmatic open-state toggles never satisfy `:hover`.
 
 Check every page you touched in **both color modes** (`document.querySelector('.VPSwitchAppearance').click()`),
 and check a page with a sidebar, not only the landing page.

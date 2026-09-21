@@ -227,6 +227,7 @@ and the chrome assertions.
 | `node:fs` ends up in the browser bundle | A client component imported a runtime value from a domain barrel that also re-exports server-only code; import from the concrete file |
 | Non-ASCII or `\uXXXX` escapes mangled in a regex or string | Editors silently flatten escape text into characters, and a diff cannot show the difference — verify codepoints (`[...line].filter((c) => c.codePointAt(0) > 127)`), never appearance |
 | `no-undef` on `window` in a `.vue` file | Many shared ESLint configs seed only Node globals; add the browser globals scoped to `**/*.vue` |
+| A component references a static asset that does not exist (`/hero.png`) | Nothing fails: the build passes and the browser shows a broken image or a placeholder fallback forever. Confirm the file is really in `public/` — one site shipped a fake skeleton UI to every visitor this way |
 | A rendered `class` attribute contains a newline and indentation | A long static `class="..."` was wrapped across two source lines to satisfy `max-len`. Hoist it to a module-level constant bound with `:class` instead — and write the snippets in your own plan that way, or every task that copies them reproduces it |
 | A "current items" list flashes or warns about hydration | Time-dependent filtering ran in `setup()`; stamp the reference time in the loader (see Phase 4) |
 | Destructured array element is `T | undefined` | Strict configs set `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple. Tuples like `[string, Person]` are unaffected |
