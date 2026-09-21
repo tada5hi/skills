@@ -105,7 +105,7 @@ export default defineComponent({
 </template>
 ```
 
-Register it as `Layout` in `theme/index.mjs` and delete `themeConfig.footer`. On pages with a sidebar the sidebar is `position: fixed`, so give the footer `position: relative; z-index: var(--vp-z-index-footer)` and let its background run the full width — a footer padded to dodge the sidebar stops short of the left edge and reads as a broken layout.
+Register it as `Layout` in `theme/index.mjs` and delete `themeConfig.footer`. On pages with a sidebar the sidebar is `position: fixed`, so give the footer `position: relative` and a `z-index` above the desktop sidebar but below the mobile drawer, and let its background run the full width — a footer padded to dodge the sidebar stops short of the left edge and reads as a broken layout. Read the actual thresholds out of the installed VitePress (`--vp-z-index-sidebar`, typically 60 with 25 from 960px up); `--vp-z-index-footer` is 10 and is *not* enough.
 
 Note for a Tailwind setup: the wrapper lives in `theme/`, which your `@source` globs usually do not scan. Keep utility classes out of it and inside the footer component.
 

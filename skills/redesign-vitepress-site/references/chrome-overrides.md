@@ -103,13 +103,19 @@ check it is legible against the hero.
 ```css
 .k-footer {
     position: relative;
-    z-index: var(--vp-z-index-footer);   /* 10 — above the desktop sidebar's z-index: 1 */
+    /* Above the desktop sidebar, below the mobile drawer. Check the real values
+     * in the installed VitePress: `--vp-z-index-sidebar` is 60 by default and 25
+     * from 960px up, and `--vp-z-index-footer` (10) is NOT enough. */
+    z-index: 26;
 }
 ```
 
 That is all it takes. The footer's inner content still sits in the normal centered column, so text stays
-aligned with the page while the background reaches both edges. Below 960px the sidebar becomes a drawer at
-`z-index: 25/60`, so an open drawer still correctly covers the footer.
+aligned with the page while the background reaches both edges, and the open mobile drawer still covers it.
+
+> Read the sidebar's z-index out of the installed package rather than trusting a number in any document —
+> including this one. `VPSidebar.vue` also contains a `z-index: 1` inside a `min-width: 960px` block that
+> belongs to `.curtain`, an inner element, and it is easy to attribute to the sidebar itself.
 
 > Padding the footer to clear the sidebar (mirroring `VPContent.has-sidebar`) looks correct in isolation and
 > wrong on the page: the dark band stops short of the left edge and reads as a broken layout. It also needs two

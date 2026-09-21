@@ -96,8 +96,11 @@ const bar = document.querySelector('.VPNavBar');
 getComputedStyle(document.documentElement).getPropertyValue('--vp-c-brand-1').trim()
     === getComputedStyle(document.documentElement).getPropertyValue('--your-primary-600').trim();
 
-// footer band reaches both edges on a docs page (viewport ≥ 1440px)
-document.querySelector('.k-footer').getBoundingClientRect().left === 0;
+// footer band reaches both edges on a docs page — and is actually the thing painted there.
+// Geometry alone passes even when the fixed sidebar covers the footer's left part, so sample the pixel:
+const f = document.querySelector('.k-footer');
+scrollTo(0, document.body.scrollHeight);
+f.contains(document.elementFromPoint(40, f.getBoundingClientRect().bottom - 30));  // must be true
 
 // the flyout trap: the overflow menu's button follows the hero, its dropdown does not
 document.querySelector('.VPNavBarExtra .button').click();
