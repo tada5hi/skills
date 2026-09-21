@@ -193,6 +193,7 @@ Build, typecheck and lint are necessary and not sufficient — every defect this
 | Symptom | Cause |
 |---------|-------|
 | Tailwind utility does nothing | Component root lacks `vp-raw`, or the file is outside the `@source` globs (`components/` is scanned; `theme/` and markdown usually are not) |
+| **No** utilities at all are generated | An `@source` path that matches nothing fails silently — and it is relative to the CSS file, so `../components` and `./components` are both right depending on whether components sit beside or inside the theme directory. After wiring it up, grep the built CSS for a class you used |
 | An override of VitePress's own styles loses | VitePress ships base, doc and component CSS **unlayered**; anything overriding it must also be unlayered, at the end of the entry CSS |
 | Layout breaks in odd places | The Tailwind `container` utility also matches VitePress's own `.container` elements — never use it |
 | `min-[960px]:` behaves inconsistently | Arbitrary min-width variants can be emitted before `md:`, so `md:` wins; use the standard breakpoints, define a named one, or put VitePress-breakpoint rules in plain CSS |

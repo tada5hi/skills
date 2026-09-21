@@ -19,8 +19,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Tailwind only generates classes it can see. List every directory that holds
- * markup — `theme/` and markdown files are deliberately not scanned here. */
-@source "../components";
+ * markup — `theme/` and markdown files are deliberately not scanned here.
+ *
+ * The path is relative to THIS file and a wrong one fails silently: no error,
+ * no utilities, everything unstyled. Themes differ — components sometimes sit
+ * beside the theme directory (`../components`), sometimes inside it
+ * (`./components`). Check where yours are, then confirm the build actually
+ * emitted a utility you use (grep the built CSS for one). */
+@source "{{./components}}";
 
 @theme inline {
     --font-sans: var(--vp-font-family-base);
