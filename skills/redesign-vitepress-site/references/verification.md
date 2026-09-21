@@ -96,9 +96,8 @@ const bar = document.querySelector('.VPNavBar');
 getComputedStyle(document.documentElement).getPropertyValue('--vp-c-brand-1').trim()
     === getComputedStyle(document.documentElement).getPropertyValue('--your-primary-600').trim();
 
-// footer clears the fixed sidebar on a docs page (viewport ≥ 1440px)
-getComputedStyle(document.querySelector('.k-footer')).paddingLeft
-    === getComputedStyle(document.querySelector('.VPContent')).paddingLeft;
+// footer band reaches both edges on a docs page (viewport ≥ 1440px)
+document.querySelector('.k-footer').getBoundingClientRect().left === 0;
 
 // the flyout trap: the overflow menu's button follows the hero, its dropdown does not
 document.querySelector('.VPNavBarExtra .button').click();

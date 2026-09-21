@@ -97,34 +97,26 @@ check it is legible against the hero.
 
 1. Delete `themeConfig.footer` from `config.mjs`.
 2. Wrap the default layout and mount your footer in `layout-bottom` (see SKILL.md).
-3. The sidebar is `position: fixed`, so the footer must mirror `VPContent.has-sidebar`'s padding —
-   both rules, or wide screens hide the footer's left edge behind it:
+3. The sidebar is `position: fixed`, so decide how the footer relates to it. **Let the footer span the
+   full width and paint above the sidebar**, rather than padding it out of the way:
 
 ```css
-@media (min-width: 960px) {
-    .k-footer.has-sidebar {
-        padding-left: var(--vp-sidebar-width);
-    }
-}
-
-@media (min-width: 1440px) {
-    .k-footer.has-sidebar {
-        padding-right: calc((100vw - var(--vp-layout-max-width)) / 2);
-        padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
-    }
+.k-footer {
+    position: relative;
+    z-index: var(--vp-z-index-footer);   /* 10 — above the desktop sidebar's z-index: 1 */
 }
 ```
 
-Toggle the class from `useSidebar()`:
+That is all it takes. The footer's inner content still sits in the normal centered column, so text stays
+aligned with the page while the background reaches both edges. Below 960px the sidebar becomes a drawer at
+`z-index: 25/60`, so an open drawer still correctly covers the footer.
 
-```ts
-import { useSidebar } from 'vitepress/theme';
-
-const { hasSidebar } = useSidebar();
-```
+> Padding the footer to clear the sidebar (mirroring `VPContent.has-sidebar`) looks correct in isolation and
+> wrong on the page: the dark band stops short of the left edge and reads as a broken layout. It also needs two
+> media queries and a `useSidebar()` class binding to do something a z-index does for free. Don't.
 
 Assert afterwards that `.VPFooter` no longer exists anywhere, that your footer renders on a docs page
-with a sidebar, and that at ≥1440px its computed `padding-left` equals `.VPContent`'s.
+with a sidebar, and that on such a page its background reaches `x = 0` at a viewport ≥1440px.
 
 ## Why not `layout: home`
 

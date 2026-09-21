@@ -105,7 +105,7 @@ export default defineComponent({
 </template>
 ```
 
-Register it as `Layout` in `theme/index.mjs` and delete `themeConfig.footer`. On pages with a sidebar the sidebar is `position: fixed`, so mirror `VPContent.has-sidebar`'s left padding on the footer (`useSidebar()` from `vitepress/theme` tells you when) — both the 960px and the 1440px rule, or the footer slides under it on wide screens.
+Register it as `Layout` in `theme/index.mjs` and delete `themeConfig.footer`. On pages with a sidebar the sidebar is `position: fixed`, so give the footer `position: relative; z-index: var(--vp-z-index-footer)` and let its background run the full width — a footer padded to dodge the sidebar stops short of the left edge and reads as a broken layout.
 
 Note for a Tailwind setup: the wrapper lives in `theme/`, which your `@source` globs usually do not scan. Keep utility classes out of it and inside the footer component.
 
@@ -222,7 +222,7 @@ and the chrome assertions.
 | `min-[960px]:` behaves inconsistently | Arbitrary min-width variants can be emitted before `md:`, so `md:` wins; use the standard breakpoints, define a named one, or put VitePress-breakpoint rules in plain CSS |
 | Radii look wrong | A design-system plugin may redefine Tailwind's radius scale (`rounded-xl` = 12px, not 0.75rem); use arbitrary values when the exact radius matters |
 | Flyout/dropdown text unreadable on the transparent nav | Variables were re-scoped on the whole nav bar; scope them to the bar's own items instead |
-| Footer slides under the sidebar | `VPFooter` hides itself on sidebar pages; a custom footer must mirror `VPContent.has-sidebar`'s padding |
+| Footer band stops short of the left edge on docs pages | It was padded to clear the fixed sidebar; give it `z-index: var(--vp-z-index-footer)` and let it run full width instead |
 | A link 404s or a selector matches nothing | `VPLink` normalizes internal links to `.html` when `cleanUrls` is off: `/projects` renders as `/projects.html` |
 | `node:fs` ends up in the browser bundle | A client component imported a runtime value from a domain barrel that also re-exports server-only code; import from the concrete file |
 | Non-ASCII or `\uXXXX` escapes mangled in a regex or string | Editors silently flatten escape text into characters, and a diff cannot show the difference — verify codepoints (`[...line].filter((c) => c.codePointAt(0) > 127)`), never appearance |
