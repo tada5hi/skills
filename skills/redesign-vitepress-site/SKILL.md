@@ -148,6 +148,10 @@ Each section is its own component reading either the page frontmatter (`useData(
 </template>
 ```
 
+Two details that are cheap now and annoying later: mark decorative glyphs in link text (`→`, `↗`) as
+`aria-hidden` so they stay out of the accessible name, and grep before deleting an asset the redesign made
+obsolete rather than trusting your memory of where it was used.
+
 **A motif beats a stock illustration.** Derive one element from something the project already owns — the shape in its logo, its data, its domain — and use it as the hero's signature. A CSS-only motif (bars, grid, glow, gradient text) costs nothing at runtime and never looks like a template. Animate it only if it means something, keep it `aria-hidden`, and disable it under `prefers-reduced-motion`.
 
 ## Phase 4 — content data model
@@ -173,9 +177,28 @@ Keep the mapping (`buildProject`) in a plain module with unit tests, not inside 
 
 Prove the migration changed nothing visible: extract the rendered text from the built HTML before and after, and diff it.
 
+**Anything time-dependent belongs to the build, not to `setup()`.** A section that shows "current" items
+(running projects, upcoming events, recent posts) must not call `new Date()` in a component: `setup()` runs at
+build time to produce the HTML *and* again when a visitor hydrates it, possibly weeks later, and the two answers
+differ the moment an item crosses a boundary — a hydration mismatch and a visible flash. Stamp the reference
+time in the loader and filter against it:
+
+```ts
+transform: (raw) => ({
+    generatedAt: new Date().toISOString(),
+    items: raw.map(...),
+}),
+```
+
+The trade is that a finished item stays listed until the next build. On a statically built site that is the same
+staleness as every other word on the page, and it buys deterministic rendering.
+
 ## Phase 5 — verification
 
 Build, typecheck and lint are necessary and not sufficient — every defect this phase catches is a visual one.
+`references/verification.md` in this skill directory has the copy-paste checks: iframe widths, codepoint
+inspection, rendered-class-attribute scan, hydration console check, before/after diff for content migrations,
+and the chrome assertions.
 
 - **Both color modes, every page you touched.** `document.querySelector('.VPSwitchAppearance').click()` toggles.
 - **The nav in both states:** at `scrollY === 0` (transparent, light text, light logo) and after scrolling (opaque, normal text).
@@ -204,6 +227,10 @@ Build, typecheck and lint are necessary and not sufficient — every defect this
 | `node:fs` ends up in the browser bundle | A client component imported a runtime value from a domain barrel that also re-exports server-only code; import from the concrete file |
 | Non-ASCII or `\uXXXX` escapes mangled in a regex or string | Editors silently flatten escape text into characters, and a diff cannot show the difference — verify codepoints (`[...line].filter((c) => c.codePointAt(0) > 127)`), never appearance |
 | `no-undef` on `window` in a `.vue` file | Many shared ESLint configs seed only Node globals; add the browser globals scoped to `**/*.vue` |
+| A rendered `class` attribute contains a newline and indentation | A long static `class="..."` was wrapped across two source lines to satisfy `max-len`. Hoist it to a module-level constant bound with `:class` instead — and write the snippets in your own plan that way, or every task that copies them reproduces it |
+| A "current items" list flashes or warns about hydration | Time-dependent filtering ran in `setup()`; stamp the reference time in the loader (see Phase 4) |
+| Destructured array element is `T | undefined` | Strict configs set `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple. Tuples like `[string, Person]` are unaffected |
+| Two components drift apart on the same rule | A shared selector (e.g. "active members of a team") was reimplemented inline instead of imported from the domain module that already exports it |
 
 ## Definition of done
 
