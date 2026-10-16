@@ -60,7 +60,7 @@ describe('commands/check with vendors', () => {
         mockExecSafe.mockReturnValue('3')
 
         expect(() => cmdCheck()).not.toThrow()
-        expect(mockExec).toHaveBeenCalledWith('git submodule foreach git fetch')
+        expect(mockExec).toHaveBeenCalledWith('git submodule foreach "git fetch && git remote set-head origin --auto"')
         expect(mockExecSafe).toHaveBeenCalledWith(
             'git rev-list HEAD..origin/HEAD --count',
             expect.stringContaining('test-repo'),

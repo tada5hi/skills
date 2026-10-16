@@ -12,7 +12,8 @@ export function cmdCheck(): void {
     }
 
     try {
-        exec('git submodule foreach git fetch')
+        // fetch does not move origin/HEAD, so refresh it in case upstream changed its default branch
+        exec('git submodule foreach "git fetch && git remote set-head origin --auto"')
     }
     catch (e) {
         warn(`Failed to fetch: ${e}`)
