@@ -65,6 +65,17 @@ The repository is also a Claude Code plugin marketplace. The `skills` plugin bun
 
 The plugin has no pinned version, so every new commit on `master` counts as an update. To pull updates automatically, open `/plugin` → **Marketplaces** → `tada5hi` and turn on auto-update (it is off by default for third-party marketplaces). To update by hand, run `/plugin marketplace update tada5hi`.
 
+### Codex plugin
+
+Codex reads the same marketplace (`.claude-plugin/marketplace.json`):
+
+```bash
+codex plugin marketplace add tada5hi/skills
+codex plugin add skills@tada5hi
+```
+
+Then start a new session. To pull in new skills, run `codex plugin marketplace upgrade tada5hi`.
+
 ## CLI Manager
 
 The project includes a CLI tool (`src/cli.ts`) for managing vendor skills and local development. To get started:

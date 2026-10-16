@@ -37,7 +37,7 @@ skills/
 │   └── unit/                          # Unit tests (mirrors src/ structure)
 ├── vendor/                            # Vendored external repos (git submodules)
 ├── .claude-plugin/
-│   ├── marketplace.json               # Claude Code marketplace (tada5hi) listing the plugin
+│   ├── marketplace.json               # Marketplace (tada5hi) for Claude Code and Codex
 │   └── plugin.json                    # Plugin manifest; skills/ is auto-discovered, no version = every commit updates
 ├── .github/
 │   ├── dependabot.yml                 # Automated dependency updates
