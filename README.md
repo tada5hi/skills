@@ -116,7 +116,7 @@ Then start a new session. To pull in new skills, run `codex plugin marketplace u
 
 ## Skills
 
-Skills marked *vendor* are synced from another repository; the source is linked.
+Skills marked *vendor* are synced from another repository; the source is linked. Skills marked *frozen copy* came from a vendor that has since removed them: they stay as they were and no longer receive updates. *Manual only* skills run when you invoke them (for example `/grill-me`), never on their own.
 
 ### Documentation and writing
 
@@ -133,11 +133,12 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 
 | Skill | Use it to |
 |---|---|
-| [write-a-prd](skills/write-a-prd/) | Write a PRD through an interview and codebase exploration, filed as a GitHub issue (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [prd-to-plan](skills/prd-to-plan/) | Turn a PRD into a multi-phase plan in `./plans/` (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [prd-to-issues](skills/prd-to-issues/) | Break a PRD into independently grabbable GitHub issues (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [request-refactor-plan](skills/request-refactor-plan/) | Plan a refactor as tiny commits and file it as an issue (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [grill-me](skills/grill-me/) | Get interviewed about a plan until every branch of the decision tree is resolved (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [write-a-prd](skills/write-a-prd/) | Write a PRD through an interview and codebase exploration, filed as a GitHub issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [prd-to-plan](skills/prd-to-plan/) | Turn a PRD into a multi-phase plan in `./plans/` (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [prd-to-issues](skills/prd-to-issues/) | Break a PRD into independently grabbable GitHub issues (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [request-refactor-plan](skills/request-refactor-plan/) | Plan a refactor as tiny commits and file it as an issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [grilling](skills/grilling/) | Get interviewed about a plan until every branch of the decision tree is resolved (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [grill-me](skills/grill-me/) | Start a `grilling` session on demand (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [plan-status](skills/plan-status/) | Report progress on a plan file against the current codebase |
 
 ### Development workflow
@@ -145,7 +146,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | Skill | Use it to |
 |---|---|
 | [tdd](skills/tdd/) | Build features or fix bugs with red-green-refactor loops (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [triage-issue](skills/triage-issue/) | Find a bug's root cause and file an issue with a TDD fix plan (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [triage-issue](skills/triage-issue/) | Find a bug's root cause and file an issue with a TDD fix plan (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Check each PR review comment against the code and fix the real issues |
 | [ponytail](skills/ponytail/) | Force the smallest solution that works: YAGNI, standard library first (*vendor*, [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)) |
 
@@ -155,7 +156,8 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 |---|---|
 | [audit-type-boundaries](skills/audit-type-boundaries/) | Find `as` casts and utility calls that hide property name mismatches in TypeScript |
 | [impact-analysis](skills/impact-analysis/) | Trace every consumer of a type, function or constant across a TypeScript monorepo |
-| [improve-codebase-architecture](skills/improve-codebase-architecture/) | Find shallow modules worth deepening to make a codebase easier to test (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [improve-codebase-architecture](skills/improve-codebase-architecture/) | Find deepening opportunities, present them as an HTML report, then grill through the one you pick (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [codebase-design](skills/codebase-design/) | Shared vocabulary for deep modules, seams and interfaces, used by `tdd` and `improve-codebase-architecture` (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 
 ### Projects, APIs and packages
 

@@ -23,6 +23,10 @@ export interface VendorSkillMeta {
 /**
  * Hand-maintained skills authored in this repository.
  * Each entry must match a directory under `skills/`.
+ *
+ * prd-to-issues, prd-to-plan, request-refactor-plan, triage-issue and write-a-prd are
+ * frozen copies of mattpocock/skills@fb3629d (MIT, see their LICENSE.md). Upstream removed
+ * them; its successors need an issue tracker set up through /setup-matt-pocock-skills.
  */
 export const manual: string[] = [
     'audit-type-boundaries',
@@ -33,11 +37,16 @@ export const manual: string[] = [
     'investigate-pr-comments',
     'link-skills',
     'plan-status',
+    'prd-to-issues',
+    'prd-to-plan',
     'query-api',
     'query-package-list',
     'redesign-vitepress-site',
     'refresh-package-list',
+    'request-refactor-plan',
+    'triage-issue',
     'update-agent-docs',
+    'write-a-prd',
     'write-readme',
     'write-release-notes',
 ]
@@ -49,16 +58,14 @@ export const manual: string[] = [
 export const vendors: Record<string, VendorSkillMeta> = {
     'mattpocock-skills': {
         source: 'https://github.com/mattpocock/skills',
-        skillsPath: '.',
         skills: {
-            'tdd': 'tdd',
-            'triage-issue': 'triage-issue',
-            'write-a-prd': 'write-a-prd',
-            'prd-to-plan': 'prd-to-plan',
-            'prd-to-issues': 'prd-to-issues',
-            'grill-me': 'grill-me',
-            'improve-codebase-architecture': 'improve-codebase-architecture',
-            'request-refactor-plan': 'request-refactor-plan',
+            'engineering/tdd': 'tdd',
+            'engineering/improve-codebase-architecture': 'improve-codebase-architecture',
+            // shared vocabulary that tdd and improve-codebase-architecture invoke
+            'engineering/codebase-design': 'codebase-design',
+            'productivity/grill-me': 'grill-me',
+            // grill-me delegates to grilling
+            'productivity/grilling': 'grilling',
         },
     },
     'dietrichgebert-ponytail': {
