@@ -22,6 +22,8 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
 | [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
+| [query-package-list](skills/query-package-list/) | Manual | Look up your own published packages in an awesome-style list before writing a utility |
+| [refresh-package-list](skills/refresh-package-list/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
 | [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
 | [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
