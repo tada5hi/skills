@@ -34,8 +34,11 @@ export const manual: string[] = [
     'link-skills',
     'plan-status',
     'query-api',
+    'query-package-list',
     'redesign-vitepress-site',
+    'refresh-package-list',
     'update-agent-docs',
+    'write-readme',
     'write-release-notes',
 ]
 

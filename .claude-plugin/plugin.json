@@ -1,0 +1,11 @@
+{
+    "name": "skills",
+    "description": "tada5hi's curated collection of agent skills.",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "repository": "https://github.com/tada5hi/skills",
+    "license": "Apache-2.0"
+}

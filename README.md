@@ -22,7 +22,10 @@ A collection of [Agent Skills](https://agentskills.io) for AI coding agents.
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
 | [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
+| [query-package-list](skills/query-package-list/) | Manual | Look up your own published packages in an awesome-style list before writing a utility |
+| [refresh-package-list](skills/refresh-package-list/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via pull request |
+| [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
 | [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
 | [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
@@ -53,6 +56,28 @@ npx skills add tada5hi/skills --skill='*' -g
 ```
 
 Learn more about the CLI usage at [vercel-labs/skills](https://github.com/vercel-labs/skills).
+
+### Claude Code plugin
+
+The repository is also a Claude Code plugin marketplace. The `skills` plugin bundles every skill:
+
+```bash
+/plugin marketplace add tada5hi/skills
+/plugin install skills@tada5hi
+```
+
+The plugin has no pinned version, so every new commit on `master` counts as an update. To pull updates automatically, open `/plugin` → **Marketplaces** → `tada5hi` and turn on auto-update (it is off by default for third-party marketplaces). To update by hand, run `/plugin marketplace update tada5hi`.
+
+### Codex plugin
+
+Codex reads the same marketplace (`.claude-plugin/marketplace.json`):
+
+```bash
+codex plugin marketplace add tada5hi/skills
+codex plugin add skills@tada5hi
+```
+
+Then start a new session. To pull in new skills, run `codex plugin marketplace upgrade tada5hi`.
 
 ## CLI Manager
 
