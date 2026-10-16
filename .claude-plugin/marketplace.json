@@ -1,0 +1,15 @@
+{
+    "name": "tada5hi",
+    "description": "tada5hi's curated collection of agent skills.",
+    "owner": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net"
+    },
+    "plugins": [
+        {
+            "name": "skills",
+            "source": "./",
+            "description": "tada5hi's curated collection of agent skills."
+        }
+    ]
+}

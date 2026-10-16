@@ -36,6 +36,9 @@ skills/
 │   ├── vitest.config.ts               # Vitest configuration
 │   └── unit/                          # Unit tests (mirrors src/ structure)
 ├── vendor/                            # Vendored external repos (git submodules)
+├── .claude-plugin/
+│   ├── marketplace.json               # Claude Code marketplace (tada5hi) listing the plugin
+│   └── plugin.json                    # Plugin manifest; skills/ is auto-discovered, no version = every commit updates
 ├── .github/
 │   ├── dependabot.yml                 # Automated dependency updates
 │   └── workflows/ci.yml              # CI pipeline (lint, test, validate)

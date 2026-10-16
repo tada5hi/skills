@@ -54,6 +54,17 @@ npx skills add tada5hi/skills --skill='*' -g
 
 Learn more about the CLI usage at [vercel-labs/skills](https://github.com/vercel-labs/skills).
 
+### Claude Code plugin
+
+The repository is also a Claude Code plugin marketplace. The `skills` plugin bundles every skill:
+
+```bash
+/plugin marketplace add tada5hi/skills
+/plugin install skills@tada5hi
+```
+
+The plugin has no pinned version, so every new commit on `master` counts as an update. To pull updates automatically, open `/plugin` → **Marketplaces** → `tada5hi` and turn on auto-update (it is off by default for third-party marketplaces). To update by hand, run `/plugin marketplace update tada5hi`.
+
 ## CLI Manager
 
 The project includes a CLI tool (`src/cli.ts`) for managing vendor skills and local development. To get started:
