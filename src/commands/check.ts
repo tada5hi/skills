@@ -20,17 +20,32 @@ export function cmdCheck(): void {
     }
 
     let anyUpdates = false
+    let anyUnchecked = false
     for (const [name, config] of Object.entries(vendors)) {
         const path = join(root, 'vendor', name)
-        if (!existsSync(path)) continue
-        const behind = execSafe('git rev-list HEAD..@{u} --count', path)
-        const count = behind ? Number.parseInt(behind, 10) : 0
+        const skillNames = Object.values(config.skills).join(', ')
+
+        // `git submodule foreach` skips uninitialized submodules, leaving an empty directory
+        if (!existsSync(join(path, '.git'))) {
+            warn(`${name} (${skillNames}): submodule not initialized. Run init first.`)
+            anyUnchecked = true
+            continue
+        }
+
+        // origin/HEAD, not @{u}: submodules are usually on a detached HEAD
+        const behind = execSafe('git rev-list HEAD..origin/HEAD --count', path)
+        if (behind === null) {
+            warn(`${name} (${skillNames}): could not compare with upstream`)
+            anyUnchecked = true
+            continue
+        }
+
+        const count = Number.parseInt(behind, 10)
         if (count > 0) {
-            const skillNames = Object.values(config.skills).join(', ')
             info(`${name} (${skillNames}): ${count} commit(s) behind`)
             anyUpdates = true
         }
     }
 
-    if (!anyUpdates) success('All vendor skills are up to date.')
+    if (!anyUpdates && !anyUnchecked) success('All vendor skills are up to date.')
 }

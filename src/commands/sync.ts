@@ -6,7 +6,7 @@ import {
     rmSync,
     writeFileSync,
 } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { vendors } from '../meta.ts'
 import { exec, getGitSha, info, log, root, success, warn } from '../utils.ts'
 
@@ -46,7 +46,7 @@ export function cmdSync(): void {
             const outputPath = join(root, 'skills', outputSkillName)
 
             if (!existsSync(sourceSkillPath)) {
-                warn(`Skill not found: vendor/${vendorName}/skills/${sourceSkillName}`)
+                warn(`Skill not found: ${relative(root, sourceSkillPath)}`)
                 continue
             }
 
@@ -80,7 +80,7 @@ export function cmdSync(): void {
             const date = new Date().toISOString().split('T')[0]
             writeFileSync(
                 join(outputPath, 'SYNC.md'),
-                `# Sync Info\n\n- **Source:** \`vendor/${vendorName}/skills/${sourceSkillName}\`\n- **Git SHA:** \`${sha}\`\n- **Synced:** ${date}\n`,
+                `# Sync Info\n\n- **Source:** \`${relative(root, sourceSkillPath)}\`\n- **Git SHA:** \`${sha}\`\n- **Synced:** ${date}\n`,
             )
 
             success(`Synced: ${sourceSkillName} → ${outputSkillName}`)
