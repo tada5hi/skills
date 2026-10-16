@@ -23,7 +23,8 @@
         "skills:check": "tsx src/cli.ts check",
         "skills:cleanup": "tsx src/cli.ts cleanup",
         "skills:link": "tsx src/cli.ts link",
-        "test": "vitest run --config test/vitest.config.ts"
+        "test": "vitest run --config test/vitest.config.ts",
+        "prepare": "simple-git-hooks"
     },
     "devDependencies": {
         "@tada5hi/tsconfig": "^0.7.2",
@@ -31,11 +32,16 @@
         "@typescript-eslint/eslint-plugin": "^8.61.1",
         "@typescript-eslint/parser": "^8.61.0",
         "eslint": "^10.5.0",
+        "lint-staged": "^17.6.0",
+        "simple-git-hooks": "^2.14.0",
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "vitest": "^4.1.11"
     },
     "lint-staged": {
         "*.{js,ts,mjs,mts}": "eslint --fix"
+    },
+    "simple-git-hooks": {
+        "pre-commit": "npx lint-staged"
     }
 }
