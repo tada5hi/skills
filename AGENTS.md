@@ -50,15 +50,17 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
 | [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
-| [grill-me](skills/grill-me/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
-| [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Explore a codebase for architectural improvement opportunities |
+| [codebase-design](skills/codebase-design/) | Vendor | Shared deep-module vocabulary used by tdd and improve-codebase-architecture |
+| [grill-me](skills/grill-me/) | Vendor | Manual-only shortcut that starts a grilling session |
+| [grilling](skills/grilling/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
+| [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Find deepening opportunities and report them as HTML (manual only) |
 | [ponytail](skills/ponytail/) | Vendor | Force the laziest solution that actually works — YAGNI, stdlib-first, minimal code |
-| [prd-to-issues](skills/prd-to-issues/) | Vendor | Break PRDs into independently-grabbable GitHub issues |
-| [prd-to-plan](skills/prd-to-plan/) | Vendor | Convert PRDs into multi-phase implementation plans |
-| [request-refactor-plan](skills/request-refactor-plan/) | Vendor | Create detailed refactor plans with tiny commits via user interview |
+| [prd-to-issues](skills/prd-to-issues/) | Manual (frozen) | Break PRDs into independently-grabbable GitHub issues |
+| [prd-to-plan](skills/prd-to-plan/) | Manual (frozen) | Convert PRDs into multi-phase implementation plans |
+| [request-refactor-plan](skills/request-refactor-plan/) | Manual (frozen) | Create detailed refactor plans with tiny commits via user interview |
 | [tdd](skills/tdd/) | Vendor | Test-driven development with red-green-refactor loops |
-| [triage-issue](skills/triage-issue/) | Vendor | Investigate bugs, identify root causes, and file issues with fix plans |
-| [write-a-prd](skills/write-a-prd/) | Vendor | Create a PRD through interactive interview and codebase exploration |
+| [triage-issue](skills/triage-issue/) | Manual (frozen) | Investigate bugs, identify root causes, and file issues with fix plans |
+| [write-a-prd](skills/write-a-prd/) | Manual (frozen) | Create a PRD through interactive interview and codebase exploration |
 
 ## Detailed Guides
 

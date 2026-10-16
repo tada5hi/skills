@@ -60,9 +60,9 @@ describe('commands/check with vendors', () => {
         mockExecSafe.mockReturnValue('3')
 
         expect(() => cmdCheck()).not.toThrow()
-        expect(mockExec).toHaveBeenCalledWith('git submodule foreach git fetch')
+        expect(mockExec).toHaveBeenCalledWith('git submodule foreach "git fetch && git remote set-head origin --auto"')
         expect(mockExecSafe).toHaveBeenCalledWith(
-            'git rev-list HEAD..@{u} --count',
+            'git rev-list HEAD..origin/HEAD --count',
             expect.stringContaining('test-repo'),
         )
     })
@@ -75,12 +75,16 @@ describe('commands/check with vendors', () => {
         expect(() => cmdCheck()).not.toThrow()
     })
 
-    it('should skip vendor when path does not exist', () => {
+    it('should warn instead of comparing when the submodule is not initialized', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
         mockExec.mockReturnValue('')
         mockExistsSync.mockReturnValue(false)
 
         expect(() => cmdCheck()).not.toThrow()
+        expect(mockExistsSync).toHaveBeenCalledWith(expect.stringMatching(/test-repo[\\/]\.git$/))
         expect(mockExecSafe).not.toHaveBeenCalled()
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('not initialized'))
+        warnSpy.mockRestore()
     })
 
     it('should warn and return early when fetch fails', () => {
@@ -90,11 +94,17 @@ describe('commands/check with vendors', () => {
         expect(mockExecSafe).not.toHaveBeenCalled()
     })
 
-    it('should handle null from execSafe as 0 behind', () => {
+    it('should warn instead of reporting up to date when the comparison fails', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
         mockExec.mockReturnValue('')
         mockExistsSync.mockReturnValue(true)
         mockExecSafe.mockReturnValue(null)
 
         expect(() => cmdCheck()).not.toThrow()
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('could not compare'))
+        expect(logSpy).not.toHaveBeenCalledWith(expect.stringContaining('up to date'))
+        warnSpy.mockRestore()
+        logSpy.mockRestore()
     })
 })
