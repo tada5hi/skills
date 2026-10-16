@@ -1,118 +1,110 @@
 <svg width="960" height="380" viewBox="0 0 960 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ska-title ska-desc">
-    <title id="ska-title">How skills get from this repository into your agent</title>
-    <desc id="ska-desc">Skills come from two sources: manual skills written in this repository, and vendor skills copied from git submodules by npm run skills:sync. Both land in skills/, one directory per skill, and every one is declared in src/meta.ts. From there you install them through the skills CLI, the Claude Code plugin or the Codex plugin.</desc>
+    <title id="ska-title">How an agent picks and loads a skill</title>
+    <desc id="ska-desc">The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example "write a commit message for my changes" matching generate-commit-message, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them.</desc>
 
     <style>
         :root {
             --fg: #1F2328;
             --muted: #59636E;
-            --panel: #F6F8FA;
-            --panel-edge: #D1D9E0;
+            --panel: #F6F9F5;
+            --panel-edge: #D6E0D3;
             --card: #FFFFFF;
-            --rail: #8C959F;
+            --rail: #93A08F;
+            --skel: #E1E8DE;
         }
         @media (prefers-color-scheme: dark) {
             :root {
                 --fg: #F0F6FC;
-                --muted: #9198A1;
-                --panel: #151B23;
-                --panel-edge: #3D444D;
-                --card: #0D1117;
-                --rail: #656C76;
+                --muted: #94A096;
+                --panel: #141A15;
+                --panel-edge: #36433A;
+                --card: #0C110D;
+                --rail: #6B7A6E;
+                --skel: #2E3A31;
             }
         }
         text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: var(--fg); }
         .muted { fill: var(--muted); }
         .code { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; }
         .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--muted); }
-        .title { font-size: 15px; font-weight: 600; }
         .panel { fill: var(--panel); stroke: var(--panel-edge); }
-        .card { fill: var(--card); }
+        .card { fill: var(--card); stroke: var(--panel-edge); }
         .rail { stroke: var(--rail); }
         .chip { fill: var(--card); stroke: var(--panel-edge); }
+        .skel { fill: var(--skel); }
     </style>
 
     <defs>
         <marker id="ska-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0 0 L10 5 L0 10 Z" fill="#8C959F"/>
+            <path d="M0 0 L10 5 L0 10 Z" fill="#93A08F"/>
         </marker>
     </defs>
 
-    <!-- sources -->
-    <rect class="panel" x="16" y="16" width="280" height="284" rx="18"/>
-    <text class="label" x="36" y="44">sources</text>
+    <!-- 1: the request -->
+    <rect class="panel" x="16" y="16" width="240" height="284" rx="18"/>
+    <text class="label" x="36" y="44">your request</text>
+    <path d="M48 98 H224 Q236 98 236 110 V166 Q236 178 224 178 H76 L60 194 V178 H48 Q36 178 36 166 V110 Q36 98 48 98 Z" fill="#64748B" fill-opacity="0.08" stroke="#64748B" stroke-width="1.5"/>
+    <text x="52" y="132" font-size="14">write a commit message</text>
+    <text x="52" y="154" font-size="14">for my changes</text>
+    <text class="muted" x="36" y="236" font-size="12">compared with every</text>
+    <text class="muted" x="36" y="254" font-size="12">skill's description</text>
 
-    <rect class="card" x="36" y="64" width="240" height="96" rx="12" stroke="#8B5CF6" stroke-width="1.5"/>
-    <text class="title" x="54" y="92">Manual skills</text>
-    <text class="code muted" x="54" y="116" font-size="12">skills/&lt;name&gt;/SKILL.md</text>
-    <text class="muted" x="54" y="140" font-size="12">written in this repository</text>
+    <!-- 2: frontmatter of every skill, always loaded -->
+    <rect class="panel" x="296" y="16" width="320" height="284" rx="18"/>
+    <text class="label" x="316" y="44">always loaded: frontmatter</text>
 
-    <rect class="card" x="36" y="184" width="240" height="96" rx="12" stroke="#0EA5E9" stroke-width="1.5"/>
-    <text class="title" x="54" y="212">Vendor skills</text>
-    <text class="code muted" x="54" y="236" font-size="12">vendor/&lt;repo&gt; submodules</text>
-    <text class="muted" x="54" y="260" font-size="12">copied by npm run skills:sync</text>
+    <rect class="card" x="316" y="60" width="280" height="36" rx="10"/>
+    <text class="code muted" x="332" y="83" font-size="12">name: write-readme</text>
 
-    <!-- registry -->
-    <rect class="panel" x="336" y="16" width="280" height="284" rx="18"/>
-    <text class="label" x="356" y="44">registry</text>
+    <rect x="316" y="106" width="280" height="64" rx="10" fill="#16A34A" fill-opacity="0.1" stroke="#16A34A" stroke-width="1.5"/>
+    <text class="code" x="332" y="131" font-size="12">name: generate-commit-message</text>
+    <text class="code muted" x="332" y="153" font-size="11">description: Generate a Conventional…</text>
 
-    <rect class="card" x="356" y="64" width="240" height="80" rx="12" stroke="#6366F1" stroke-width="1.5"/>
-    <text class="title" x="374" y="92">src/meta.ts</text>
-    <text class="code muted" x="374" y="116" font-size="12">manual[] · vendors{}</text>
-    <text class="muted" x="374" y="134" font-size="12">every skill declared once</text>
+    <rect class="card" x="316" y="180" width="280" height="36" rx="10"/>
+    <text class="code muted" x="332" y="203" font-size="12">name: tdd</text>
 
-    <rect class="card" x="356" y="184" width="240" height="96" rx="12" stroke="#6366F1" stroke-width="1.5"/>
-    <text class="title" x="374" y="212">skills/</text>
-    <text class="code muted" x="374" y="236" font-size="12">one directory per skill</text>
-    <text class="muted" x="374" y="260" font-size="12">checked against meta.ts in CI</text>
+    <rect class="card" x="316" y="226" width="280" height="36" rx="10"/>
+    <text class="code muted" x="332" y="249" font-size="12">name: plan-status</text>
 
-    <path class="rail" d="M476 144 V180" stroke-width="2" marker-end="url(#ska-head)"/>
+    <text class="muted" x="316" y="284" font-size="12">one entry per installed skill</text>
 
-    <!-- sources into skills/ -->
-    <path class="rail" d="M276 112 C316 112 316 214 352 214" stroke-width="2" marker-end="url(#ska-head)"/>
-    <path class="rail" d="M276 232 H352" stroke-width="2" marker-end="url(#ska-head)"/>
-
-    <!-- install channels -->
+    <!-- 3: the matched skill, loaded in full -->
     <rect class="panel" x="656" y="16" width="288" height="284" rx="18"/>
-    <text class="label" x="676" y="44">install with</text>
+    <text class="label" x="676" y="44">loaded on match</text>
 
-    <rect class="card" x="676" y="60" width="248" height="68" rx="12" stroke="#14B8A6" stroke-width="1.5"/>
-    <text class="title" x="692" y="86">skills CLI</text>
-    <text class="code muted" x="692" y="110" font-size="11">npx skills add tada5hi/skills</text>
+    <rect class="card" x="676" y="60" width="248" height="224" rx="12" stroke="#16A34A" stroke-width="1.5"/>
+    <rect x="676" y="60" width="248" height="34" rx="12" fill="#16A34A" fill-opacity="0.12"/>
+    <text class="code" x="692" y="82" font-size="12">SKILL.md</text>
+    <text class="code" x="692" y="118" font-size="12"># generate-commit-message</text>
+    <rect class="skel" x="692" y="132" width="200" height="7" rx="3.5"/>
+    <rect class="skel" x="692" y="146" width="170" height="7" rx="3.5"/>
+    <rect class="skel" x="692" y="160" width="186" height="7" rx="3.5"/>
+    <rect class="chip" x="692" y="190" width="100" height="24" rx="12"/>
+    <text class="code" x="742" y="206" font-size="11" text-anchor="middle">references/</text>
+    <rect class="chip" x="802" y="190" width="80" height="24" rx="12"/>
+    <text class="code" x="842" y="206" font-size="11" text-anchor="middle">scripts/</text>
+    <text class="muted" x="692" y="240" font-size="12">read only when a step</text>
+    <text class="muted" x="692" y="258" font-size="12">of the skill needs them</text>
 
-    <rect class="card" x="676" y="140" width="248" height="68" rx="12" stroke="#14B8A6" stroke-width="1.5"/>
-    <text class="title" x="692" y="166">Claude Code plugin</text>
-    <text class="code muted" x="692" y="190" font-size="11">/plugin install skills@tada5hi</text>
+    <!-- arrows -->
+    <path class="rail" d="M236 138 H312" stroke-width="2" marker-end="url(#ska-head)"/>
+    <path class="rail" d="M596 138 H672" stroke-width="2" marker-end="url(#ska-head)"/>
 
-    <rect class="card" x="676" y="220" width="248" height="68" rx="12" stroke="#14B8A6" stroke-width="1.5"/>
-    <text class="title" x="692" y="246">Codex plugin</text>
-    <text class="code muted" x="692" y="270" font-size="11">codex plugin add skills@tada5hi</text>
-
-    <path class="rail" d="M596 232 C636 232 636 94 672 94" stroke-width="2" marker-end="url(#ska-head)"/>
-    <path class="rail" d="M596 232 C636 232 636 174 672 174" stroke-width="2" marker-end="url(#ska-head)"/>
-    <path class="rail" d="M596 232 C636 232 636 254 672 254" stroke-width="2" marker-end="url(#ska-head)"/>
-
-    <!-- a skill travelling from the repository to each channel: one pass -->
-    <g>
-        <circle r="9" fill="#14B8A6" fill-opacity="0.25"/>
-        <circle r="4.5" fill="#14B8A6"/>
-        <animateMotion dur="2.6s" repeatCount="1" fill="freeze" path="M596 232 C636 232 636 94 676 94"/>
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="2.6s" repeatCount="1" fill="freeze"/>
+    <!-- the request finds its skill, then the skill is loaded: one pass -->
+    <g opacity="0">
+        <circle r="9" fill="#64748B" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#64748B"/>
+        <animateMotion dur="1.2s" repeatCount="1" fill="freeze" path="M236 138 H316"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="1.2s" repeatCount="1" fill="freeze"/>
     </g>
-    <g>
-        <circle r="9" fill="#14B8A6" fill-opacity="0.25"/>
-        <circle r="4.5" fill="#14B8A6"/>
-        <animateMotion dur="2.6s" begin="-0.6s" repeatCount="1" fill="freeze" path="M596 232 C636 232 636 174 676 174"/>
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="2.6s" begin="-0.6s" repeatCount="1" fill="freeze"/>
-    </g>
-    <g>
-        <circle r="9" fill="#14B8A6" fill-opacity="0.25"/>
-        <circle r="4.5" fill="#14B8A6"/>
-        <animateMotion dur="2.6s" begin="-1.2s" repeatCount="1" fill="freeze" path="M596 232 C636 232 636 254 676 254"/>
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="2.6s" begin="-1.2s" repeatCount="1" fill="freeze"/>
+    <g opacity="0">
+        <circle r="9" fill="#16A34A" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#16A34A"/>
+        <animateMotion dur="1.2s" begin="1.2s" repeatCount="1" fill="freeze" path="M596 138 H676"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="1.2s" begin="1.2s" repeatCount="1" fill="freeze"/>
     </g>
 
     <!-- caveat -->
     <rect class="panel" x="16" y="320" width="928" height="44" rx="14" stroke-dasharray="5 5"/>
-    <text class="muted" x="36" y="347" font-size="13">skills:sync replaces each vendor skill directory: change a vendor skill upstream, not in skills/.</text>
+    <text class="muted" x="36" y="347" font-size="13">Installing every skill is cheap: only names and descriptions stay in context until a request matches one.</text>
 </svg>

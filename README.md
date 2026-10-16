@@ -62,7 +62,7 @@ codex plugin add skills@tada5hi
 Then ask for the task, for example "write a commit message for my changes", and the agent picks up `generate-commit-message`.
 
 <p align="center">
-    <img src="./.github/assets/architecture.svg" alt="Skills come from two sources: manual skills written in this repository, and vendor skills copied from git submodules by npm run skills:sync. Both land in skills/, one directory per skill, and every one is declared in src/meta.ts. From there you install them through the skills CLI, the Claude Code plugin or the Codex plugin." width="100%" />
+    <img src="./.github/assets/architecture.svg" alt="The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example &quot;write a commit message for my changes&quot; matching generate-commit-message, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them." width="100%" />
 </p>
 
 **Table of Contents**
