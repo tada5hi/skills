@@ -118,10 +118,12 @@ and check a page with a sidebar, not only the landing page.
 ## Utilities were generated at all
 
 A wrong `@source` path produces no error and no utilities. After wiring Tailwind up, grep the built CSS for a
-class you actually used:
+utility that only a scanned component uses — not a shared class like `.k-section`, which the token file defines
+itself and which is emitted even when `@source` matches nothing:
 
 ```bash
-grep -l "k-section" src/.vitepress/dist/assets/*.css
+# e.g. an arbitrary value or a utility no other file uses
+grep -l "{{utility-only-used-in-a-component}}" src/.vitepress/dist/assets/*.css
 ```
 
 ## Deleting assets

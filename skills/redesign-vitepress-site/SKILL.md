@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: VitePress 1.x with the default theme. Tailwind v4 optional — the skill covers both the Tailwind and the plain-CSS-variable route. Browser automation is needed for the verification phase.
 metadata:
   author: tada5hi
-  version: "2026.09.21"
+  version: "2026.10.16"
 allowed-tools: Bash(npm:*) Bash(git:*) Bash(node:*) Bash(grep:*) Read Write Edit Glob Grep
 ---
 
@@ -46,6 +46,7 @@ Keep each landing section a separate component with one responsibility, and make
 
 ```js
 // config.mjs
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, postcssIsolateStyles } from 'vitepress';
 
 export default defineConfig({
@@ -66,7 +67,7 @@ Every component root you render into page content then carries `vp-raw`. Without
 
 **Tokens and shared classes:** copy `templates/design-tokens.css` from this skill directory and fill in the palette. It contains the three things that are easy to get wrong: the bridge from VitePress's brand variables to your own scale, the fixed-dark surface tokens (a hero and footer that stay dark in both color modes), and the shared layout classes the sections use.
 
-**Without Tailwind:** the same file works as plain CSS — keep the `:root` variables and the shared classes, drop the `@layer`/`@apply` wrappers, and write the section styles as ordinary rules.
+**Without Tailwind:** the same file converts to plain CSS — keep the `:root` variables and the shared classes; delete the `@import "tailwindcss"`, `@custom-variant`, `@source` and `@theme` rules; flatten the `@layer` blocks; replace every `@apply` with the longhand declarations it stands for, turning `sm:`/`md:`/`lg:` variants into `min-width` media queries and `hover:` into `:hover` rules. Then write the section styles as ordinary rules.
 
 ## Phase 2 — chrome
 
@@ -222,7 +223,7 @@ and the chrome assertions.
 | `min-[960px]:` behaves inconsistently | Arbitrary min-width variants can be emitted before `md:`, so `md:` wins; use the standard breakpoints, define a named one, or put VitePress-breakpoint rules in plain CSS |
 | Radii look wrong | A design-system plugin may redefine Tailwind's radius scale (`rounded-xl` = 12px, not 0.75rem); use arbitrary values when the exact radius matters |
 | Flyout/dropdown text unreadable on the transparent nav | Variables were re-scoped on the whole nav bar; scope them to the bar's own items instead |
-| Footer band stops short of the left edge on docs pages | It was padded to clear the fixed sidebar; give it `z-index: var(--vp-z-index-footer)` and let it run full width instead |
+| Footer band stops short of the left edge on docs pages | It was padded to clear the fixed sidebar; give it `position: relative` and a `z-index` above the desktop sidebar but below the mobile drawer (see Phase 2 — `--vp-z-index-footer` is too low), and let it run full width instead |
 | A link 404s or a selector matches nothing | `VPLink` normalizes internal links to `.html` when `cleanUrls` is off: `/projects` renders as `/projects.html` |
 | `node:fs` ends up in the browser bundle | A client component imported a runtime value from a domain barrel that also re-exports server-only code; import from the concrete file |
 | Non-ASCII or `\uXXXX` escapes mangled in a regex or string | Editors silently flatten escape text into characters, and a diff cannot show the difference — verify codepoints (`[...line].filter((c) => c.codePointAt(0) > 127)`), never appearance |
@@ -230,7 +231,7 @@ and the chrome assertions.
 | A component references a static asset that does not exist (`/hero.png`) | Nothing fails: the build passes and the browser shows a broken image or a placeholder fallback forever. Confirm the file is really in `public/` — one site shipped a fake skeleton UI to every visitor this way |
 | A rendered `class` attribute contains a newline and indentation | A long static `class="..."` was wrapped across two source lines to satisfy `max-len`. Hoist it to a module-level constant bound with `:class` instead — and write the snippets in your own plan that way, or every task that copies them reproduces it |
 | A "current items" list flashes or warns about hydration | Time-dependent filtering ran in `setup()`; stamp the reference time in the loader (see Phase 4) |
-| Destructured array element is `T | undefined` | Strict configs set `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple. Tuples like `[string, Person]` are unaffected |
+| Destructured array element is `T \| undefined` | Strict configs set `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple. Tuples like `[string, Person]` are unaffected |
 | Two components drift apart on the same rule | A shared selector (e.g. "active members of a team") was reimplemented inline instead of imported from the domain module that already exports it |
 
 ## Definition of done

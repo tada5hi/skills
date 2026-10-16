@@ -2,8 +2,9 @@
  * Design tokens and shared layout classes for a VitePress redesign.
  *
  * Tailwind v4 version. Without Tailwind: keep the `:root` blocks and the class
- * definitions, drop the `@layer`/`@apply`/`@theme` wrappers, and write the
- * declarations out longhand.
+ * definitions, delete the `@import`/`@custom-variant`/`@source`/`@theme` rules,
+ * flatten the `@layer` blocks, and write every `@apply` out longhand —
+ * `sm:`/`md:`/`lg:` as min-width media queries, `hover:` as `:hover`.
  *
  * Replace every {{placeholder}}.
  */
