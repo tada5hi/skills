@@ -30,6 +30,7 @@ export interface VendorSkillMeta {
  */
 export const manual: string[] = [
     'audit-type-boundaries',
+    'create-pull-request',
     'generate-commit-message',
     'impact-analysis',
     'init-agent-docs',

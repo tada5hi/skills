@@ -147,6 +147,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 |---|---|
 | [tdd](skills/tdd/) | Build features or fix bugs with red-green-refactor loops (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [triage-issue](skills/triage-issue/) | Find a bug's root cause and file an issue with a TDD fix plan (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [create-pull-request](skills/create-pull-request/) | Open a pull request from the current branch with a Conventional Commits title and an evidence-based body |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Check each PR review comment against the code and fix the real issues |
 | [ponytail](skills/ponytail/) | Force the smallest solution that works: YAGNI, standard library first (*vendor*, [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)) |
 
