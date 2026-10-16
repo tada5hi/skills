@@ -45,6 +45,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |
 | [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
 | [query-package-list](skills/query-package-list/) | Manual | Look up your own published packages in an awesome-style list before writing a utility |
+| [redesign-vitepress-site](skills/redesign-vitepress-site/) | Manual | Turn a default-looking VitePress site into a hero-led site with tokens, sections and restyled chrome |
 | [refresh-package-list](skills/refresh-package-list/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |

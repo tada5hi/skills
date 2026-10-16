@@ -35,6 +35,7 @@ export const manual: string[] = [
     'plan-status',
     'query-api',
     'query-package-list',
+    'redesign-vitepress-site',
     'refresh-package-list',
     'update-agent-docs',
     'write-readme',
