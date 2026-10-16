@@ -1,0 +1,82 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sk-title">
+    <title id="sk-title">tada5hi/skills logo: one SKILL.md document routed to three coding agents</title>
+
+    <defs>
+        <linearGradient id="sk-tile" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6" stop-opacity="0.16"/>
+            <stop offset="1" stop-color="#14B8A6" stop-opacity="0.16"/>
+        </linearGradient>
+        <linearGradient id="sk-edge" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6"/>
+            <stop offset="1" stop-color="#14B8A6"/>
+        </linearGradient>
+        <linearGradient id="sk-route" x1="118" y1="128" x2="186" y2="128" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6"/>
+            <stop offset="1" stop-color="#14B8A6"/>
+        </linearGradient>
+        <linearGradient id="sk-doc" x1="50" y1="70" x2="118" y2="186" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#A78BFA"/>
+            <stop offset="1" stop-color="#7C3AED"/>
+        </linearGradient>
+    </defs>
+
+    <!-- rounded app-icon tile -->
+    <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#sk-tile)"/>
+    <rect x="8.75" y="8.75" width="238.5" height="238.5" rx="55.25" stroke="url(#sk-edge)" stroke-opacity="0.35" stroke-width="1.5"/>
+
+    <!-- routes: the same skill reaches every agent -->
+    <path d="M118 128 C150 128 150 76 186 76" stroke="url(#sk-route)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M118 128 H186" stroke="url(#sk-route)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M118 128 C150 128 150 180 186 180" stroke="url(#sk-route)" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- the skill: a document with a folded corner -->
+    <path d="M58 70 H98 L122 94 V178 Q122 186 114 186 H58 Q50 186 50 178 V78 Q50 70 58 70 Z" fill="url(#sk-doc)"/>
+    <path d="M98 70 V88 Q98 94 104 94 H122" fill="#FFFFFF" fill-opacity="0.35"/>
+    <rect x="62" y="108" width="44" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.9"/>
+    <rect x="62" y="124" width="36" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.6"/>
+    <rect x="62" y="140" width="44" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.6"/>
+    <rect x="62" y="156" width="28" height="7" rx="3.5" fill="#FFFFFF" fill-opacity="0.6"/>
+
+    <!-- skills travelling to the agents: one pass, then they settle -->
+    <g>
+        <circle r="9" fill="#FFFFFF" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#FFFFFF"/>
+        <animateMotion dur="2.4s" repeatCount="1" fill="freeze" path="M118 128 C150 128 150 76 186 76"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="2.4s" repeatCount="1" fill="freeze"/>
+    </g>
+    <g>
+        <circle r="9" fill="#FFFFFF" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#FFFFFF"/>
+        <animateMotion dur="2.4s" begin="-0.8s" repeatCount="1" fill="freeze" path="M118 128 H186"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="2.4s" begin="-0.8s" repeatCount="1" fill="freeze"/>
+    </g>
+    <g>
+        <circle r="9" fill="#FFFFFF" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#FFFFFF"/>
+        <animateMotion dur="2.4s" begin="-1.6s" repeatCount="1" fill="freeze" path="M118 128 C150 128 150 180 186 180"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="2.4s" begin="-1.6s" repeatCount="1" fill="freeze"/>
+    </g>
+
+    <!-- agents: a tile with a status light that turns on once the skill arrives -->
+    <g>
+        <rect x="174" y="54" width="44" height="44" rx="13" fill="#14B8A6" fill-opacity="0.16" stroke="#14B8A6" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="183" y="63" width="26" height="26" rx="8" fill="#14B8A6"/>
+        <circle cx="202" cy="70" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="0.35;0.35;1" keyTimes="0;0.8;1" dur="2.4s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+    <g>
+        <rect x="174" y="106" width="44" height="44" rx="13" fill="#0EA5E9" fill-opacity="0.16" stroke="#0EA5E9" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="183" y="115" width="26" height="26" rx="8" fill="#0EA5E9"/>
+        <circle cx="202" cy="122" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="0.35;0.35;1" keyTimes="0;0.8;1" dur="2.4s" begin="-0.8s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+    <g>
+        <rect x="174" y="158" width="44" height="44" rx="13" fill="#6366F1" fill-opacity="0.16" stroke="#6366F1" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="183" y="167" width="26" height="26" rx="8" fill="#6366F1"/>
+        <circle cx="202" cy="174" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="0.35;0.35;1" keyTimes="0;0.8;1" dur="2.4s" begin="-1.6s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+</svg>

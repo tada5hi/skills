@@ -40,6 +40,7 @@ skills/
 │   ├── marketplace.json               # Marketplace (tada5hi) for Claude Code and Codex
 │   └── plugin.json                    # Plugin manifest; skills/ is auto-discovered, no version = every commit updates
 ├── .github/
+│   ├── assets/                        # README logo and diagrams (theme-aware SVGs)
 │   ├── dependabot.yml                 # Automated dependency updates
 │   └── workflows/ci.yml              # CI pipeline (lint, test, validate)
 ├── .editorconfig                      # Editor settings (4-space indent, LF, UTF-8)
