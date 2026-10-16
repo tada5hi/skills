@@ -1,6 +1,7 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="xx-title">
-    <!-- Template: replace the xx- id prefix, the {{placeholder}}, the two tile gradient colours and the pictogram.
-         Default house style (use the project's own brand when it has one): translucent tile so one file works on light and dark pages,
+    <!-- Template: replace the xx- id prefix, the {{placeholder}}, every colour and the pictogram.
+         Keep the technique, not the look: the violet/teal hub below belongs to another project. Derive the palette and the
+         pictogram from the project itself (SKILL.md, Step 3). Keep: translucent tile so one file works on light and dark pages,
          staggered animations that run one pass and settle (README images cannot be paused, WCAG 2.2.2). -->
     <title id="xx-title">{{project}} logo: {{describe the pictogram}}</title>
 

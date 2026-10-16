@@ -1,5 +1,7 @@
 <svg width="960" height="300" viewBox="0 0 960 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="xx-title xx-desc">
     <!-- Template: replace the xx- id prefix and every {{placeholder}}. Colours come from the variables below, which flip in dark mode.
+         The accent strokes (#8B5CF6, #14B8A6) and the Producer/Consumer layout are placeholders: take the accents from the project's
+         logo palette and draw the mechanism its "Why" section promises, with real names (SKILL.md, Step 3).
          Keep text on a panel, card or chip: text on the transparent background vanishes when the scheme and the page disagree (npm on a dark OS). -->
     <title id="xx-title">How {{the mechanism}} works</title>
     <desc id="xx-desc">{{The whole flow, in one or two plain sentences. Repeat it in the alt text of the img tag: that is what screen readers get.}}</desc>

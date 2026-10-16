@@ -20,7 +20,7 @@ Copy this checklist and track progress:
 ```
 - [ ] Step 1: public surface and behaviour read from the code
 - [ ] Step 2: "Why" table drafted from the reader's side
-- [ ] Step 3: logo and diagrams drawn, previewed in all four renders
+- [ ] Step 3: visual identity derived from the project, logo concepts chosen by the user, diagrams drawn, all previewed in four renders
 - [ ] Step 4: sections written
 - [ ] Step 5: samples type-check, claims match the code, anchors resolve, lint passes
 ```
@@ -64,13 +64,23 @@ Be concrete. "Re-published after an exponential backoff, dropped after `maxAttem
 
 ## Step 3: Draw the SVGs
 
-Put them in `.github/assets/`. Start from `templates/logo.svg` and `templates/diagram.svg`. The values below are the default house style; when the project has its own colours or logo, use those.
+Put them in `.github/assets/`. `templates/logo.svg` and `templates/diagram.svg` supply technique (structure, theme handling, animation, accessibility), not identity: their colours and pictogram belong to another project, and copying them makes every README look alike.
+
+**Design from the project.** Before drawing, write down in a sentence or two:
+
+1. **Existing brand cues.** A logo, docs-site theme colours, an emoji in the old title, badge colours, the organisation's other projects. Keep what exists; derive the rest from it.
+2. **The project's own objects.** What the project is made of, in its vocabulary: a queue and an exchange, a `SKILL.md` with frontmatter, a schema and a migration. The pictogram is drawn from these, never from a generic hub, node graph or gear.
+3. **The one mechanism the "Why" section promises.** The diagram draws that claim (resolution order, retry loop, what stays loaded and what loads on demand), not a generic "sources, core, consumers" row of boxes.
+4. **What it must not look like.** Open the logos and diagrams of sibling projects by the same author, and choose a palette and layout that differ from them.
+
+Unless the project already has a logo, draw two or three concepts, preview them, and show them to the user side by side (an HTML page or the preview PNGs) to choose from. Do not just ship the first one.
 
 **Logo** (256 × 256):
 
-- A rounded tile filled with a two-stop gradient at low opacity and a thin gradient edge. Translucent, so one file works on light and dark backgrounds without a media query.
-- A pictogram of the mechanism, not of the name: an exchange routing into queues, components around a bus.
-- One or two SMIL animations (`animateMotion` along the paths, `animate` on `opacity`) with staggered negative `begin` offsets so the motion is already under way on load. Let them run one pass and settle (`repeatCount="1" fill="freeze"`): a README image cannot be paused, and motion longer than 5 seconds without a pause control fails WCAG 2.2.2. A perpetual loop is the project owner's call, not a default.
+- A rounded tile filled with a two-stop gradient at low opacity and a thin gradient edge. Translucent, so one file works on light and dark backgrounds without a media query. The two stops come from the project's palette.
+- A pictogram of the mechanism, built from the project's own objects (see above), not of the name.
+- One or two SMIL animations (`animateMotion` along the paths, `animate` on `opacity`, `animateTransform` to slide or fan elements into place). Use staggered negative `begin` offsets so the motion is already under way on load. Let them run one pass and settle (`repeatCount="1" fill="freeze"`): a README image cannot be paused, and motion longer than 5 seconds without a pause control fails WCAG 2.2.2. A perpetual loop is the project owner's call, not a default.
+- Write the settled state into the static attributes (for example `transform="rotate(16 128 204)"` beside the `animateTransform` that ends there). Renderers without SMIL, such as some previews and thumbnails, then show the finished picture instead of the first frame.
 - A `<title>` for anyone opening the file on its own. Prefix every `id` (`ae-`, `sy-`): ids are global when several SVGs share a page.
 - Sub-packages get a variant of the parent logo that swaps one element (the bus becomes the exchange), so they read as a family.
 
@@ -78,7 +88,8 @@ Put them in `.github/assets/`. Start from `templates/logo.svg` and `templates/di
 
 - Colours as CSS variables in a `<style>` block, redefined under `@media (prefers-color-scheme: dark)`. GitHub shows `<img>` SVGs on a transparent background and the media query follows the reader's theme there.
 - npm's page is always light, while the SVG may still pick the dark palette from the reader's OS. Put every piece of text on a panel, card or chip, never directly on the transparent background, so it stays readable when scheme and page disagree.
-- One accent colour per role (caller, bus, worker; ok, retry, drop) and keep it consistent across every diagram of the project.
+- One accent colour per role (caller, bus, worker; ok, retry, drop), taken from the logo's palette, and keep it consistent across every diagram of the project. Tint the neutrals slightly towards that palette instead of reusing the template's greys unchanged.
+- Show real names from the project in the cards (real skill names, option names, queue names), not `foo` and `bar`.
 - A `<desc>` that states the whole flow in prose, repeated in the `alt` of the `<img>`: screen readers get the `alt` only, never the SVG's `<title>` or `<desc>`. Keep the facts in the surrounding text too.
 - SVG collapses leading whitespace in `<text>`: indent code lines with `x`, not spaces.
 
@@ -130,6 +141,10 @@ Run every check; fix and re-run until all pass.
 | Samples written from memory | Type-check them against the source |
 | Claims copied from the old README | Re-derive them from the code and the dependency's behaviour |
 | Clashing ids between SVGs | Prefix every id per file |
+| Template colours and pictogram shipped as they are | Derive palette and pictogram from the project; check that the result does not look like a sibling project |
+| A generic "sources → core → consumers" diagram | Draw the mechanism the "Why" section promises, with real names |
+| Only one logo concept | Draw two or three and let the user choose |
+| Static renderers show the first animation frame | Put the settled state in the static attributes |
 
 ## Examples
 
