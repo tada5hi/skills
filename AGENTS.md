@@ -36,6 +36,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | Skill | Type | Description |
 |-------|------|-------------|
 | [audit-type-boundaries](skills/audit-type-boundaries/) | Manual | Audit type boundary mismatches from casts and utility calls in TypeScript |
+| [create-pull-request](skills/create-pull-request/) | Manual | Open a pull request from the current branch with a Conventional Commits title and evidence-based body |
 | [generate-commit-message](skills/generate-commit-message/) | Manual | Generate a Conventional Commits message for uncommitted changes |
 | [impact-analysis](skills/impact-analysis/) | Manual | Cross-package impact analysis for TypeScript monorepo symbols |
 | [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with structured AI agent documentation |
