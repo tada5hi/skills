@@ -1,0 +1,72 @@
+<svg width="960" height="300" viewBox="0 0 960 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="xx-title xx-desc">
+    <!-- Template: replace the xx- id prefix and every {{placeholder}}. Colours come from the variables below, which flip in dark mode.
+         Keep text on a panel, card or chip: text on the transparent background vanishes when the scheme and the page disagree (npm on a dark OS). -->
+    <title id="xx-title">How {{the mechanism}} works</title>
+    <desc id="xx-desc">{{The whole flow, in one or two plain sentences. Repeat it in the alt text of the img tag: that is what screen readers get.}}</desc>
+
+    <style>
+        :root {
+            --fg: #1F2328;
+            --muted: #59636E;
+            --panel: #F6F8FA;
+            --panel-edge: #D1D9E0;
+            --card: #FFFFFF;
+            --rail: #8C959F;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fg: #F0F6FC;
+                --muted: #9198A1;
+                --panel: #151B23;
+                --panel-edge: #3D444D;
+                --card: #0D1117;
+                --rail: #656C76;
+            }
+        }
+        text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: var(--fg); }
+        .muted { fill: var(--muted); }
+        .code { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; }
+        .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--muted); }
+        .title { font-size: 15px; font-weight: 600; }
+        .panel { fill: var(--panel); stroke: var(--panel-edge); }
+        .card { fill: var(--card); }
+        .rail { stroke: var(--rail); }
+        .chip { fill: var(--card); stroke: var(--panel-edge); }
+    </style>
+
+    <defs>
+        <marker id="xx-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#8C959F"/>
+        </marker>
+    </defs>
+
+    <!-- a panel groups the cards of one process or layer -->
+    <rect class="panel" x="16" y="16" width="300" height="200" rx="18"/>
+    <text class="label" x="36" y="44">first layer</text>
+
+    <!-- a card: accent stroke for its role, title, one line of code -->
+    <rect class="card" x="36" y="64" width="260" height="72" rx="12" stroke="#8B5CF6" stroke-width="1.5"/>
+    <text class="title" x="54" y="92">Producer</text>
+    <text class="code muted" x="54" y="116" font-size="12">publish('event', data)</text>
+
+    <!-- an arrow with a label on a chip, so the label stays readable on any page background -->
+    <path class="rail" d="M296 100 H640" stroke-width="2" marker-end="url(#xx-head)"/>
+    <rect class="chip" x="436" y="76" width="64" height="20" rx="10"/>
+    <text class="code" x="468" y="90" font-size="11" text-anchor="middle">event</text>
+
+    <rect class="card" x="644" y="64" width="260" height="72" rx="12" stroke="#14B8A6" stroke-width="1.5"/>
+    <text class="title" x="662" y="92">Consumer</text>
+    <text class="code muted" x="662" y="116" font-size="12">on('event', handler)</text>
+
+    <!-- a message travelling along the arrow: one pass, then it stays hidden (README images cannot be paused, WCAG 2.2.2) -->
+    <g>
+        <circle r="9" fill="#8B5CF6" fill-opacity="0.25"/>
+        <circle r="4.5" fill="#8B5CF6"/>
+        <animateMotion dur="3s" repeatCount="1" fill="freeze" path="M296 100 H644"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="3s" repeatCount="1" fill="freeze"/>
+    </g>
+
+    <!-- a dashed footer strip for the alternative path or a caveat -->
+    <rect class="panel" x="16" y="240" width="928" height="44" rx="14" stroke-dasharray="5 5"/>
+    <text class="muted" x="36" y="267" font-size="13">{{A caveat or the alternative path, in one sentence.}}</text>
+</svg>

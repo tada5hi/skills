@@ -56,6 +56,7 @@ Every skill lives under `skills/<skill-id>/` and contains:
 | `SKILL.md` | Yes | YAML frontmatter (name, description, version, allowed-tools) + markdown instructions |
 | `templates/` | No | Template files with `{{placeholder}}` variables for generation |
 | `references/` | No | Individual concept files for large skills (one `.md` per concept) |
+| `scripts/` | No | Executable helpers the skill runs (e.g. previews, validators) instead of inline shell code |
 | `SYNC.md` | No | Auto-generated tracking metadata for vendor-synced skills |
 
 ### SKILL.md Frontmatter Format
@@ -104,4 +105,5 @@ allowed-tools: <tool-list>    # Space-delimited list of pre-approved tools.
 - **Skill definitions** (`SKILL.md`) → Instructions and metadata for agent consumption
 - **Templates** (`templates/`) → Reusable scaffolding with `{{placeholders}}` that agents fill in per-project
 - **References** (`references/`) → Individual concept files for large skills
+- **Scripts** (`scripts/`) → Deterministic helpers a skill runs rather than inlines
 - **Vendor sources** (`vendor/`) → Git submodules of external skill repositories
