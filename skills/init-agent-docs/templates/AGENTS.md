@@ -1,6 +1,6 @@
 <!-- NOTE: Keep this file and all corresponding files in the .agents directory updated as the project evolves. When making architectural changes, adding new patterns, or discovering important conventions, update the relevant sections. -->
 
-# {{project_name}} — Agent Guide
+# {{project_name}}: Agent Guide
 
 {{project_description_paragraph}}
 
@@ -45,21 +45,22 @@ The `{{docs_directory}}` directory contains the project documentation site. When
 
 <!-- Customize each description below to reflect the project's actual content. Specific descriptions (e.g. "Orchestrator pattern, topological sort, and DI integration") are more useful to agents than generic ones (e.g. "Design patterns"). -->
 
-- **[Project Structure](.agents/structure.md)** — Source layout, modules, and dependency layers
+- **[Project Structure](.agents/structure.md)**: Source layout, modules, and dependency layers
 <!-- Include only guides that were created: -->
-<!-- - **[Architecture](.agents/architecture.md)** — Design patterns, data flow, and key abstractions -->
-<!-- - **[Testing](.agents/testing.md)** — Test runner, conventions, and infrastructure -->
-<!-- - **[Conventions](.agents/conventions.md)** — Best practices, tooling, validation, and error handling -->
+<!-- - **[Architecture](.agents/architecture.md)**: Design patterns, data flow, and key abstractions -->
+<!-- - **[Testing](.agents/testing.md)**: Test runner, conventions, and infrastructure -->
+<!-- - **[Conventions](.agents/conventions.md)**: Best practices, tooling, validation, and error handling -->
 
 ## Plans
 
 <!-- Remove this section if not tracking ongoing work. Use it to document modernization efforts, migration plans, or phased refactoring work with status. Link to detailed plan files in .agents/plans/ if needed. -->
 
 <!-- Example: -->
-<!-- 1. ~~Tooling Modernization~~ — Complete (#123) -->
-<!-- 2. [Hexagonal Migration](.agents/plans/002-hexagonal.md) — In progress -->
+<!-- 1. ~~Tooling Modernization~~: Complete (#123) -->
+<!-- 2. [Hexagonal Migration](.agents/plans/002-hexagonal.md): In progress -->
 
 ## Commits, Issues & Pull Requests
 
 - Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
 - Do **not** add AI-attribution lines (e.g. `🤖 Generated with [Claude Code](...)`) to issue or pull request titles, bodies, or comments.
+- Do **not** use em dashes (`—`) in commit messages, issue or pull request titles, bodies, or comments. Use a comma, a colon, parentheses, or a separate sentence instead.

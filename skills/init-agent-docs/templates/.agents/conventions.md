@@ -70,8 +70,8 @@
 
 <!-- Example: -->
 <!-- Husky runs on every commit: -->
-<!-- 1. **lint-staged** — ESLint with fix on `*.{vue,js,ts}` -->
-<!-- 2. **commitlint** — Validates commit message format -->
+<!-- 1. **lint-staged**: ESLint with fix on `*.{vue,js,ts}` -->
+<!-- 2. **commitlint**: Validates commit message format -->
 
 {{pre_commit_hooks_description}}
 

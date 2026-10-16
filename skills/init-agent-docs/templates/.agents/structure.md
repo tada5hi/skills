@@ -22,7 +22,7 @@
 
 ## Package Dependency Layers
 
-<!-- Show which packages depend on which. Changes to a lower-layer package affect all packages above it. Build order follows these layers. Internal dependencies are declared in each package's package.json — always consult those for the authoritative dependency graph. -->
+<!-- Show which packages depend on which. Changes to a lower-layer package affect all packages above it. Build order follows these layers. Internal dependencies are declared in each package's package.json. Always consult those for the authoritative dependency graph. -->
 
 ```
 Foundation (no internal deps):
