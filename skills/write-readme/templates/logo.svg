@@ -1,0 +1,96 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="xx-title">
+    <!-- Template: replace the xx- id prefix, the {{placeholder}}, the two tile gradient colours and the pictogram.
+         Default house style (use the project's own brand when it has one): translucent tile so one file works on light and dark pages,
+         staggered animations that run one pass and settle (README images cannot be paused, WCAG 2.2.2). -->
+    <title id="xx-title">{{project}} logo: {{describe the pictogram}}</title>
+
+    <defs>
+        <linearGradient id="xx-tile" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6" stop-opacity="0.16"/>
+            <stop offset="1" stop-color="#14B8A6" stop-opacity="0.16"/>
+        </linearGradient>
+        <linearGradient id="xx-edge" x1="24" y1="24" x2="232" y2="232" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6"/>
+            <stop offset="1" stop-color="#14B8A6"/>
+        </linearGradient>
+
+        <!-- one spoke per component, fading from the component's colour into the bus -->
+        <linearGradient id="xx-spoke-a" x1="128" y1="62" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8B5CF6"/>
+            <stop offset="1" stop-color="#6366F1"/>
+        </linearGradient>
+        <linearGradient id="xx-spoke-b" x1="185" y1="161" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#14B8A6"/>
+            <stop offset="1" stop-color="#6366F1"/>
+        </linearGradient>
+        <linearGradient id="xx-spoke-c" x1="71" y1="161" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#0EA5E9"/>
+            <stop offset="1" stop-color="#6366F1"/>
+        </linearGradient>
+
+        <linearGradient id="xx-bus" x1="128" y1="106" x2="128" y2="150" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#818CF8"/>
+            <stop offset="1" stop-color="#4F46E5"/>
+        </linearGradient>
+    </defs>
+
+    <!-- rounded app-icon tile -->
+    <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#xx-tile)"/>
+    <rect x="8.75" y="8.75" width="238.5" height="238.5" rx="55.25" stroke="url(#xx-edge)" stroke-opacity="0.35" stroke-width="1.5"/>
+
+    <!-- the orbit the components share -->
+    <circle cx="128" cy="128" r="72" stroke="url(#xx-edge)" stroke-opacity="0.3" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+
+    <!-- spokes: every component talks to the bus, never to another component directly -->
+    <path d="M128 62 V128" stroke="url(#xx-spoke-a)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M185 161 L128 128" stroke="url(#xx-spoke-b)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M71 161 L128 128" stroke="url(#xx-spoke-c)" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- messages: a command leaves one component, crosses the bus and reaches the next -->
+    <g>
+        <circle r="10" fill="#FFFFFF" fill-opacity="0.2"/>
+        <circle r="5" fill="#FFFFFF"/>
+        <animateMotion dur="3.6s" repeatCount="1" fill="freeze" path="M128 62 L128 128 L185 161"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.85;1" dur="3.6s" repeatCount="1" fill="freeze"/>
+    </g>
+    <g>
+        <circle r="10" fill="#FFFFFF" fill-opacity="0.2"/>
+        <circle r="5" fill="#FFFFFF"/>
+        <animateMotion dur="3.6s" begin="-1.2s" repeatCount="1" fill="freeze" path="M185 161 L128 128 L71 161"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.85;1" dur="3.6s" begin="-1.2s" repeatCount="1" fill="freeze"/>
+    </g>
+    <g>
+        <circle r="10" fill="#FFFFFF" fill-opacity="0.2"/>
+        <circle r="5" fill="#FFFFFF"/>
+        <animateMotion dur="3.6s" begin="-2.4s" repeatCount="1" fill="freeze" path="M71 161 L128 128 L128 62"/>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.85;1" dur="3.6s" begin="-2.4s" repeatCount="1" fill="freeze"/>
+    </g>
+
+    <!-- the bus -->
+    <circle cx="128" cy="128" r="30" fill="url(#xx-bus)" fill-opacity="0.18"/>
+    <circle cx="128" cy="128" r="18" fill="url(#xx-bus)"/>
+    <circle cx="128" cy="128" r="6" fill="#FFFFFF" fill-opacity="0.85"/>
+
+    <!-- components: a tile with a status light -->
+    <g>
+        <rect x="104" y="38" width="48" height="48" rx="14" fill="#8B5CF6" fill-opacity="0.16" stroke="#8B5CF6" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="114" y="48" width="28" height="28" rx="8" fill="#8B5CF6"/>
+        <circle cx="136" cy="54" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="1;0.35;1" dur="3.6s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+    <g>
+        <rect x="161" y="137" width="48" height="48" rx="14" fill="#14B8A6" fill-opacity="0.16" stroke="#14B8A6" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="171" y="147" width="28" height="28" rx="8" fill="#14B8A6"/>
+        <circle cx="193" cy="153" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="1;0.35;1" dur="3.6s" begin="-1.2s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+    <g>
+        <rect x="47" y="137" width="48" height="48" rx="14" fill="#0EA5E9" fill-opacity="0.16" stroke="#0EA5E9" stroke-opacity="0.65" stroke-width="2"/>
+        <rect x="57" y="147" width="28" height="28" rx="8" fill="#0EA5E9"/>
+        <circle cx="79" cy="153" r="3.5" fill="#FFFFFF">
+            <animate attributeName="fill-opacity" values="1;0.35;1" dur="3.6s" begin="-2.4s" repeatCount="1" fill="freeze"/>
+        </circle>
+    </g>
+</svg>
