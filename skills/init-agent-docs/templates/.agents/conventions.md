@@ -35,7 +35,7 @@
 ## Naming Conventions
 
 <!-- Document naming patterns that agents should follow when writing new code. Remove sections that don't apply. Common patterns to document: -->
-<!-- - Type/interface naming: prefix conventions (I for interfaces?), suffix conventions (Options vs Context vs Config) -->
+<!-- - Type suffix conventions (Options vs Context vs Config) -->
 <!-- - Function naming: verb prefixes (get, set, create, resolve, handle) -->
 <!-- - File naming: kebab-case, PascalCase, matching export names -->
 <!-- - Variable naming: boolean prefixes (is, has, should), collections (plural), constants (UPPER_SNAKE_CASE) -->
@@ -47,15 +47,48 @@
 <!-- | `*Context` | Class instances, Maps, functions | `ApplicationContext { container?: IContainer }` | -->
 <!-- | `*Config` | Static configuration loaded from files/env | `DatabaseConfig { host: string; port: number }` | -->
 
-{{naming_conventions}}
+<!-- Interface vs type: keep the two bullets below only when the code already follows them (grep `export interface` and `export type`), and fill the examples with 2-4 real exported names each. The first bullet is the common rule; drop the second when the project keeps records as plain interfaces (e.g. domain entities). Never introduce the convention into a project that lacks it, and remove both bullets if an ESLint `naming-convention` rule forbids the prefix. -->
+<!-- Optional companion rule: declare the contract explicitly and let the class `implements` it; never derive a public contract from a class (`typeof Client`, mapped-over-class types), except at a third-party boundary. -->
+
+- **Every `interface` carries the `I` prefix; `type` aliases never do**: {{contract_interface_examples}}.
+- **`interface` is for behavior contracts**: a class implements it, or a factory returns it. Data shapes (records, options, payloads) are `type` aliases: {{data_type_examples}}.
+- {{naming_conventions}}
 
 ## File Organization
 
 <!-- Describe where types, constants, utils, and barrel exports live. -->
+<!-- The module rules below are the default layout; keep them for new projects and for projects that already follow them, and adapt the file names to what the code uses. -->
+<!-- Base error class file: use the name the code already uses (`base.ts` in most libraries, `module.ts` in some monorepos); for a new project, use `base.ts`. -->
 
-- Exported **types** (interfaces, type aliases) live in a `types.ts` file in the same directory.
-- Barrel `index.ts` files re-export from `types.ts` and implementation modules.
+- **A module is a folder.** Once a concept has more than one kind of content it gets `src/<concept>/` with, as needed:
+  - `module.ts`: the implementation (the class or the main functions).
+  - `types.ts`: every exported type. No exported type lives in an implementation file.
+  - `helpers.ts`: functions the implementation uses; a `helpers/` folder with one file per helper once it grows.
+  - `constants.ts`: every exported constant.
+  - `index.ts`: the barrel.
+- **One class per file.** Never disable `max-classes-per-file` in source. Sibling classes share a folder: `errors/{{base_error_file}}` holds the base class, every other error has its own file named after its concept without an `-error` suffix (`not-found.ts` holds `NotFoundError`), and error codes live in `errors/constants.ts`.
+- **Barrels only re-export their own folder.** No file whose only job is to pull symbols out of other modules. A `./testing` subpath is a `src/testing/` folder that holds the helpers itself.
+- **The package entry composes folder barrels.** `src/index.ts` re-exports each folder's `index.ts`; inside the package, import the file you need, not `src/index.ts`.
 - {{additional_file_org_rules}}
+
+<!-- File header: keep this bullet only when most existing source files start with the same header (read the first lines of a few files under each source and test root, and of the config files). Copy the block verbatim from a real file; never write one from memory. Keep each file's existing year, whether a single year or a range (`2021-2024.`). Note the form used in other file types (e.g. `.vue` files use an HTML comment) and any exemptions: build/config files such as `tsdown.config.ts` often lack it, generated files (e.g. ORM migrations) and snippets embedded verbatim in docs may omit it. Remove the bullet if there is no consistent header. -->
+
+- **Every file under {{header_paths}} starts with this header**{{header_exemptions}}:
+
+  ```ts
+  {{file_header}}
+  ```
+
+## House Libraries
+
+<!-- Keep this section only when the project already depends on packages published by its own author or organisation; remove it otherwise, including the paragraph below. List only packages the project actually uses, each with the hand-written pattern it replaces, and don't repeat rules already stated under Validation & Error Handling. Example entries from tada5hi projects (copy one only if that package is a dependency): -->
+<!-- - Object checks use `isObject` from `smob`, never `typeof x === 'object' && x !== null` (`isObject` also rejects arrays). -->
+<!-- - Errors extend `BaseError` from `@ebec/core`; structured failures are passed as ebec `issues`, never a custom issue field. -->
+<!-- - Standard Schema validation goes through validup (`buildIssuesForStandardSchemaIssues` from `@validup/standard-schema`). -->
+
+Before writing a generic helper, check {{package_list_reference}} (the `query-package-list` skill reads it) and prefer an existing package over a local implementation.
+
+- {{house_library_rules}}
 
 ## Configuration Naming
 

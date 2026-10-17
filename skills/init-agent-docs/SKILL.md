@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.10.16"
+  version: "2026.10.17"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -67,5 +67,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **Add the NOTE comment** at the top of AGENTS.md reminding to keep docs updated as the project evolves.
 - **Document per-application layouts for monorepos** in structure.md. Show the internal directory tree of each service/app, especially when they follow a specific architecture pattern (hexagonal, MVC, etc.).
 - **Prefer fakes over mocks** in testing.md when the project uses hexagonal architecture or dependency inversion. Guide agents toward fake implementations of port interfaces rather than `vi.fn()`/`vi.mock()`.
+- **Check default rules against the code before keeping them.** The conventions and testing templates ship rules in plain text with a "keep only when…" comment: the module-folder layout, interface/type naming, the file header, house libraries and the test-kit package. Keep each one only when its condition holds, replace it with the rule the code actually follows, or remove it. Never introduce a convention the project doesn't follow, except the module layout in a new project.
+- **Copy the file header verbatim** from an existing source file; never write one from memory.
 - **Include a References section** in conventions.md when the project depends on external projects that agents may need to cross-reference. Use `.agents/references/` to build cumulative code mappings.
 - **Add Plans and Commits sections** to AGENTS.md when the project has ongoing modernization work or commit rules that override default agent behavior.
