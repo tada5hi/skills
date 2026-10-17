@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git, Node.js >= 22, npm, and network access to fetch the template.
 metadata:
   author: tada5hi
-  version: "2026.06.10"
+  version: "2026.10.17"
 allowed-tools: Read Write Edit Bash(git:*) Bash(npm:*) Bash(mkdir:*) Bash(ls:*) Bash(rm:*) Bash(mv:*) Glob Grep
 ---
 
@@ -142,7 +142,7 @@ Print a short summary listing:
 - Target directory (absolute path)
 - Package name and resulting repository URL
 - Build status (passed/failed)
-- Suggested next steps: create the GitHub repo (`gh repo create <org>/<name> --source=<target> --push`), write `src/index.ts`, and replace the README's `## Usage` placeholder.
+- Suggested next steps: create the GitHub repo (`gh repo create <org>/<name> --source=<target> --push`), run `init-agent-docs` so the File Organization rules (module folders, one class per file, own-folder barrels) are in place before the first source file, write `src/index.ts`, and replace the README's `## Usage` placeholder.
 
 ## Guidelines
 

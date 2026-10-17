@@ -38,7 +38,10 @@
 
 <!-- Describe reusable test utilities, fake implementations, factories, fixture data. -->
 
+<!-- Test kit bullet: keep only in a monorepo whose packages share test helpers (one package's tests import another package's fakes or contract suites); use the real kit package name, e.g. `server-test-kit` or `test-kit`. Otherwise remove it. -->
+
 - {{test_helper_description}}
+- **Test helpers other packages need are a package.** Fakes, contract suites and controllable clocks live in a dedicated `{{test_kit_package}}` package, which depends on the packages it supports, never the other way round; consumers take it as a devDependency. A fake that belongs to one package's public API (e.g. an HTTP client's `FakeClient`) may ship as that package's `./testing` subpath instead, as a `src/testing/` folder that holds the helpers itself.
 
 ## Test Application Pattern
 
