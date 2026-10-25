@@ -44,6 +44,7 @@ export const manual: string[] = [
     'query-package-list',
     'redesign-vitepress-site',
     'refresh-package-list',
+    'release-please-version-bump',
     'request-refactor-plan',
     'triage-issue',
     'update-agent-docs',
