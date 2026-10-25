@@ -6,7 +6,7 @@ compatibility: Requires a git repository using release-please (manifest config) 
 metadata:
   author: tada5hi
   version: "2026.10.25"
-allowed-tools: Bash(git:*) Bash(gh:*) Bash(node:*) Read Edit Glob Grep
+allowed-tools: Bash(git:*) Bash(gh:*) Read Edit Glob Grep
 ---
 
 # release-please-version-bump
@@ -35,7 +35,7 @@ Note:
 gh pr list --state open --label "autorelease: pending" --json number,title,url
 ```
 
-No open release PR: there is nothing to compare yet. Go to Step 3 only if the user asked to prepare the next release anyway, and say that the result is unverified until release-please opens the PR.
+No open release PR: there is nothing to compare yet, so touch nothing. Wait until release-please opens or updates it (any `fix:` or `feat:` on the default branch does). Packages without own commits usually get the group version anyway, so a list of untouched packages alone is no reason to touch them.
 
 Otherwise list the version every `package.json` and the manifest get in that PR:
 
@@ -47,22 +47,28 @@ gh pr diff <number> | awk '
 '
 ```
 
-The group version is the one the release PR's title or changelog names (`release-as` when set). Collect every package of the linked group whose version differs from it, and every package of the group that is missing from the PR entirely.
+The group version is the `release-as` version when one is set, else the highest version in the PR (`linked-versions` aligns the group to its highest member). The PR title (`chore: release <branch>`) names no version. Never fall back to the highest version while a `release-as` pin exists: the wrongly bumped `1.0.1-beta.30` sorts above the pinned `1.0.0-beta.31`. Collect every package of the linked group whose version differs from it, and every package of the group that is missing from the PR entirely.
 
 **All versions equal and every package present: stop.** Report the version and that no bump is needed. Do not touch packages "to be safe": every extra `fix:` commit is a changelog entry the user has to explain.
 
 ## Step 3: Find packages without a bump-worthy commit
 
-Only when Step 2 found a gap, or the user asked to prepare a release without a PR. release-please bumps a component only for `fix:`, `feat:` and breaking commits that touch its path.
+Only when Step 2 found a gap. release-please bumps a component only for `fix:`, `feat:` and breaking commits (`<type>!:` or a `BREAKING CHANGE:` footer) that touch its path.
+
+The range starts at the tag of the last release: `v<version>` with `include-component-in-tag: false`, else `<component>-v<version>`, with the version from the manifest. Do not search for the release commit by its subject (the title pattern is configurable, `chore(main): release ...` for single-package setups) or by the last change to the manifest (a hand edit moves it). Stop when the tag is missing: an empty base turns the range into `HEAD..HEAD`, and every package would look untouched.
 
 ```bash
-last=$(git log --format=%H --grep='^chore: release' -1)
-for path in <package paths from the config>; do
-    git log "$last"..HEAD --format=%s -- "$path" | grep -qE '^(fix|feat)(\(.+\))?!?:' || echo "$path"
+base=$(git rev-parse -q --verify "refs/tags/<tag>^{commit}") || { echo "release tag <tag> not found"; exit 1; }
+for pkg in <package paths from the config>; do
+    git log "$base"..HEAD --format=%s -- "$pkg" | grep -qE '^((fix|feat)(\([^)]*\))?!?|[a-z]+(\([^)]*\))?!):' && continue
+    git log "$base"..HEAD --format=%B -- "$pkg" | grep -qE '^BREAKING[ -]CHANGE:' && continue
+    echo "$pkg"
 done
 ```
 
-The packages to touch are the ones Step 2 flagged, plus, when there is no release PR, the ones this loop prints. A package that already has a `fix:` or `feat:` commit and still shows another version points at a configuration problem (a component missing from `linked-versions`, a per-package `release-as`): report it instead of touching it.
+For the root component (`.`), add `':(exclude)<path>'` for every other package path after `-- .`: release-please gives each commit to the most specific package path, so a commit inside a package does not count for the root.
+
+The packages to touch are the ones Step 2 flagged that this loop also prints. A package that already has a `fix:` or `feat:` commit and still shows another version points at a configuration problem (a component missing from `linked-versions`, a per-package `release-as`): report it instead of touching it.
 
 ## Step 4: Touch each package
 
@@ -80,9 +86,10 @@ A single year becomes a range (`2025.` to `2025-2026.`). When the header is alre
 One commit for every touched package:
 
 ```bash
-git add <touched files>
-git commit -m "fix: ensure consistent version for release"
+git commit --only -m "fix: ensure consistent version for release" -- <touched files>
 ```
+
+`--only` with the paths commits exactly those files, so changes the user had staged elsewhere stay out of the commit. Check `git diff --cached -- <touched files>` first: anything staged in those files beyond the header change goes in too.
 
 It has to be `fix:`: release-please ignores `chore:` and `refactor:` for the version. Follow the repository's own rules (branch protection, a pull request per change, no AI attribution).
 
@@ -93,6 +100,9 @@ Pushing is the user's call. Once the commit is on the default branch, wait for r
 | Mistake | Fix |
 |---------|-----|
 | Touching every package on every release | Check the release PR first; touch only the packages behind |
+| Touching packages before the release PR exists | Wait for the PR: under `linked-versions` most untouched packages get the group version anyway |
+| Naming the loop variable `path` | zsh ties `path` to `PATH`; use another name |
 | A `chore:` or `refactor:` commit for the touch | release-please only counts `fix:`/`feat:`; use `fix:` |
 | Editing `package.json` versions or the manifest by hand | Leave them to release-please; touch source files only |
 | Running it on independently versioned packages | Without `linked-versions`, different versions are intended |
+| Finding the last release by commit subject or manifest change | Start the range at the release tag; stop when it is missing |
