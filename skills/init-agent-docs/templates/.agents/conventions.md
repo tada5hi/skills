@@ -46,6 +46,7 @@
 <!-- | `*Options` | Plain scalars, simple config | `SetupOptions { resolveCache?: boolean }` | -->
 <!-- | `*Context` | Class instances, Maps, functions | `ApplicationContext { container?: IContainer }` | -->
 <!-- | `*Config` | Static configuration loaded from files/env | `DatabaseConfig { host: string; port: number }` | -->
+<!-- | `*OptionsNormalized` | Options after checks and defaults; the function producing them is `normalize<Name>Options()` (or `normalizeOptions()` inside the module), never `resolve*`/`Resolved*` | `normalizeOptions(input: ClientOptions): ClientOptionsNormalized` | -->
 
 <!-- Interface vs type: keep the two bullets below only when the code already follows them (grep `export interface` and `export type`), and fill the examples with 2-4 real exported names each. The first bullet is the common rule; drop the second when the project keeps records as plain interfaces (e.g. domain entities). Never introduce the convention into a project that lacks it, and remove both bullets if an ESLint `naming-convention` rule forbids the prefix. -->
 <!-- Optional companion rule: declare the contract explicitly and let the class `implements` it; never derive a public contract from a class (`typeof Client`, mapped-over-class types), except at a third-party boundary. -->
@@ -85,6 +86,7 @@
 <!-- - Object checks use `isObject` from `smob`, never `typeof x === 'object' && x !== null` (`isObject` also rejects arrays). -->
 <!-- - Errors extend `BaseError` from `@ebec/core`; structured failures are passed as ebec `issues`, never a custom issue field. -->
 <!-- - Standard Schema validation goes through validup (`buildIssuesForStandardSchemaIssues` from `@validup/standard-schema`). -->
+<!-- - HTTP requests go through a hapic client (`createClient()`, whose transport takes the proxy from `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`), never a hand-written fetch wrapper or transport. -->
 
 Before writing a generic helper, check {{package_list_reference}} (the `query-package-list` skill reads it) and prefer an existing package over a local implementation.
 
@@ -214,4 +216,5 @@ External project references live in `.agents/references/`. **If you keep this se
 - Use **ESM** and modern TypeScript/JavaScript.
 - Before adding new code, always study surrounding patterns, naming conventions, and architectural decisions.
 - Maintain consistency with existing conventions.
+- Prefer a thin layer over an existing library to bespoke infrastructure (a custom transport, a worker thread, one client per external service). When something stays uncovered, document the gap and the operator's mitigation instead of building around it.
 - {{additional_best_practices}}
