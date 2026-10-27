@@ -71,13 +71,13 @@ Put them in `.github/assets/`. `templates/logo.svg` and `templates/diagram.svg` 
 1. **Existing brand cues.** A logo, docs-site theme colours, an emoji in the old title, badge colours, the organisation's other projects. Keep what exists; derive the rest from it.
 2. **The project's own objects.** What the project is made of, in its vocabulary: a queue and an exchange, a `SKILL.md` with frontmatter, a schema and a migration. The pictogram is drawn from these, never from a generic hub, node graph or gear.
 3. **The one mechanism the "Why" section promises.** The diagram draws that claim (resolution order, retry loop, what stays loaded and what loads on demand), not a generic "sources, core, consumers" row of boxes.
-4. **What it must not look like.** Open the logos and diagrams of sibling projects by the same author, and choose a palette and layout that differ from them.
+4. **What it must not look like.** Open the logos and diagrams of sibling projects by the same author, and choose a palette, a form and a silhouette that differ from them. Compare them small (32 px, as in a tab or a list) next to each other: logos that share an outline, such as the same rounded tile with a centred pictogram, read as one family even in different colours. Logos made in the same session for different projects must differ in form, not only in palette.
 
-Unless the project already has a logo, draw two or three concepts, preview them, and show them to the user side by side (an HTML page or the preview PNGs) to choose from. Do not just ship the first one.
+Unless the project already has a logo, draw two or three concepts, preview them, and show them to the user side by side (an HTML page or the preview PNGs) to choose from. Do not just ship the first one. The concepts differ in composition (form, pictogram, layout), not only in colour: one recoloured idea is not three concepts. Drop a concept that reads as something else at a glance (a branch line ending in a hexagon can look like a stethoscope).
 
 **Logo** (256 × 256):
 
-- A rounded tile filled with a two-stop gradient at low opacity and a thin gradient edge. Translucent, so one file works on light and dark backgrounds without a media query. The two stops come from the project's palette.
+- Choose the form from the project, not from the template. A rounded tile filled with a two-stop gradient at low opacity and a thin gradient edge is one option (translucent, so one file works on light and dark backgrounds without a media query); others are a free-standing pictogram without a frame, a background that belongs to the motif (a nebula around a cluster, a page behind a document), or a badge or seal shape. Whatever the form, it has to read on GitHub's light (`#ffffff`) and dark (`#0d1117`) pages: use mid-tone colours that hold contrast on both, translucent fills, or CSS variables redefined under `@media (prefers-color-scheme: dark)` as in the diagrams.
 - A pictogram of the mechanism, built from the project's own objects (see above), not of the name.
 - One or two SMIL animations (`animateMotion` along the paths, `animate` on `opacity`, `animateTransform` to slide or fan elements into place). Use staggered negative `begin` offsets so the motion is already under way on load. Let them run one pass and settle (`repeatCount="1" fill="freeze"`): a README image cannot be paused, and motion longer than 5 seconds without a pause control fails WCAG 2.2.2. A perpetual loop is the project owner's call, not a default.
 - Write the settled state into the static attributes (for example `transform="rotate(16 128 204)"` beside the `animateTransform` that ends there). Renderers without SMIL, such as some previews and thumbnails, then show the finished picture instead of the first frame.
@@ -100,6 +100,8 @@ bash scripts/preview-svg.sh .github/assets/architecture.svg "${TMPDIR:-/tmp}/rea
 ```
 
 It checks that the file is well-formed XML, then writes four PNGs: `light.png` and `dark.png` (GitHub's two themes), `mismatch.png` (dark scheme on a light page, as npm shows it on a dark OS) and `inverse.png`. It forces each colour scheme, because headless Chrome otherwise follows the OS. Set `CHROME=/path/to/binary` if it cannot find a browser.
+
+Headless Chrome captures an animated SVG at its first frame, so a check mark that draws itself or an element that slides in looks unfinished there. For an SVG with SMIL animations the script also writes `settled-light.png` and `settled-dark.png`: the same file with every animation element removed, which shows the static attributes. That is what a renderer without SMIL shows, and, when the static attributes hold the settled state, the picture after the animation ends. Judge the design on the settled renders and the motion on the first-frame ones.
 
 Open all four PNGs and check: overlapping labels, text running out of its box, arrows that miss their target, contrast in every combination. Fix and re-run until all four read cleanly.
 
@@ -145,6 +147,9 @@ Run every check; fix and re-run until all pass.
 | A generic "sources → core → consumers" diagram | Draw the mechanism the "Why" section promises, with real names |
 | Only one logo concept | Draw two or three and let the user choose |
 | Static renderers show the first animation frame | Put the settled state in the static attributes |
+| Every logo is the template's tile with a new pictogram | Pick the form per project; compare silhouettes with the sibling logos at 32 px |
+| Concepts that are one idea in three palettes | Vary form, pictogram and layout between concepts |
+| An animated logo judged on `light.png` | Look at `settled-light.png` and `settled-dark.png` for the design |
 
 ## Examples
 
