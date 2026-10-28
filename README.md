@@ -157,6 +157,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | Skill | Use it to |
 |---|---|
 | [audit-type-boundaries](skills/audit-type-boundaries/) | Find `as` casts and utility calls that hide property name mismatches in TypeScript |
+| [security-audit](skills/security-audit/) | Audit trust boundaries with coverage-led hunting, independent validation and source-grounded reports (*vendor*, [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)) |
 | [impact-analysis](skills/impact-analysis/) | Trace every consumer of a type, function or constant across a TypeScript monorepo |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Find deepening opportunities, present them as an HTML report, then grill through the one you pick (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [codebase-design](skills/codebase-design/) | Shared vocabulary for deep modules, seams and interfaces, used by `tdd` and `improve-codebase-architecture` (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
