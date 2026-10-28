@@ -1,8 +1,10 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="xx-title">
     <!-- Template: replace the xx- id prefix, the {{placeholder}}, every colour and the pictogram.
-         Keep the technique, not the look: the violet/teal hub below belongs to another project. Derive the palette and the
-         pictogram from the project itself (SKILL.md, Step 3). Keep: translucent tile so one file works on light and dark pages,
-         staggered animations that run one pass and settle (README images cannot be paused, WCAG 2.2.2). -->
+         Keep the technique, not the look: the violet/teal hub below belongs to another project. Derive the palette, the
+         form and the pictogram from the project itself (SKILL.md, Step 3). The translucent tile is one possible form (it works
+         on light and dark pages without a media query), not a requirement: a free-standing pictogram or a motif background
+         works too when it holds contrast on #ffffff and #0d1117. Keep: staggered animations that run one pass and settle
+         (README images cannot be paused, WCAG 2.2.2), the settled state in the static attributes, prefixed ids. -->
     <title id="xx-title">{{project}} logo: {{describe the pictogram}}</title>
 
     <defs>
