@@ -2,10 +2,10 @@
 name: write-readme
 description: Write or overhaul a project README in a hero-led style — centered logo, one-line pitch, a few meaningful badges, a "Why <project>?" section with a comparison table, theme-aware SVG diagrams, and reference sections (usage, options, API, notes) verified against the source. Use when asked to write, rewrite, improve or "make beautiful" a README, when a README is just a heading, an install line and an API dump, when a rename, monorepo split or API overhaul left READMEs stale, when a package needs its first real README, or when asked for a project logo, diagrams or a "Why …?" section. Geared to npm packages and monorepos.
 license: Apache-2.0
-compatibility: Previews SVGs with headless Chrome or Chromium. Type-checking samples needs the project's TypeScript toolchain.
+compatibility: Previews SVGs with headless Chrome or Chromium (and perl for the settled renders of animated SVGs). Type-checking samples needs the project's TypeScript toolchain.
 metadata:
   author: tada5hi
-  version: "2026.10.16"
+  version: "2026.10.28"
 allowed-tools: Bash(bash:*) Bash(npx:*) Bash(npm:*) Bash(git:*) Bash(curl:*) Read Write Edit Glob Grep
 ---
 
@@ -103,7 +103,7 @@ It checks that the file is well-formed XML, then writes four PNGs: `light.png` a
 
 Headless Chrome captures an animated SVG at its first frame, so a check mark that draws itself or an element that slides in looks unfinished there. For an SVG with SMIL animations the script also writes `settled-light.png` and `settled-dark.png`: the same file with every animation element removed, which shows the static attributes. That is what a renderer without SMIL shows, and, when the static attributes hold the settled state, the picture after the animation ends. Judge the design on the settled renders and the motion on the first-frame ones.
 
-Open all four PNGs and check: overlapping labels, text running out of its box, arrows that miss their target, contrast in every combination. Fix and re-run until all four read cleanly.
+Open every PNG the script wrote (four, plus the two settled renders for an animated SVG) and check: overlapping labels, text running out of its box, arrows that miss their target, contrast in every combination. Fix and re-run until all of them read cleanly.
 
 ## Step 4: Write the sections
 
