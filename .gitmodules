@@ -4,3 +4,6 @@
 [submodule "vendor/dietrichgebert-ponytail"]
 	path = vendor/dietrichgebert-ponytail
 	url = https://github.com/DietrichGebert/ponytail
+[submodule "vendor/cloudflare-security-audit"]
+	path = vendor/cloudflare-security-audit
+	url = https://github.com/cloudflare/security-audit-skill

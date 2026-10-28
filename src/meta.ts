@@ -58,6 +58,13 @@ export const manual: string[] = [
  * Cloned as submodules under `vendor/<key>/` and synced into `skills/`.
  */
 export const vendors: Record<string, VendorSkillMeta> = {
+    'cloudflare-security-audit': {
+        official: true,
+        source: 'https://github.com/cloudflare/security-audit-skill',
+        skills: {
+            'security-audit': 'security-audit',
+        },
+    },
     'mattpocock-skills': {
         source: 'https://github.com/mattpocock/skills',
         skills: {

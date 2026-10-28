@@ -52,6 +52,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
 | [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
+| [security-audit](skills/security-audit/) | Vendor | Source-first security audits with coverage-led hunting and independent validation |
 | [codebase-design](skills/codebase-design/) | Vendor | Shared deep-module vocabulary used by tdd and improve-codebase-architecture |
 | [grill-me](skills/grill-me/) | Vendor | Manual-only shortcut that starts a grilling session |
 | [grilling](skills/grilling/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
