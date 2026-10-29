@@ -149,7 +149,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | [triage-issue](skills/triage-issue/) | Find a bug's root cause and file an issue with a TDD fix plan (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [create-pull-request](skills/create-pull-request/) | Open a pull request from the current branch with a Conventional Commits title and an evidence-based body |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Check each PR review comment against the code and fix the real issues |
-| [release-please-version-bump](skills/release-please-version-bump/) | Give packages behind a linked release-please group a no-op `fix:` commit so they all release at the same version |
+| [release-please-version-bump](skills/release-please-version-bump/) | Diagnose linked release version splits and verify plugin fixes or an approved one-time `release-as` recovery |
 | [ponytail](skills/ponytail/) | Force the smallest solution that works: YAGNI, standard library first (*vendor*, [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)) |
 
 ### Code analysis
