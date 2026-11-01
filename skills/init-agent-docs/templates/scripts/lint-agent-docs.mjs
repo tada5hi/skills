@@ -15,7 +15,8 @@
  *   node scripts/lint-agent-docs.mjs                 check
  *   node scripts/lint-agent-docs.mjs --base <ref>    check, and refuse budgets that rose against <ref>
  *   node scripts/lint-agent-docs.mjs --update        lower budgets to the current sizes plus headroom
- *   node scripts/lint-agent-docs.mjs --init          write .agents/budget.json from the current files
+ *   node scripts/lint-agent-docs.mjs --init          write .agents/budget.json from the current files (refuses
+ *                                                    to replace an existing one: that would raise its budgets)
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -25,7 +26,9 @@ const ROOT = process.cwd();
 const BUDGET_PATH = '.agents/budget.json';
 
 // Phrases that narrate history or cite a local artifact instead of stating a rule.
-const HISTORY_PATTERN = /plan [0-9]{3}|\bused to\b|\bbefore #[0-9]|\bno longer\b|\bpinned by\b/gi;
+// "used to" after a form of "be" or "get" is the passive voice ("is used to
+// validate"), which states a current fact, so it does not match.
+const HISTORY_PATTERN = /plan [0-9]{3}|(?<!\b(?:is|are|am|be|been|being|was|were|get|gets|got|getting)\s+)\bused to\b|\bbefore #[0-9]|\bno longer\b|\bpinned by\b/gi;
 
 // Largest budget a new file may start with.
 const NEW_TOPIC_BYTES = 20000;
@@ -125,6 +128,11 @@ if (baseIndex !== -1 && !baseRef) {
 }
 
 if (args.includes('--init')) {
+    if (fs.existsSync(path.join(ROOT, BUDGET_PATH))) {
+        console.error(`error: ${BUDGET_PATH} already exists. Re-initializing would raise its budgets to the current sizes; run --update to lower them instead.`);
+        process.exit(1);
+    }
+
     const files = {};
 
     for (const file of listFiles()) {

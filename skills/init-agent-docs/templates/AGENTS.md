@@ -66,7 +66,7 @@ The guides above are loaded into every session, so their whole size is paid on e
 The test for a paragraph: would removing it let a reasonable change break something silently? If not, leave it out.
 
 - **Update docs only when an invariant or a cross-cutting rule changes.** A bug fix or a feature that follows the existing rules needs no doc change. Edit the existing line; never add a section for a single fix.
-- **Describe what the code does now.** No "used to", "no longer", "before #N". The one exception is a rejected alternative: keep the verdict and its one-line reason.
+- **Describe what the code does now.** No `used to`, `no longer`, `before #N`. The one exception is a rejected alternative: keep the verdict and its one-line reason.
 - **Cite issues or PRs, never local plan files**: a gitignored `.agents/plans/` file resolves for one person on one machine.
 <!-- Keep the next bullet only when scripts/lint-agent-docs.mjs was installed: -->
 - **`{{lint_agent_docs_command}}` enforces it.** Every file has a byte budget and a history-phrase budget in `.agents/budget.json`, and CI fails above either. Budgets only go down: run `node scripts/lint-agent-docs.mjs --update` after shortening a file (it keeps about 5% headroom), and never raise one to make room. On a pull request CI compares the budgets with the base branch and fails on any rise. A new topic file needs a budget entry of at most `newTopicBytes`.
