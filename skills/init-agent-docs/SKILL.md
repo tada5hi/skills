@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.10.26"
+  version: "2026.11.01"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -20,6 +20,8 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **`CLAUDE.md`** — Manifest file that references all agent guides (loaded by Claude Code on startup)
 - **`AGENTS.md`** — Main entry point with project overview, setup commands, and links to detailed guides
 - **`.agents/*.md`** — Detailed guides covering structure, architecture, testing, and conventions
+- **`.agents/topics/`** *(optional)*: Per-subsystem detail read on demand, never imported by `CLAUDE.md`; only create when a subsystem outgrows a few paragraphs
+- **`scripts/lint-agent-docs.mjs`** + **`.agents/budget.json`** *(optional)*: A size and history-phrase ratchet that keeps the always-loaded guides from growing back
 - **`.agents/references/`** *(optional)* — One Markdown file per external project the codebase cross-references; only create when `conventions.md` keeps its References section
 - **`.agents/plans/`** *(optional)* — Phased plan files for ongoing modernization or migration work; only create when `AGENTS.md` keeps its Plans section
 
@@ -41,7 +43,8 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
    - **Monorepos**: Use Applications/Packages tables, Dependency Layers, workspace-specific test commands
    - **Single packages**: Use Directory Layout, Module Responsibilities, Key Dependencies
 4. **Generate from templates** — Use the templates in [templates/](templates/) as starting points. Replace all `{{placeholders}}` with project-specific information. Remove HTML comments and unused sections. Add project-specific sections as needed (e.g., design patterns with code examples).
-5. **Write the files** — Create `CLAUDE.md`, `AGENTS.md`, and the selected `.agents/*.md` files in the project root. If `conventions.md` keeps its References section, create `.agents/references/` (and seed one file per external project). If `AGENTS.md` keeps its Plans section, create `.agents/plans/` (and add the phased plan files it links to).
+5. **Install the ratchet** *(recommended for any project expected to live long)*: copy [templates/scripts/lint-agent-docs.mjs](templates/scripts/lint-agent-docs.mjs) to `scripts/`, add a `lint:agent-docs` script (`node scripts/lint-agent-docs.mjs`), run it once with `--init` to write `.agents/budget.json`, and add the script to the CI lint job. Fill `{{lint_agent_docs_command}}` in AGENTS.md, or drop that bullet.
+6. **Write the files** — Create `CLAUDE.md`, `AGENTS.md`, and the selected `.agents/*.md` files in the project root. If `conventions.md` keeps its References section, create `.agents/references/` (and seed one file per external project). If `AGENTS.md` keeps its Plans section, create `.agents/plans/` (and add the phased plan files it links to).
 
 ## Available Templates
 
@@ -53,6 +56,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 | [.agents/architecture.md](templates/.agents/architecture.md)| Design patterns & data flow       | When architecture is notable |
 | [.agents/testing.md](templates/.agents/testing.md)          | Test setup & conventions          | When tests exist             |
 | [.agents/conventions.md](templates/.agents/conventions.md)  | Code style, tooling, CI/CD        | When conventions are defined |
+| [scripts/lint-agent-docs.mjs](templates/scripts/lint-agent-docs.mjs) | Size and history-phrase ratchet | Recommended |
 
 ## Guidelines
 
@@ -64,7 +68,8 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **Update CLAUDE.md** to only reference the guides that were actually created (uncomment the relevant `@` lines).
 - **Include code examples in architecture.md** when documenting design patterns. Show actual interfaces and implementations so agents can follow the patterns when writing new code.
 - **Document dependency layers for monorepos.** This is critical for agents to understand build order and impact of changes.
-- **Add the NOTE comment** at the top of AGENTS.md reminding to keep docs updated as the project evolves.
+- **Keep the "Writing agent docs" section in AGENTS.md.** It is the rule that stops the guides from growing back: update docs only when an invariant or a cross-cutting rule changes, edit the existing line, and route everything else (defect stories, spec lists, mechanism walkthroughs, release notes) elsewhere. Never add a generic "keep these docs updated as the project evolves" note: it turns every finished task into a new paragraph, and append-only docs grow without bound (one project went from 86 KB to 715 KB in four months).
+- **Budget the always-loaded set.** Everything `CLAUDE.md` imports is paid on every session. Keep it under about 60 KB in total; move a subsystem that needs more than a few paragraphs into `.agents/topics/<name>.md` and list it in a one-line index at the end of architecture.md.
 - **Document per-application layouts for monorepos** in structure.md. Show the internal directory tree of each service/app, especially when they follow a specific architecture pattern (hexagonal, MVC, etc.).
 - **Prefer fakes over mocks** in testing.md when the project uses hexagonal architecture or dependency inversion. Guide agents toward fake implementations of port interfaces rather than `vi.fn()`/`vi.mock()`.
 - **Check default rules against the code before keeping them.** The conventions and testing templates ship rules in plain text with a "keep only when…" comment: the module-folder layout, interface/type naming, the file header, house libraries and the test-kit package. Keep each one only when its condition holds, replace it with the rule the code actually follows, or remove it. Never introduce a convention the project doesn't follow, except the module layout in a new project.
