@@ -21,7 +21,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **`AGENTS.md`** — Main entry point with project overview, setup commands, and links to detailed guides
 - **`.agents/*.md`** — Detailed guides covering structure, architecture, testing, and conventions
 - **`.agents/topics/`** *(optional)*: Per-subsystem detail read on demand, never imported by `CLAUDE.md`; only create when a subsystem outgrows a few paragraphs
-- **Size and history checks**: `@tada5hi/eslint-config` 3.3.0 or later runs them by default (`agentDocs`); a project without that config installs **`scripts/lint-agent-docs.mjs`** + **`.agents/budget.json`** *(fallback)*, a ratchet that keeps the always-loaded guides from growing back
+- **Size and history checks**: `@tada5hi/eslint-config` 3.3.1 or later runs them by default (`agentDocs`); a project without that config installs **`scripts/lint-agent-docs.mjs`** + **`.agents/budget.json`** *(fallback)*, a ratchet that keeps the always-loaded guides from growing back
 - **`.agents/references/`** *(optional)* — One Markdown file per external project the codebase cross-references; only create when `conventions.md` keeps its References section
 - **`.agents/plans/`** *(optional)* — Phased plan files for ongoing modernization or migration work; only create when `AGENTS.md` keeps its Plans section
 
@@ -45,7 +45,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 4. **Generate from templates** — Use the templates in [templates/](templates/) as starting points. Replace all `{{placeholders}}` with project-specific information. Remove HTML comments and unused sections. Add project-specific sections as needed (e.g., design patterns with code examples).
 5. **Write the files** — Create `CLAUDE.md`, `AGENTS.md`, and the selected `.agents/*.md` files in the project root. If `conventions.md` keeps its References section, create `.agents/references/` (and seed one file per external project). If `AGENTS.md` keeps its Plans section, create `.agents/plans/` (and add the phased plan files it links to).
 6. **Enforce the size rules**, once every guide is written:
-   - **The project lints with `@tada5hi/eslint-config`** (bump it to `^3.3.0` if older): the `agentDocs` checks are on by default. `CLAUDE.md`, `AGENTS.md`, `.agents/*.md` and `.agents/topics/**/*.md` are linted as Markdown for size (40000 bytes per file), history phrases outside code, and the total `CLAUDE.md` loads through its imports (60000 bytes). Plans (`.agents/plans/`) are not linted. Make sure the lint script reaches those files: `eslint .` does, a script listing directories needs `CLAUDE.md AGENTS.md .agents` added. Raise `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` only when existing docs exceed the defaults, set just above their current size, and lower them as the docs shrink.
+   - **The project lints with `@tada5hi/eslint-config`** (bump it to `^3.3.1` if older): the `agentDocs` checks are on by default. `CLAUDE.md`, `AGENTS.md`, `.agents/*.md` and `.agents/topics/**/*.md` are linted as Markdown for size (40000 bytes per file), history phrases outside code, and the total `CLAUDE.md` loads through its imports (60000 bytes). Plans (`.agents/plans/`) are ignored; `agentDocs.ignores` replaces that list. Make sure the lint script reaches those files: `eslint .` does, a script listing directories needs `CLAUDE.md AGENTS.md .agents` added. Raise `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` only when existing docs exceed the defaults, set just above their current size, and lower them as the docs shrink.
    - **Otherwise**, install the ratchet: copy [templates/scripts/lint-agent-docs.mjs](templates/scripts/lint-agent-docs.mjs) to `scripts/`, add a `lint:agent-docs` script (`node scripts/lint-agent-docs.mjs`), run it once with `--init` to write `.agents/budget.json` (current sizes plus about 5% headroom), and add two CI steps to the lint job: `npm run lint:agent-docs` on every run, and on pull requests only `git fetch --no-tags --depth=1 origin "$BASE_REF"` followed by `npm run lint:agent-docs -- --base FETCH_HEAD`, which fails when a budget rises against the base branch. Without that second step a change can raise a budget together with the file and still pass.
    - Fill `{{lint_agent_docs_command}}` in AGENTS.md with the command that runs the checks (`npm run lint` or `npm run lint:agent-docs`), and keep the matching bullet.
 
@@ -59,7 +59,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 | [.agents/architecture.md](templates/.agents/architecture.md)| Design patterns & data flow       | When architecture is notable |
 | [.agents/testing.md](templates/.agents/testing.md)          | Test setup & conventions          | When tests exist             |
 | [.agents/conventions.md](templates/.agents/conventions.md)  | Code style, tooling, CI/CD        | When conventions are defined |
-| [scripts/lint-agent-docs.mjs](templates/scripts/lint-agent-docs.mjs) | Size and history-phrase ratchet | Only without `@tada5hi/eslint-config` 3.3.0+ |
+| [scripts/lint-agent-docs.mjs](templates/scripts/lint-agent-docs.mjs) | Size and history-phrase ratchet | Only without `@tada5hi/eslint-config` 3.3.1+ |
 
 ## Guidelines
 
