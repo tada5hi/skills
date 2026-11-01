@@ -2,81 +2,185 @@
  * Ratchet for the agent docs (AGENTS.md, .agents/*.md, .agents/topics/*.md).
  *
  * Every file has a byte budget and a history-phrase budget in
- * .agents/budget.json. A file over either budget fails. Budgets only go down:
- * after shortening a file, run with --update to lower them. A new file needs
- * a budget entry.
+ * .agents/budget.json. A file over either budget fails. Budgets only ever go
+ * down: after shortening a file, run with --update to lower them (to the new
+ * size plus a little headroom). A new file needs a budget entry.
+ *
+ * With --base <ref> (CI on a pull request) the budgets themselves are checked
+ * against the ones on <ref>: no entry may rise, and an entry the base does not
+ * have may not exceed newTopicBytes. Without it, raising a budget in the same
+ * change as the file would pass.
  *
  * Usage (from the repository root):
- *   node scripts/lint-agent-docs.mjs           check
- *   node scripts/lint-agent-docs.mjs --update  lower budgets to the current values
- *   node scripts/lint-agent-docs.mjs --init    write .agents/budget.json from the current files
+ *   node scripts/lint-agent-docs.mjs                 check
+ *   node scripts/lint-agent-docs.mjs --base <ref>    check, and refuse budgets that rose against <ref>
+ *   node scripts/lint-agent-docs.mjs --update        lower budgets to the current sizes plus headroom
+ *   node scripts/lint-agent-docs.mjs --init          write .agents/budget.json from the current files
  */
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const BUDGET_FILE = path.join(ROOT, '.agents', 'budget.json');
+const BUDGET_PATH = '.agents/budget.json';
 
 // Phrases that narrate history or cite a local artifact instead of stating a rule.
 const HISTORY_PATTERN = /plan [0-9]{3}|\bused to\b|\bbefore #[0-9]|\bno longer\b|\bpinned by\b/gi;
 
-// Starting budget for a new topic file, and for core files on --init.
+// Largest budget a new file may start with.
 const NEW_TOPIC_BYTES = 20000;
+
+// --update and --init leave this much room above the current size, so a
+// correction that adds a few words still fits. --update never raises a budget.
+const HEADROOM_RATIO = 0.05;
+const HEADROOM_MIN_BYTES = 512;
+
+function withHeadroom(bytes) {
+    return bytes + Math.max(HEADROOM_MIN_BYTES, Math.ceil(bytes * HEADROOM_RATIO));
+}
 
 function listFiles() {
     const files = fs.existsSync(path.join(ROOT, 'AGENTS.md')) ? ['AGENTS.md'] : [];
+
     for (const dir of ['.agents', '.agents/topics']) {
         const abs = path.join(ROOT, dir);
-        if (!fs.existsSync(abs)) continue;
+
+        if (!fs.existsSync(abs)) {
+            continue;
+        }
+
         for (const name of fs.readdirSync(abs)) {
-            if (name.endsWith('.md')) files.push(`${dir}/${name}`);
+            if (name.endsWith('.md')) {
+                files.push(`${dir}/${name}`);
+            }
         }
     }
+
     return files.sort();
 }
 
 function measure(file) {
     const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
-    return { bytes: Buffer.byteLength(text), history: (text.match(HISTORY_PATTERN) || []).length };
+
+    return {
+        bytes: Buffer.byteLength(text),
+        history: (text.match(HISTORY_PATTERN) || []).length,
+    };
 }
 
-const args = new Set(process.argv.slice(2));
+function readBaseBudget(ref) {
+    try {
+        const content = execFileSync('git', ['show', `${ref}:${BUDGET_PATH}`], {
+            cwd: ROOT,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+        });
 
-if (args.has('--init')) {
+        return JSON.parse(content);
+    } catch {
+        // The base predates the budget file: everything counts as new.
+        return null;
+    }
+}
+
+function checkAgainstBase(budget, base, errors) {
+    if (!base) {
+        return;
+    }
+
+    const maxNew = Math.min(base.newTopicBytes, budget.newTopicBytes);
+
+    if (budget.newTopicBytes > base.newTopicBytes) {
+        errors.push(`newTopicBytes rose from ${base.newTopicBytes} to ${budget.newTopicBytes}. Budgets only go down.`);
+    }
+
+    for (const [file, limit] of Object.entries(budget.files)) {
+        const previous = base.files[file];
+
+        if (!previous) {
+            if (limit.bytes > maxNew) {
+                errors.push(`${file}: a new file's budget is ${limit.bytes} bytes, above newTopicBytes (${maxNew}). Split it or cut it down.`);
+            }
+
+            continue;
+        }
+
+        if (limit.bytes > previous.bytes) {
+            errors.push(`${file}: byte budget rose from ${previous.bytes} to ${limit.bytes}. Budgets only go down.`);
+        }
+
+        if (limit.history > previous.history) {
+            errors.push(`${file}: history budget rose from ${previous.history} to ${limit.history}. Budgets only go down.`);
+        }
+    }
+}
+
+const args = process.argv.slice(2);
+const baseIndex = args.indexOf('--base');
+const baseRef = baseIndex === -1 ? undefined : args[baseIndex + 1];
+
+if (baseIndex !== -1 && !baseRef) {
+    console.error('error: --base needs a git ref');
+    process.exit(1);
+}
+
+if (args.includes('--init')) {
     const files = {};
-    for (const file of listFiles()) files[file] = measure(file);
-    fs.writeFileSync(BUDGET_FILE, `${JSON.stringify({ newTopicBytes: NEW_TOPIC_BYTES, files }, null, 4)}\n`);
-    console.log(`wrote ${path.relative(ROOT, BUDGET_FILE)} for ${Object.keys(files).length} files`);
+
+    for (const file of listFiles()) {
+        const current = measure(file);
+        files[file] = { bytes: withHeadroom(current.bytes), history: current.history };
+    }
+
+    fs.writeFileSync(path.join(ROOT, BUDGET_PATH), `${JSON.stringify({ newTopicBytes: NEW_TOPIC_BYTES, files }, null, 4)}\n`);
+    console.log(`wrote ${BUDGET_PATH} for ${Object.keys(files).length} files`);
     process.exit(0);
 }
 
-const budget = JSON.parse(fs.readFileSync(BUDGET_FILE, 'utf8'));
+const update = args.includes('--update');
+const budget = JSON.parse(fs.readFileSync(path.join(ROOT, BUDGET_PATH), 'utf8'));
 const errors = [];
 
 for (const file of listFiles()) {
     const current = measure(file);
     const limit = budget.files[file];
+
     if (!limit) {
-        errors.push(`${file}: no budget. Add it to .agents/budget.json (at most ${budget.newTopicBytes} bytes for a new topic file).`);
+        errors.push(`${file}: no budget. Add it to ${BUDGET_PATH}, at most ${budget.newTopicBytes} bytes for a new file.`);
+
         continue;
     }
+
     if (current.bytes > limit.bytes) {
         errors.push(`${file}: ${current.bytes} bytes, budget ${limit.bytes}. Rewrite or move detail out; do not raise the budget.`);
     }
+
     if (current.history > limit.history) {
         errors.push(`${file}: ${current.history} history phrases, budget ${limit.history}. State the rule as it is now.`);
     }
-    if (args.has('--update')) {
-        limit.bytes = Math.min(limit.bytes, current.bytes);
+
+    if (update) {
+        limit.bytes = Math.min(limit.bytes, withHeadroom(current.bytes));
         limit.history = Math.min(limit.history, current.history);
     }
 }
 
 for (const file of Object.keys(budget.files)) {
-    if (!fs.existsSync(path.join(ROOT, file))) errors.push(`${file}: budget entry for a file that does not exist.`);
+    if (!fs.existsSync(path.join(ROOT, file))) {
+        errors.push(`${file}: budget entry for a file that does not exist.`);
+    }
 }
 
-if (args.has('--update')) fs.writeFileSync(BUDGET_FILE, `${JSON.stringify(budget, null, 4)}\n`);
+if (baseRef) {
+    checkAgainstBase(budget, readBaseBudget(baseRef), errors);
+}
 
-for (const error of errors) console.error(`error: ${error}`);
+if (update) {
+    fs.writeFileSync(path.join(ROOT, BUDGET_PATH), `${JSON.stringify(budget, null, 4)}\n`);
+}
+
+for (const error of errors) {
+    console.error(`error: ${error}`);
+}
+
 process.exit(errors.length ? 1 : 0);
