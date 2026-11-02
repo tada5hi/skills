@@ -18,9 +18,9 @@
  *     }
  *   }
  *
- * Usage (from the repository root):
- *   node split-agent-docs.mjs <map.json>            dry run: sizes per topic, what stays, unmatched headings
- *   node split-agent-docs.mjs <map.json> --write    write .agents/topics/*.md and remove the moved sections
+ * Usage (from the repository root; <skill-dir> is this skill's directory):
+ *   node <skill-dir>/scripts/split-agent-docs.mjs <map.json>            dry run: sizes per topic, what stays, unmatched headings
+ *   node <skill-dir>/scripts/split-agent-docs.mjs <map.json> --write    write .agents/topics/*.md and remove the moved sections
  *
  * It refuses a heading that matches no section or more than one, a section
  * claimed twice and a topic file that already exists, so a run never loses or
@@ -49,14 +49,32 @@ function parse(file) {
 
     const lines = fs.readFileSync(file, 'utf8').split('\n');
     const sections = [];
-    let fence = false;
+    // Line indexes inside fenced code blocks (fence lines included).
+    const fenced = new Set();
+    let fence = null;
 
     lines.forEach((line, index) => {
-        if (/^(```|~~~)/.test(line)) {
-            fence = !fence;
+        const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+
+        if (fence) {
+            fenced.add(index);
+
+            // A closing fence uses the opening character, is at least as long and has nothing after it.
+            if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && marker[2].trim() === '') {
+                fence = null;
+            }
+
+            return;
         }
 
-        const match = !fence && /^(#{2,3}) (.+)$/.exec(line);
+        if (marker && !(marker[1][0] === '`' && marker[2].includes('`'))) {
+            fence = marker[1];
+            fenced.add(index);
+
+            return;
+        }
+
+        const match = /^(#{2,3}) (.+)$/.exec(line);
 
         if (match) {
             sections.push({ level: match[1].length, text: match[2].trim(), start: index });
@@ -68,7 +86,9 @@ function parse(file) {
         section.end = next ? next.start : lines.length;
     }
 
-    const parsed = { lines, sections, claimed: [] };
+    const parsed = {
+        lines, sections, fenced, claimed: [],
+    };
     files.set(file, parsed);
 
     return parsed;
@@ -103,8 +123,11 @@ for (const [name, topic] of Object.entries(map)) {
         }
 
         doc.claimed.push(section);
-        const body = doc.lines.slice(section.start + 1, section.end).join('\n').trim()
-            .replace(/^### /gm, '#### ');
+        // Demote `###` headings under the new `##`; leave code blocks verbatim.
+        const body = doc.lines.slice(section.start + 1, section.end)
+            .map((line, i) => (doc.fenced.has(section.start + 1 + i) ? line : line.replace(/^### /, '#### ')))
+            .join('\n')
+            .trim();
         text += `\n## ${ref.as ?? section.text}\n\n${body}\n`;
     }
 
