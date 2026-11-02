@@ -43,6 +43,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [init-ts-project](skills/init-ts-project/) | Manual | Scaffold a new TypeScript project from `tada5hi/typescript-template` |
 | [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
 | [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [migrate-agent-docs](skills/migrate-agent-docs/) | Manual | Move oversized agent docs into on-demand topic files and lint-enforced limits |
 | [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |
 | [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
 | [query-package-list](skills/query-package-list/) | Manual | Look up your own published packages in an awesome-style list before writing a utility |

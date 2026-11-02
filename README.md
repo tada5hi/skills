@@ -124,6 +124,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 |---|---|
 | [init-agent-docs](skills/init-agent-docs/) | Scaffold `CLAUDE.md`, `AGENTS.md` and `.agents/*.md` for a repository |
 | [update-agent-docs](skills/update-agent-docs/) | Propose improvements to the `init-agent-docs` templates back to this repository |
+| [migrate-agent-docs](skills/migrate-agent-docs/) | Move an existing project's oversized agent docs into on-demand topic files with lint-enforced size limits |
 | [write-readme](skills/write-readme/) | Write a hero-led README with a "Why …?" section, theme-aware SVGs and verified samples |
 | [write-release-notes](skills/write-release-notes/) | Write highlights-first GitHub release notes above the generated changelog |
 | [generate-commit-message](skills/generate-commit-message/) | Generate a Conventional Commits message for uncommitted changes |
