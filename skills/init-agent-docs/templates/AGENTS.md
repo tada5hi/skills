@@ -1,5 +1,3 @@
-<!-- NOTE: Keep this file and all corresponding files in the .agents directory updated as the project evolves. When making architectural changes, adding new patterns, or discovering important conventions, update the relevant sections. -->
-
 # {{project_name}}: Agent Guide
 
 {{project_description_paragraph}}
@@ -50,6 +48,29 @@ The `{{docs_directory}}` directory contains the project documentation site. When
 <!-- - **[Architecture](.agents/architecture.md)**: Design patterns, data flow, and key abstractions -->
 <!-- - **[Testing](.agents/testing.md)**: Test runner, conventions, and infrastructure -->
 <!-- - **[Conventions](.agents/conventions.md)**: Best practices, tooling, validation, and error handling -->
+<!-- Once a subsystem needs more than a few paragraphs, move it to its own on-demand file and keep this line: -->
+<!-- - **[Topic files](.agents/topics/)**: per-subsystem detail, indexed at the end of architecture.md. NOT loaded into every session: read the topic file before changing that area. -->
+
+### Writing agent docs
+
+The guides above are loaded into every session, so their whole size is paid on every task. They say what a future task must know to avoid a silent breakage. **They are not a changelog, a design record or a test index.**
+
+| Content | Where it goes |
+|---|---|
+| A cross-cutting rule or an easy-to-break invariant, its reason, and the rejected alternative | One line in a guide, with the issue number |
+| A subsystem's invariants and rejected alternatives | Its topic file (`.agents/topics/<name>.md`) |
+| Mechanism the code already shows | Nowhere, or a code comment |
+| How a defect happened, before/after, "pinned by spec X" | The PR description or commit message |
+| What changed for users or operators | CHANGELOG or the docs site |
+
+The test for a paragraph: would removing it let a reasonable change break something silently? If not, leave it out.
+
+- **Update docs only when an invariant or a cross-cutting rule changes.** A bug fix or a feature that follows the existing rules needs no doc change. Edit the existing line; never add a section for a single fix.
+- **Describe what the code does now.** No `used to`, `no longer`, `before #N`. The one exception is a rejected alternative: keep the verdict and its one-line reason.
+- **Cite issues or PRs, never local plan files**: a gitignored `.agents/plans/` file resolves for one person on one machine.
+<!-- Keep the bullet that matches how the checks run (SKILL.md step 6), and delete the other. -->
+- **`{{lint_agent_docs_command}}` enforces it** through the `agentDocs` checks of `@tada5hi/eslint-config`: a size limit per agent doc, a limit on everything `CLAUDE.md` loads through its imports, and no history phrases outside code. Lower the limits in `eslint.config.js` as the docs shrink; raising one is a policy change, not a fix.
+- **`{{lint_agent_docs_command}}` enforces it.** Every file has a byte budget and a history-phrase budget in `.agents/budget.json`, and CI fails above either. Budgets only go down: run `node scripts/lint-agent-docs.mjs --update` after shortening a file (it keeps about 5% headroom), and never raise one to make room. On a pull request CI compares the budgets with the base branch and fails on any rise. A new topic file needs a budget entry of at most `newTopicBytes`.
 
 ## Plans
 
