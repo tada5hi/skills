@@ -37,6 +37,7 @@ export const manual: string[] = [
     'init-ts-project',
     'investigate-pr-comments',
     'link-skills',
+    'migrate-agent-docs',
     'plan-status',
     'prd-to-issues',
     'prd-to-plan',
