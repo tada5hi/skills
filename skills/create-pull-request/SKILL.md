@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires a git repository with a GitHub remote and the `gh` CLI authenticated.
 metadata:
   author: tada5hi
-  version: "2026.10.16"
-allowed-tools: Bash(git:*) Bash(gh:*) Read Write Glob Grep
+  version: "2026.11.03"
+allowed-tools: Bash(git:*) Bash(gh:*) Bash(sleep:*) Read Write Glob Grep Skill
 ---
 
 # create-pull-request
@@ -115,4 +115,29 @@ gh pr create --base <base> --title "<title>" --body-file "${TMPDIR:-/tmp}/pr-bod
 
 - Add `--draft` when the user asks for it or the work is incomplete (failing checks, open TODOs).
 - `gh pr create` prints the PR URL. Give it to the user.
-- Once reviewers comment, `/investigate-pr-comments` triages and fixes the feedback.
+
+## Step 7: Await review and checks, then investigate
+
+Do not end the task at the PR URL. Automated reviewers (CodeRabbit, Copilot, Qodo and similar) and CI need a few minutes, and their findings belong to the same piece of work.
+
+Wait until no check on the PR is pending, for at most 30 minutes. Run the wait in the background when your agent supports it (for example `run_in_background` in Claude Code) and keep working or report progress meanwhile; otherwise run it in the foreground:
+
+```bash
+pr=$(gh pr view --json number --jq .number)
+sleep 60  # checks register a few seconds to a minute after the push
+for i in $(seq 1 58); do
+  pending=$(gh pr checks "$pr" --json bucket --jq '[.[] | select(.bucket == "pending")] | length' 2>/dev/null || echo 0)
+  [ "$pending" = 0 ] && break
+  sleep 30
+done
+gh pr checks "$pr"
+```
+
+Review bots usually report as a check (CodeRabbit's is named `CodeRabbit`), so "no check pending" also means their review is in. Then:
+
+- **Review comments exist** (from bots or people): run `/investigate-pr-comments` on the PR. It triages each comment against the code and fixes the real ones.
+- **A check failed**: read its log (`gh run view <run-id> --log-failed`), fix the cause on the branch if it is caused by this PR, push, and say so. Report failures that are not caused by this PR instead of fixing them.
+- **Still pending after 30 minutes**: report which checks are pending and stop; do not wait longer.
+- **No checks and no comments**: report that and stop.
+
+Skip this step only when the user asked you to stop after opening the PR.
