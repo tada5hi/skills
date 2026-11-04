@@ -132,6 +132,18 @@ Commits follow **{{commit_convention}}**:
 
 {{typescript_config_description}}
 
+## Dependency Pins
+
+<!-- Remove if package.json has no `overrides` / `resolutions` / `pnpm.overrides` block and no dependency is deliberately held below its latest major. Otherwise list every pin with its reason and the condition that lifts it. A pin without an exit condition outlives its reason: the next dependency update either keeps a workaround nobody needs or bumps the held package and breaks the build. -->
+
+| Pin | Reason | Lift when |
+|-----|--------|-----------|
+| {{pinned_dependency}} | {{pin_reason}} | {{pin_exit_condition}} |
+
+<!-- Example rows: -->
+<!-- | `overrides`: `@scope/plugin` accepts the root `core` | the peer range of `@scope/plugin` lags one major behind `core` | `@scope/plugin` publishes a release whose peer range includes the installed `core` | -->
+<!-- | `typescript` held at 6.x | `typescript-eslint` peers `typescript <6.1.0` | `typescript-eslint` widens its peer range | -->
+
 ## Build Output
 
 <!-- Describe what the build produces and where it goes. -->
@@ -146,7 +158,7 @@ Commits follow **{{commit_convention}}**:
 
 ## CI/CD
 
-<!-- Describe CI/CD pipelines: what triggers them, what they do. -->
+<!-- Describe CI/CD pipelines: the workflow files, what triggers them, which jobs they run. Leave out action versions (`actions/checkout@v6`) and the runtime version: Dependabot and runtime upgrades change them without touching the docs, so they go stale. The workflow file is the source for both. -->
 
 - {{ci_cd_description}}
 

@@ -18,6 +18,8 @@
 - **Package manager**: {{package_manager}}
 - **Build orchestration**: {{build_orchestrator}}
 
+<!-- Take {{node_version}} from `engines.node` in package.json. State runtime and tool versions only here; the other guides refer to this line instead of repeating the version, so a runtime upgrade edits one place. -->
+
 <!-- For monorepos, add a workspace layout note like: "Apps are runnable applications in apps/, packages are shared libraries in packages/." -->
 
 ### CLI Entry Points
