@@ -73,7 +73,7 @@ The test for a paragraph: would removing it let a reasonable change break someth
 - **Describe what the code does now.** No `used to`, `no longer`, `before #N`. The one exception is a rejected alternative: keep the verdict and its one-line reason.
 - **Cite issues or PRs, never local plan files**: a gitignored `.agents/plans/` file resolves for one person on one machine.
 <!-- Keep the bullet that matches how the checks run (SKILL.md step 6), and delete the other. -->
-- **`{{lint_agent_docs_command}}` enforces it** through the `agentDocs` checks of `@tada5hi/eslint-config`: a size limit per agent doc, a combined size limit for imported guides, and no history phrases outside code. Lower the limits in `eslint.config.js` as the docs shrink; raising one is a policy change, not a fix.
+- **`{{lint_agent_docs_command}}` enforces it** through the `agentDocs` checks of `@tada5hi/eslint-config`: size and history-phrase limits for checked documents, and a combined size limit for configured import roots and their guides. File patterns and import roots are selected by the ESLint configuration; additional instruction files need matching patterns. Lower the limits in `eslint.config.js` as the docs shrink; raising one is a policy change, not a fix.
 - **`{{lint_agent_docs_command}}` enforces it.** Every file has a byte budget and a history-phrase budget in `.agents/budget.json`, and CI fails above either. Budgets only go down: run `node scripts/lint-agent-docs.mjs --update` after shortening a file (it keeps about 5% headroom), and never raise one to make room. On a pull request CI compares the budgets with the base branch and fails on any rise. A new topic file needs a budget entry of at most `newTopicBytes`.
 
 ## Plans
