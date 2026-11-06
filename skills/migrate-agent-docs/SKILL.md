@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires a git repository that already has CLAUDE.md/AGENTS.md and .agents/*.md, and Node.js for the split script.
 metadata:
   author: tada5hi
-  version: "2026.11.02"
+  version: "2026.11.06"
 allowed-tools: Read Write Edit Glob Grep Bash(node:*) Bash(npx eslint:*) Bash(npm:*) Bash(git:*) Bash(wc:*)
 ---
 

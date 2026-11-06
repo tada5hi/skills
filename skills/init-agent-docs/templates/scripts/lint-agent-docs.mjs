@@ -137,6 +137,7 @@ if (args.includes('--init')) {
 
     for (const file of listFiles()) {
         const current = measure(file);
+
         files[file] = { bytes: withHeadroom(current.bytes), history: current.history };
     }
 

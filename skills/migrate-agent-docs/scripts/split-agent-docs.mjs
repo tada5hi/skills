@@ -77,18 +77,27 @@ function parse(file) {
         const match = /^(#{2,3}) (.+)$/.exec(line);
 
         if (match) {
-            sections.push({ level: match[1].length, text: match[2].trim(), start: index });
+            sections.push({
+                level: match[1].length,
+                text: match[2].trim(),
+                start: index,
+            });
         }
     });
 
     for (const [i, section] of sections.entries()) {
         const next = sections.slice(i + 1).find((s) => s.level <= section.level);
+
         section.end = next ? next.start : lines.length;
     }
 
     const parsed = {
-        lines, sections, fenced, claimed: [],
+        lines,
+        sections,
+        fenced,
+        claimed: [],
     };
+
     files.set(file, parsed);
 
     return parsed;
@@ -111,6 +120,7 @@ for (const [name, topic] of Object.entries(map)) {
 
         if (found.length !== 1) {
             errors.push(`${ref.file}: "${ref.heading}" matches ${found.length} headings.`);
+
             continue;
         }
 
@@ -119,15 +129,18 @@ for (const [name, topic] of Object.entries(map)) {
 
         if (overlap) {
             errors.push(`${ref.file}: "${section.text}" overlaps "${overlap.text}", claimed already.`);
+
             continue;
         }
 
         doc.claimed.push(section);
+
         // Demote `###` headings under the new `##`; leave code blocks verbatim.
         const body = doc.lines.slice(section.start + 1, section.end)
             .map((line, i) => (doc.fenced.has(section.start + 1 + i) ? line : line.replace(/^### /, '#### ')))
             .join('\n')
             .trim();
+
         text += `\n## ${ref.as ?? section.text}\n\n${body}\n`;
     }
 
@@ -139,8 +152,9 @@ for (const [target, text] of Object.entries(topics)) {
 }
 
 for (const [file, doc] of files) {
-    const kept = doc.lines.filter((_, i) => !doc.claimed.some((c) => i >= c.start && i < c.end)).join('\n');
-    const left = doc.sections.filter((s) => !doc.claimed.some((c) => s.start >= c.start && s.start < c.end));
+    const kept = doc.lines.filter((_, i) => doc.claimed.every((c) => !(i >= c.start && i < c.end))).join('\n');
+    const left = doc.sections.filter((s) => doc.claimed.every((c) => !(s.start >= c.start && s.start < c.end)));
+
     console.log(`${file}: ${Buffer.byteLength(kept)} bytes stay; headings left: ${left.map((s) => s.text).join(' | ') || 'none'}`);
     doc.kept = kept;
 }

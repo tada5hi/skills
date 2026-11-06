@@ -1,24 +1,5 @@
-export interface VendorSkillMeta {
-    /**
-     * Whether this is an official/first-party skill from the upstream project.
-     */
-    official?: boolean
-    /**
-     * Git repository URL to clone as a submodule.
-     */
-    source: string
-    /**
-     * Subdirectory within the vendor repo that contains skill directories.
-     * Defaults to `'skills'`. Use `'.'` for repos where skills are at the root.
-     */
-    skillsPath?: string
-    /**
-     * Map of source skill name → output skill name.
-     * Source skills are read from `vendor/<key>/<skillsPath>/<sourceSkillName>/`.
-     * Output skills are written to `skills/<outputSkillName>/`.
-     */
-    skills: Record<string, string>
-}
+import type { IVendorSkillMeta } from './types.ts';
+
 
 /**
  * Hand-maintained skills authored in this repository.
@@ -52,19 +33,17 @@ export const manual: string[] = [
     'write-a-prd',
     'write-readme',
     'write-release-notes',
-]
+];
 
 /**
  * External repositories that already maintain their own skills.
  * Cloned as submodules under `vendor/<key>/` and synced into `skills/`.
  */
-export const vendors: Record<string, VendorSkillMeta> = {
+export const vendors: Record<string, IVendorSkillMeta> = {
     'cloudflare-security-audit': {
         official: true,
         source: 'https://github.com/cloudflare/security-audit-skill',
-        skills: {
-            'security-audit': 'security-audit',
-        },
+        skills: { 'security-audit': 'security-audit' },
     },
     'mattpocock-skills': {
         source: 'https://github.com/mattpocock/skills',
@@ -80,8 +59,6 @@ export const vendors: Record<string, VendorSkillMeta> = {
     },
     'dietrichgebert-ponytail': {
         source: 'https://github.com/DietrichGebert/ponytail',
-        skills: {
-            ponytail: 'ponytail',
-        },
+        skills: { ponytail: 'ponytail' },
     },
-}
+};

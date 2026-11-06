@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires Node.js >= 18, git and the `gh` CLI authenticated with push access to the list repository.
 metadata:
   author: tada5hi
-  version: "2026.10.16"
+  version: "2026.11.06"
 allowed-tools: Bash(node:*) Bash(gh:*) Bash(git:*) Read Edit Write AskUserQuestion
 ---
 

@@ -1,27 +1,29 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest';
 import {
     getExistingSubmodulePaths,
     submoduleExists,
-} from '../../../src/submodule.ts'
+} from '../../../src/submodule.ts';
 
 describe('submodule', () => {
     describe('submoduleExists', () => {
         it('should return false for a non-existent submodule', () => {
-            expect(submoduleExists('vendor/does-not-exist')).toBe(false)
-        })
-    })
+            expect(submoduleExists('vendor/does-not-exist')).toBe(false);
+        });
+    });
 
     describe('getExistingSubmodulePaths', () => {
         it('should return an array', () => {
-            const paths = getExistingSubmodulePaths()
-            expect(Array.isArray(paths)).toBe(true)
-        })
+            const paths = getExistingSubmodulePaths();
+
+            expect(Array.isArray(paths)).toBe(true);
+        });
 
         it('should return strings', () => {
-            const paths = getExistingSubmodulePaths()
+            const paths = getExistingSubmodulePaths();
+
             for (const p of paths) {
-                expect(typeof p).toBe('string')
+                expect(typeof p).toBe('string');
             }
-        })
-    })
-})
+        });
+    });
+});
