@@ -1,5 +1,3 @@
-<!-- NOTE: Keep this file and all corresponding files in the .agents directory updated as the project evolves. When adding new skills, changing templates, or updating conventions, update the relevant sections. -->
-
 # tada5hi/skills — Agent Guide
 
 A curated collection of reusable Agent Skills following the [Agent Skills](https://agentskills.io) open standard. Skills provide structured, template-driven documentation scaffolding for AI coding agents (Claude Code, Cursor, VS Code Copilot, Gemini CLI, Goose, Roo Code, etc.).
@@ -25,7 +23,7 @@ npm run skills:cleanup    # Remove stale submodules/skills
 npm run skills:link       # Link skills for Claude Code discovery
 ```
 
-- **Node.js**: CLI >= 22.0.0; development tooling >= 24.11.0
+- **Node.js**: CLI >= 22.0.0; development tooling `^24.11.0 || >=26.0.0`
 - **Package manager**: npm
 - **Skill registry**: `src/meta.ts` (single source of truth for all skills)
 
@@ -75,3 +73,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 
 - Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
 - Do **not** add AI-attribution lines (e.g. `🤖 Generated with [Claude Code](...)`) to issue or pull request titles, bodies, or comments.
+
+## Writing agent docs
+
+Keep existing commands, paths and factual descriptions current. Add guide content only for an invariant or cross-cutting rule. Describe current source behavior and verified commands; keep defect stories and task history in commits or PRs. Preserve architectural contracts when splitting detail into linked topic files. Use `npm run lint` to enforce guide budgets and history checks.

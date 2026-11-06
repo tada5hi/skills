@@ -15,10 +15,12 @@
 ```
 
 - **Node.js**: {{node_version}}
+<!-- Include the next line only when contributor tooling needs a different range. -->
+<!-- - **Development Node.js**: {{development_node_version}} -->
 - **Package manager**: {{package_manager}}
 - **Build orchestration**: {{build_orchestrator}}
 
-<!-- Take {{node_version}} from `engines.node` in package.json. State runtime and tool versions only here; the other guides refer to this line instead of repeating the version, so a runtime upgrade edits one place. -->
+<!-- Derive runtime support from the application or public package engines.node; a private workspace root is not the runtime contract of every published package. Check devEngines.runtime, CI, .nvmrc and tool engine requirements separately. When these differ, include development_node_version and explain runtime support separately. State each version fact here once; other guides refer here. -->
 
 <!-- For monorepos, add a workspace layout note like: "Apps are runnable applications in apps/, packages are shared libraries in packages/." -->
 
@@ -50,7 +52,7 @@ The `{{docs_directory}}` directory contains the project documentation site. When
 <!-- - **[Architecture](.agents/architecture.md)**: Design patterns, data flow, and key abstractions -->
 <!-- - **[Testing](.agents/testing.md)**: Test runner, conventions, and infrastructure -->
 <!-- - **[Conventions](.agents/conventions.md)**: Best practices, tooling, validation, and error handling -->
-<!-- Once a subsystem needs more than a few paragraphs, move it to its own on-demand file and keep this line: -->
+<!-- Split subsystem detail into focused, size-checked topic files. Keep cross-cutting invariants, extension contracts and their navigation in the main guide; do not replace them with a tiny summary or move the whole guide into references to avoid its budget. -->
 <!-- - **[Topic files](.agents/topics/)**: per-subsystem detail, indexed at the end of architecture.md. NOT loaded into every session: read the topic file before changing that area. -->
 
 ### Writing agent docs
@@ -67,7 +69,7 @@ The guides above are loaded into every session, so their whole size is paid on e
 
 The test for a paragraph: would removing it let a reasonable change break something silently? If not, leave it out.
 
-- **Update docs only when an invariant or a cross-cutting rule changes.** A bug fix or a feature that follows the existing rules needs no doc change. Edit the existing line; never add a section for a single fix.
+- **Keep existing commands, paths and factual descriptions current.** Add guide content only for an invariant or a cross-cutting rule. A bug fix or feature that follows existing rules needs no new section; correct the existing line when it is inaccurate.
 - **Describe what the code does now.** No `used to`, `no longer`, `before #N`. The one exception is a rejected alternative: keep the verdict and its one-line reason.
 - **Cite issues or PRs, never local plan files**: a gitignored `.agents/plans/` file resolves for one person on one machine.
 <!-- Keep the bullet that matches how the checks run (SKILL.md step 6), and delete the other. -->

@@ -1,5 +1,7 @@
 # Architecture
 
+<!-- Keep shared ownership rules, extension contracts and failure boundaries in this guide. Split detailed subsystem examples into .agents/topics/<topic>.md with descriptive links; preserve their current contracts and validate links after moving them. References are for external-project mappings, not an unchecked copy of an oversized guide. Reconcile contradictory instructions against the source before moving text. -->
+
 ## System Overview
 
 <!-- For multi-service projects: show an ASCII diagram of how services connect (HTTP, message queues, external systems). This gives agents an at-a-glance view of the system topology. Remove for single-service projects. -->
