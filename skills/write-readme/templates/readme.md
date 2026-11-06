@@ -1,5 +1,6 @@
 <!--
 Template: replace every {{placeholder}} and drop sections that do not apply.
+For an existing README, preserve its capability explanations and examples while adding the presentation. Do not replace useful reference sections with this shorter scaffold.
 Package READMEs on npm: image paths resolve against the default branch, so pin them (see references/rendering.md).
 -->
 <p align="center">
@@ -86,7 +87,7 @@ npm install {{package}} --save
 
 ## API
 
-<!-- With a docs site, link to its reference here instead of duplicating it. -->
+<!-- Keep capability explanations and examples alongside this index. Move detail only to verified dedicated docs with a capability explanation and direct link here; without such a site, keep the full reference in this README. -->
 | Export | Kind | Purpose |
 |---|---|---|
 

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Previews SVGs with headless Chrome or Chromium (and perl for the settled renders of animated SVGs). Type-checking samples needs the project's TypeScript toolchain.
 metadata:
   author: tada5hi
-  version: "2026.10.28"
+  version: "2026.11.06"
 allowed-tools: Bash(bash:*) Bash(npx:*) Bash(npm:*) Bash(git:*) Bash(curl:*) Read Write Edit Glob Grep
 ---
 
@@ -15,14 +15,16 @@ allowed-tools: Bash(bash:*) Bash(npx:*) Bash(npm:*) Bash(git:*) Bash(curl:*) Rea
 
 A reader decides in ten seconds whether to keep reading. The top of the page has to answer "what is this and why would I want it"; the rest is a reference they come back to.
 
+**Preserve capability explanations when improving an existing README.** Add the presentation around its useful reference material. Keep the explanations and examples for capabilities, configuration, safe operations, error handling, limits and testing; an export table or a shorter quick start does not replace them. When there is no dedicated documentation site, keep the full user reference in the README. With a dedicated site such as VitePress, move detail only after verifying that the specific material is covered there; retain the capability explanation and link to that coverage. Correct obsolete claims against the code rather than dropping the capability.
+
 Copy this checklist and track progress:
 
 ```
-- [ ] Step 1: public surface and behaviour read from the code
+- [ ] Step 1: existing capability documentation inventoried; public surface and behaviour read from the code
 - [ ] Step 2: "Why" table drafted from the reader's side
 - [ ] Step 3: visual identity derived from the project, logo concepts chosen by the user, diagrams drawn, all previewed in four renders
 - [ ] Step 4: sections written
-- [ ] Step 5: samples type-check, claims match the code, anchors resolve, lint passes
+- [ ] Step 5: samples type-check, claims match the code, capability coverage preserved, anchors resolve, lint passes
 ```
 
 ## Structure
@@ -38,7 +40,7 @@ Write the page in this order. Copy `templates/readme.md` and fill in its `{{plac
 | `## Installation` | Install command, module format, Node range, notable peer dependencies |
 | `## Usage` / topic sections | One `##` per concept, each with a sample first and the rules after it |
 | `## Options` / `## Hooks` | Tables: name, type, default, description |
-| `## API` | Table of every public export: export, kind, purpose. With a docs site, link to its reference instead: duplicates drift |
+| `## API` | Public export index alongside the capability explanations and examples. With verified dedicated docs, link to the specific reference coverage |
 | `## Notes` | Bold-led bullets for behaviour readers get wrong: delivery guarantees, what is lost, what is never retried |
 | `## Contributing` / `## License` | Links to `CONTRIBUTING.md` and `LICENSE`; keep the project's existing sign-off |
 
@@ -46,9 +48,11 @@ When the project already has a brand, badge set or README conventions, keep them
 
 For a monorepo, the root README is a landing page: hero, Why, the diagram, a Packages table (name, version badge, one-line description), install, one quick start, development commands. Each package README must also stand on its own on npm, where it is read without the root: pitch, install, a minimal sample, then the full reference for that package.
 
-## Step 1: Read the code, not the old README
+## Step 1: Inventory the README, verify against the code
 
-List the public surface first — the barrel file (`src/index.ts`) is the source of truth — then read every module it exports. Note for each class: constructor options and defaults, hooks and when they fire, what resolves, what rejects, what is acked, what is dropped. Old READMEs and agent docs are hints, never sources.
+Read the existing README and record its capabilities, usage examples, options, error handling and non-obvious behavior before replacing any sections. Use this inventory to check coverage, not as evidence that every old claim is correct.
+
+List the public surface — the barrel file (`src/index.ts`) is the source of truth — then read every module it exports. Note for each class: constructor options and defaults, hooks and when they fire, what resolves, what rejects, what is acked, what is dropped. Verify the existing explanations against this behavior.
 
 When a dependency's behaviour shapes a claim (which queue is declared, what is retried), read that dependency's source or docs too. This is where READMEs most often go wrong.
 
@@ -120,6 +124,7 @@ Run every check; fix and re-run until all pass.
 2. **Check every behavioural claim** against the code from Step 1: defaults, what resolves or rejects, what is acked, what is retried. Check that each sample shows what its table row promises. If the code contradicts what the README should promise, document what the code does and tell the user. Do not fix the code silently.
 3. **Check links and anchors**: every `#anchor` in the nav row and the ToC matches a heading (`## Why foo?` → `#why-foo`).
 4. Run the project's lint, and update agent docs (`.agents/structure.md`) that list `.github/assets/`.
+5. **Review the README diff for lost capability documentation.** Map every removed explanation and example to its retained or corrected location, or to verified dedicated documentation with a README explanation and direct link. A list of exported names is not coverage. Restore unexplained omissions before opening the PR.
 
 ## Writing rules
 
@@ -141,6 +146,7 @@ Run every check; fix and re-run until all pass.
 | An endlessly looping animation | One pass with `fill="freeze"` |
 | Package README images showing the wrong version on npm | Pin to a tag, a commit or the published package |
 | Samples written from memory | Type-check them against the source |
+| A visual refresh removes safe-operation, error-handling or other capability explanations | Preserve the reference and examples; use the existing README as a coverage checklist |
 | Claims copied from the old README | Re-derive them from the code and the dependency's behaviour |
 | Clashing ids between SVGs | Prefix every id per file |
 | Template colours and pictogram shipped as they are | Derive palette and pictogram from the project; check that the result does not look like a sibling project |
