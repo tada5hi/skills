@@ -175,7 +175,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 
 ## CLI Manager
 
-The repository includes a CLI (`src/cli.ts`) for managing vendor skills and local development. The CLI needs Node.js 22 or later; development tooling needs Node.js 24.11 or later:
+The repository includes a CLI (`src/cli.ts`) for managing vendor skills and local development. The CLI needs Node.js 22 or later; development tooling needs Node.js 24.11 or later in the 24.x line, or Node.js 26 or later:
 
 ```bash
 npm install
