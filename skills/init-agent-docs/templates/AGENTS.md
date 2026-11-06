@@ -62,7 +62,7 @@ The guides above are loaded into every session, so their whole size is paid on e
 | A cross-cutting rule or an easy-to-break invariant, its reason, and the rejected alternative | One line in a guide, with the issue number |
 | A subsystem's invariants and rejected alternatives | Its topic file (`.agents/topics/<name>.md`) |
 | Mechanism the code already shows | Nowhere, or a code comment |
-| How a defect happened, before/after, "pinned by spec X" | The PR description or commit message |
+| How a defect happened, before/after, "specified by spec X" | The PR description or commit message |
 | What changed for users or operators | CHANGELOG or the docs site |
 
 The test for a paragraph: would removing it let a reasonable change break something silently? If not, leave it out.

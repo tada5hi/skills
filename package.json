@@ -15,7 +15,7 @@
         "node": ">=22.0.0"
     },
     "scripts": {
-        "lint": "eslint --ext .js,.ts,.mjs,.mts .",
+        "lint": "eslint .",
         "lint:fix": "npm run lint -- --fix",
         "skills": "tsx src/cli.ts",
         "skills:init": "tsx src/cli.ts init",
@@ -29,14 +29,14 @@
     "devDependencies": {
         "@tada5hi/tsconfig": "^0.7.2",
         "@types/node": "^25.9.2",
-        "@typescript-eslint/eslint-plugin": "^8.71.2",
-        "@typescript-eslint/parser": "^8.61.0",
-        "eslint": "^10.12.0",
+        "eslint": "^10.14.0",
         "lint-staged": "^17.6.0",
         "simple-git-hooks": "^2.14.0",
         "tsx": "^4.23.15",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.11"
+        "vitest": "^5.1.0",
+        "@tada5hi/eslint-config": "^3.3.1",
+        "typescript-eslint": "^8.72.1"
     },
     "lint-staged": {
         "*.{js,ts,mjs,mts}": "eslint --fix"
