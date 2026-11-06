@@ -43,5 +43,11 @@
     },
     "simple-git-hooks": {
         "pre-commit": "npx lint-staged"
+    },
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "^24.11.0 || >=26.0.0"
+        }
     }
 }

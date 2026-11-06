@@ -25,7 +25,7 @@ npm run skills:cleanup    # Remove stale submodules/skills
 npm run skills:link       # Link skills for Claude Code discovery
 ```
 
-- **Node.js**: >= 22.0.0
+- **Node.js**: CLI >= 22.0.0; development tooling >= 24.11.0
 - **Package manager**: npm
 - **Skill registry**: `src/meta.ts` (single source of truth for all skills)
 
