@@ -55,6 +55,7 @@ Apps:
 ## Module Responsibilities
 
 <!-- List each major source module and its purpose. -->
+<!-- For generated files or datasets, name the upstream input, the generator and the regeneration command. State which source to edit instead of hand-editing generated output. -->
 
 | Module                 | Purpose                                              |
 |------------------------|------------------------------------------------------|
