@@ -48,6 +48,16 @@
 <!-- | `*Config` | Static configuration loaded from files/env | `DatabaseConfig { host: string; port: number }` | -->
 <!-- | `*OptionsNormalized` | Options after checks and defaults; the function producing them is `normalize<Name>Options()` (or `normalizeOptions()` inside the module), never `resolve*`/`Resolved*` | `normalizeOptions(input: ClientOptions): ClientOptionsNormalized` | -->
 
+<!-- Free-function APIs: when a library exposes many standalone helpers, a prefix table tells agents what to call a new function and how it must behave. Derive the rows from the exported helpers, keep only prefixes the code uses, and keep only columns where the prefixes differ. Example: -->
+<!-- | Prefix | Meaning | Caches? | Async? | Example | -->
+<!-- |--------|---------|---------|--------|---------| -->
+<!-- | `get*` | Pure read, no side effects | No | No | `getUserName` | -->
+<!-- | `set*` | Mutates the target's state | No | No | `setUserName` | -->
+<!-- | `read*` | Async I/O read, cached on the context | Yes | Yes | `readConfigFile` | -->
+<!-- | `use*` | Creates an object, cached on the context | Yes | No | `useLogger` | -->
+<!-- | `is*` | Boolean check | No | No | `isExpired` | -->
+<!-- | `create*` | Factory, returns a new object | No | No | `createClient` | -->
+
 <!-- Interface vs type: keep the two bullets below only when the code already follows them (grep `export interface` and `export type`), and fill the examples with 2-4 real exported names each. The first bullet is the common rule; drop the second when the project keeps records as plain interfaces (e.g. domain entities). Never introduce the convention into a project that lacks it, and remove both bullets if an ESLint `naming-convention` rule forbids the prefix. -->
 <!-- Optional companion rule: declare the contract explicitly and let the class `implements` it; never derive a public contract from a class (`typeof Client`, mapped-over-class types), except at a third-party boundary. -->
 
@@ -119,6 +129,14 @@ Commits follow **{{commit_convention}}**:
 ```
 {{commit_format}}
 ```
+
+## Branching
+
+<!-- Remove if the project has a single long-lived branch. Otherwise take the branches from the CI triggers and release config, so agents open pull requests against the right base and know which pushes publish a release. -->
+
+| Branch              | Purpose               |
+|---------------------|-----------------------|
+| `{{branch_name}}`   | {{branch_purpose}}    |
 
 ## TypeScript
 
@@ -218,8 +236,17 @@ External project references live in `.agents/references/`. **If you keep this se
 - The source file path / function name in the external project
 - The corresponding file path / function name in this project
 - Any behavioral differences between the implementations
+- Upstream features deliberately left out, so they are not investigated again
 
 <!-- This builds a cumulative mapping over time so future work can quickly find corresponding code without re-searching. -->
+
+<!-- Reference file shape. A mapping is only trustworthy against a known upstream state, so pin it when the code ports or benchmarks against upstream: -->
+<!-- # Reference: <owner>/<project> -->
+<!-- | Field | Value | with rows: Repo, Pinned commit, Pinned version, Last synced -->
+<!-- ## Mapping -->
+<!-- | Upstream (`<file>`) | Local (`<file>`) | Notes | with one row per symbol; put `-` under Local for a feature left out and say why in Notes -->
+<!-- ## Test parity (only when local tests mirror upstream ones): which local spec covers which upstream spec -->
+
 
 ## Best Practices
 

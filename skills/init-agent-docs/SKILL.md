@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.11.06"
+  version: "2026.11.08"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -79,5 +79,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **Separate runtime and contributor requirements.** Fill `{{node_version}}` from application/public-package `engines.node`; a private root does not establish every workspace's consumer support. Check `devEngines.runtime`, CI, `.nvmrc` and tool engine requirements. Include optional `{{development_node_version}}` when tooling needs a different range, and do not raise published runtime engines just to install development tools. State each fact once in the Quick Reference; other guides and CI descriptions refer there.
 - **Document every dependency pin with its exit condition** in the Dependency Pins table of conventions.md: `overrides` / `resolutions` entries and packages held below their latest major. Without the condition, a later update either keeps a dead workaround or breaks on the held package.
 - **Copy the file header verbatim** from an existing source file; never write one from memory.
-- **Include a References section** in conventions.md when the project depends on external projects that agents may need to cross-reference. Use `.agents/references/` to build cumulative code mappings.
+- **Include a References section** in conventions.md when the project depends on external projects that agents may need to cross-reference. Use `.agents/references/` to build cumulative code mappings, and pin the upstream commit and version when the code ports or benchmarks against that project.
+- **Keep Key Exports short** in AGENTS.md: it is always loaded, so list only the symbols an agent reaches for first and verify each one against the barrel file. Omit it for applications.
+- **Derive the Branching table from CI triggers and release config**, not from memory, and omit it for a project with a single long-lived branch.
 - **Add Plans and Commits sections** to AGENTS.md when the project has ongoing modernization work or commit rules that override default agent behavior.
