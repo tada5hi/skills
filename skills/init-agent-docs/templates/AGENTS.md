@@ -32,14 +32,6 @@
 |------------------|---------------------|
 | `{{cli_binary}}` | {{cli_source_path}} |
 
-### Key Exports
-
-<!-- Remove this section for applications. For libraries: list only the handful of public symbols an agent reaches for first, grouping related ones on a row. This is an orientation table, not an API reference; check every name against the barrel file. -->
-
-| Export             | Description                 |
-|--------------------|-----------------------------|
-| `{{key_export}}`   | {{key_export_description}}  |
-
 ## Documentation
 
 <!-- Remove this section if the project has no documentation site. Include the dev command, build command, and a note about keeping docs in sync with code changes. -->
