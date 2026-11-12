@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.11.06"
+  version: "2026.11.07"
 allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
 ---
 
@@ -71,6 +71,7 @@ This skill scaffolds agent-friendly documentation for any project. It creates:
 - **Update CLAUDE.md** to only reference the guides that were actually created (uncomment the relevant `@` lines).
 - **Include code examples in architecture.md** when documenting design patterns. Show actual interfaces and implementations so agents can follow the patterns when writing new code.
 - **Document dependency layers for monorepos.** This is critical for agents to understand build order and impact of changes.
+- **Identify generated-data sources of truth** in structure.md: the upstream input, generator and regeneration command, plus which source to edit instead of the generated output. Include this only when the project has generated files or datasets.
 - **Keep the "Writing agent docs" section in AGENTS.md.** It is the rule that stops the guides from growing back: keep existing commands, paths and facts accurate; add content only for an invariant or cross-cutting rule, edit the existing line, and route everything else (defect stories, spec lists, mechanism walkthroughs, release notes) elsewhere. Never add a generic "keep these docs updated as the project evolves" note: it turns every finished task into a new paragraph, and append-only docs grow without bound (one project went from 86 KB to 715 KB in four months).
 - **Budget the always-loaded set.** Everything `CLAUDE.md` imports is paid on every session. Keep it under about 60 KB in total. Preserve cross-cutting invariants and extension/error contracts in the core guide; split detailed subsystem contracts and examples into focused `.agents/topics/<name>.md` files with descriptive links. Check the moved facts against the source and reconcile contradictions. Do not replace a substantial guide with a tiny summary or move the whole file into unchecked references merely to pass a size check. Keep core imports aligned with the stated loading policy.
 - **Document per-application layouts for monorepos** in structure.md. Show the internal directory tree of each service/app, especially when they follow a specific architecture pattern (hexagonal, MVC, etc.).
