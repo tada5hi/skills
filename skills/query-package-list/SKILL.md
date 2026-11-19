@@ -6,7 +6,7 @@ compatibility: Requires network access to GitHub; uses the `gh` CLI or curl to f
 metadata:
   author: tada5hi
   version: "2026.11.19"
-allowed-tools: Bash(gh:*) Bash(curl:*) Bash(npm:*) Read Grep
+allowed-tools: Bash(gh:*) Bash(curl:*) Bash(npm:*) Bash(pip:*) Bash(node:*) Bash(tar:*) Bash(mktemp:*) Bash(grep:*) Bash(rm:*) Read Grep
 ---
 
 # query-package-list
@@ -47,17 +47,27 @@ The decision to reuse is made before the code is written, so run the lookup at t
 3. **Verify each candidate** against what it actually exports, not only its README. The list line is a summary, and READMEs lag behind: a package can ship helpers neither of them mentions.
    ```bash
    gh api repos/<owner>/<repo>/readme -H "Accept: application/vnd.github.raw"
-   # what the published package exports (names and documented declarations):
-   tar -xzf "$(npm pack <package> --silent)" package/dist
-   grep -nE "^(export )?declare (function|class|const)|^export \{" package/dist/*.d.*ts
    ```
-   If the package is already installed, read `node_modules/<package>/dist/*.d.*ts` instead. In a monorepo, also read the specific package's README; the root one is often only an overview:
+   Then read what the published package exposes, per entry type, each candidate in a fresh temporary directory that you remove afterwards, so no other candidate's files are read:
+   - **`npm:`** unpack the published tarball and start from the declaration entry that `package.json` names (`types`, or `types` under `exports`), not from an assumed `dist/`:
+     ```bash
+     d=$(mktemp -d) && (cd "$d" && npm pack <package> --silent | xargs tar -xzf)
+     node -e "const p = require('$d/package/package.json'); console.log(p.types ?? p.typings, JSON.stringify(p.exports))"
+     grep -rnE "^(export )?declare (function|class|const)|^export (\{|\*)" "$d/package" --include='*.d.ts' --include='*.d.mts' --include='*.d.cts'
+     rm -rf "$d"
+     ```
+     The grep is a scan. An API counts only when it is reachable from that entry: exported there directly, in its `export { … }` list, or through an `export * from` chain you followed. A `declare function` that no entry exports does not count. If the package is already installed, read the same entry under `node_modules/<package>/`.
+   - **`pypi:`** `pip download <package> --no-deps -d "$d"`, unpack the wheel, and read the top-level module's `__init__.py` (and `__all__`).
+   - **`action:`** read `action.yml` (inputs, outputs) in the repository.
+   - **`plugin:`** read the repository's skill or command listing (its `skills/` folder or plugin manifest).
+
+   In a monorepo, also read the specific package's README; the root one is often only an overview:
    ```bash
    gh api repos/<owner>/<repo>/contents/packages --jq '.[].name'
    gh api repos/<owner>/<repo>/contents/packages/<dir>/README.md -H "Accept: application/vnd.github.raw"
    ```
    Confirm the exact capability exists and note the real API. Check the defaults that decide whether it fits (merge priority, array handling, error codes) and write the sample so it does what the user asked, not just what the README demos. When one of the user's other projects already uses the package for the same need, follow that usage (`grep -rn "from '<package>'"` there).
-4. **Check the current project**: is the package already a dependency (`package.json`, lockfile), or named in the project's plan or docs? Then it is decided: use it, no install question needed.
+4. **Check the current project**: is the package already a dependency (`package.json`, lockfile), or does the project's plan explicitly choose it? Then it is decided: use it, no install question needed. A mere mention in docs (an option, an example) is not a decision.
 5. **Answer** with, per fit: package name, one line on why it fits, the install command, and a minimal sample taken from its README or declarations. When nothing fits, say so in one line and carry on with the normal approach.
 
 ## Audit a diff
@@ -70,7 +80,7 @@ To find reinvented helpers in a branch, a package or a review:
 
 ## Rules
 
-- Never add a dependency without the user's go-ahead; suggest it and wait. A dependency the project already has, or that its plan names, needs no go-ahead.
+- Never add a dependency without the user's go-ahead; suggest it and wait. A dependency the project already has, or that its plan explicitly chooses, needs no go-ahead.
 - A partial fit is worth naming ("smob merges, but not with array dedupe"); let the user decide. If the package lacks a small piece, propose adding it to the package instead of copying the rest.
 - Do not recommend from the list line alone; step 3 is not optional.
 - When the list line or README misses a capability you found in the exports, mention it so the list can be refreshed (refresh-package-list).
