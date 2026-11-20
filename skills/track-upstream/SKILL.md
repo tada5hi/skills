@@ -21,6 +21,8 @@ Three parts make the record, and each points at the others:
 | Tracking issue | the project's repo, exactly one | one entry per upstream issue: `Local`, `Adopt`, specs to keep green |
 | `Upstream:` comment | first line of each local copy or workaround | `Upstream: <owner>/<repo>#<n>` plus a few words |
 
+The reverse direction, what an already released version of any dependency lets the project delete, is the `adopt-upgrades` skill, with its own tracking issue.
+
 The user's libraries are the owners and repos in their package list (default `tada5hi/awesome`, see the `query-package-list` skill). Third-party libraries do not go into the tracking issue.
 
 ## Mode 1: file (a workaround was just written)
