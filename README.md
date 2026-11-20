@@ -169,7 +169,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 |---|---|
 | [init-ts-project](skills/init-ts-project/) | Scaffold a TypeScript project from [`tada5hi/typescript-template`](https://github.com/tada5hi/typescript-template) |
 | [query-api](skills/query-api/) | Query a live HTTP API from a base URL and credentials, using OpenAPI or rapiq conventions |
-| [query-package-list](skills/query-package-list/) | Look up your own published packages in an awesome-style list before writing a utility |
+| [query-package-list](skills/query-package-list/) | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
 | [refresh-package-list](skills/refresh-package-list/) | Sync the awesome-style package list with GitHub and npm, then open a PR |
 | [link-skills](skills/link-skills/) | Link `skills/` into `.claude/skills/` so Claude Code discovers them locally |
 
