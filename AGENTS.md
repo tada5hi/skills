@@ -48,6 +48,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [redesign-vitepress-site](skills/redesign-vitepress-site/) | Manual | Turn a default-looking VitePress site into a hero-led site with tokens, sections and restyled chrome |
 | [refresh-package-list](skills/refresh-package-list/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
 | [release-please-version-bump](skills/release-please-version-bump/) | Manual | Align a linked release-please group by touching only the packages behind the group version |
+| [track-upstream](skills/track-upstream/) | Manual | Track upstream issues of your own libraries in one tracking issue per project, adopt fixes once released |
 | [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
 | [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
 | [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
