@@ -10,6 +10,7 @@ import type { IVendorSkillMeta } from './types.ts';
  * them; its successors need an issue tracker set up through /setup-matt-pocock-skills.
  */
 export const manual: string[] = [
+    'adopt-upgrades',
     'audit-type-boundaries',
     'create-pull-request',
     'generate-commit-message',
