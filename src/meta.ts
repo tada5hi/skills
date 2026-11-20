@@ -28,6 +28,7 @@ export const manual: string[] = [
     'refresh-package-list',
     'release-please-version-bump',
     'request-refactor-plan',
+    'track-upstream',
     'triage-issue',
     'update-agent-docs',
     'write-a-prd',
