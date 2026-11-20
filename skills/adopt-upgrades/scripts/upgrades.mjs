@@ -327,9 +327,14 @@ async function resolveDeclaration(from, specifier) {
         return await readIfExists(join(dirname(from), specifier)) === undefined ? undefined : join(dirname(from), specifier);
     }
 
-    const base = join(dirname(from), specifier).replace(/\.(?:[mc]?js|[mc]?ts)$/, '');
+    const path = join(dirname(from), specifier);
+    const extension = /\.([mc]?)(?:js|ts)$/.exec(path);
+    const base = extension ? path.slice(0, -extension[0].length) : path;
+    // TypeScript's own pairing: `.mjs` -> `.d.mts`, `.cjs` -> `.d.cts`, `.js` (or none) -> `.d.ts`
+    const own = extension && extension[1] ? `${base}.d.${extension[1]}ts` : `${base}.d.ts`;
+    const candidates = extension ? [own] : [own, `${base}.d.mts`, `${base}.d.cts`, join(base, 'index.d.ts')];
 
-    for (const candidate of [`${base}.d.ts`, `${base}.d.mts`, `${base}.d.cts`, join(base, 'index.d.ts')]) {
+    for (const candidate of candidates) {
         if (await readIfExists(candidate) !== undefined) {
             return candidate;
         }
@@ -523,6 +528,19 @@ async function selfTestPackages() {
             'test/fixture.d.ts': 'export interface Fixture {}\n',
         });
         assert.deepEqual([...(await packageExports(runtime)).names.keys()], ['a']);
+
+        // an import and a require entry each read their own declarations
+        const dual = join(root, 'dual');
+
+        await writeFiles(dual, {
+            'package.json': JSON.stringify({ exports: { '.': { import: './dist/index.mjs', require: './dist/index.cjs' } } }),
+            'dist/index.mjs': '',
+            'dist/index.cjs': '',
+            'dist/index.d.ts': 'export declare function shared(): void;\n',
+            'dist/index.d.mts': 'export declare function esm(): void;\n',
+            'dist/index.d.cts': 'export declare function cjs(): void;\n',
+        });
+        assert.deepEqual([...(await packageExports(dual)).names.keys()].sort(), ['cjs', 'esm']);
 
         const none = join(root, 'none');
 
