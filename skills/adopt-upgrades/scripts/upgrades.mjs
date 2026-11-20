@@ -10,6 +10,8 @@ import {
     mkdtemp,
     readFile,
     readdir,
+    rm,
+    writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
@@ -23,8 +25,8 @@ const DECLARATION_FILE = /\.d\.(?:ts|mts|cts)$/;
 const DECLARATION = /(\/\*\*(?:(?!\*\/)[\s\S])*\*\/\s*)?(export\s+)?(?:declare\s+)?(?:default\s+)?(?:abstract\s+)?(?:async\s+)?(?:function\*?|class|const|let|var|type|interface|enum|namespace)\s+([A-Za-z_$][\w$]*)/g;
 const EXPORT_LIST = /export\s+(?:type\s+)?\{([^}]*)\}(?!\s*from)/g;
 const EXPORT_FROM = /export\s+(?:type\s+)?\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/g;
-const EXPORT_STAR = /export\s*\*\s*from\s*['"]([^'"]+)['"]/g;
-const EXPORT_NAMESPACE = /export\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from/g;
+const EXPORT_STAR = /export\s+(?:type\s+)?\*\s*from\s*['"]([^'"]+)['"]/g;
+const EXPORT_NAMESPACE = /export\s+(?:type\s+)?\*\s*as\s+([A-Za-z_$][\w$]*)\s+from/g;
 
 // ---- versions ----
 
@@ -33,6 +35,8 @@ function parseVersion(version) {
 
     return match ? match.slice(1, 4).map(Number) : null;
 }
+
+const isPrerelease = (version) => /^\d+\.\d+\.\d+-/.test(version ?? '');
 
 /** `patch`, `minor`, `major` (a 0.x minor counts as major, as npm's caret does), or `unknown`. */
 export function bumpKind(from, to) {
@@ -47,7 +51,12 @@ export function bumpKind(from, to) {
         return 'major';
     }
 
-    return a[1] !== b[1] ? 'minor' : 'patch';
+    if (a[1] !== b[1]) {
+        return 'minor';
+    }
+
+    // 2.0.0-beta.1 -> 2.0.0-beta.2 or -> 2.0.0 can add any API: no stable patch
+    return isPrerelease(from) || isPrerelease(to) ? 'unknown' : 'patch';
 }
 
 /** Ascending by major, minor, patch; an unparsable version sorts first. */
@@ -60,8 +69,8 @@ export function compareVersions(a, b) {
 // ---- changed ----
 
 /**
- * The direct dependencies of the root and every workspace in a package-lock v2/v3: dependency name -> the
- * published package it resolves to (an `npm:` alias names another one) and its versions.
+ * The direct dependencies of the root (`.`) and every workspace in a package-lock v2/v3, one row per declaring
+ * workspace: the published package it resolves to (an `npm:` alias names another one) and its version.
  */
 export function directVersions(lock) {
     if (!lock || typeof lock.packages !== 'object' || lock.packages === null) {
@@ -82,10 +91,14 @@ export function directVersions(lock) {
                 const resolved = nested ?? packages[`node_modules/${name}`];
 
                 if (resolved?.version && !resolved.link) {
-                    const current = out.get(name) ?? { package: resolved.name ?? name, versions: new Set() };
+                    const workspace = path === '' ? '.' : path;
 
-                    current.versions.add(resolved.version);
-                    out.set(name, current);
+                    out.set(`${workspace}\0${name}`, {
+                        workspace,
+                        name,
+                        package: resolved.name ?? name,
+                        version: resolved.version,
+                    });
                 }
             }
         }
@@ -94,34 +107,34 @@ export function directVersions(lock) {
     return out;
 }
 
+/**
+ * The version transitions of direct dependencies, compared per declaring workspace (a workspace moving onto a
+ * version another one already had is still a bump), then merged: one row per name, package, from and to.
+ */
 export function changedDependencies(before, after) {
     const old = directVersions(before);
-    const now = directVersions(after);
-    const changes = [];
+    const rows = new Map();
 
-    for (const [name, { package: published, versions }] of now) {
-        const previous = old.get(name);
+    for (const [key, now] of directVersions(after)) {
+        const previous = old.get(key);
 
         // a new dependency or a swapped alias target has no earlier version to diff against
-        if (!previous || previous.package !== published) {
+        if (!previous || previous.package !== now.package || previous.version === now.version) {
             continue;
         }
 
-        for (const to of versions) {
-            if (previous.versions.has(to)) {
-                continue;
-            }
+        const id = [now.name, now.package, previous.version, now.version].join('\0');
+        const row = rows.get(id) ?? {
+            name: now.name,
+            package: now.package,
+            from: previous.version,
+            to: now.version,
+            kind: bumpKind(previous.version, now.version),
+            workspaces: [],
+        };
 
-            const from = [...previous.versions].sort(compareVersions).at(-1);
-
-            changes.push({
-                name,
-                package: published,
-                from,
-                to,
-                kind: bumpKind(from, to),
-            });
-        }
+        row.workspaces.push(now.workspace);
+        rows.set(id, row);
     }
 
     const rank = {
@@ -131,7 +144,9 @@ export function changedDependencies(before, after) {
         patch: 3,
     };
 
-    return changes.sort((a, b) => rank[a.kind] - rank[b.kind] || a.name.localeCompare(b.name));
+    return [...rows.values()].sort((a, b) => rank[a.kind] - rank[b.kind] ||
+        a.name.localeCompare(b.name) ||
+        compareVersions(a.from, b.from));
 }
 
 async function lockfileAt(ref) {
@@ -271,6 +286,33 @@ export function typeEntries(manifest) {
     return [...out].map((path) => path.replace(/^\.\//, ''));
 }
 
+const RUNTIME_FILE = /\.(?:[mc]?js)$/;
+
+/**
+ * The runtime entry files of a package without type entries (`exports` targets, else `main`, else `index.js`),
+ * whose declaration counterparts (`index.js` -> `index.d.ts`) are its public types when it ships them side by side.
+ */
+export function runtimeEntries(manifest) {
+    const out = new Set();
+    const visit = (value) => {
+        if (typeof value === 'string') {
+            if (RUNTIME_FILE.test(value) && !value.includes('*')) {
+                out.add(value);
+            }
+        } else if (value && typeof value === 'object') {
+            Object.values(value).forEach(visit);
+        }
+    };
+
+    visit(manifest.exports);
+
+    if (out.size === 0 && manifest.exports === undefined) {
+        out.add(typeof manifest.main === 'string' ? manifest.main : 'index.js');
+    }
+
+    return [...out].map((path) => path.replace(/^\.\//, ''));
+}
+
 async function readIfExists(path) {
     try {
         return await readFile(path, 'utf8');
@@ -281,6 +323,10 @@ async function readIfExists(path) {
 
 /** The declaration file a relative specifier of `from` points at (`./x.js` -> `./x.d.ts`, `.d.mts`, ...). */
 async function resolveDeclaration(from, specifier) {
+    if (DECLARATION_FILE.test(specifier)) {
+        return await readIfExists(join(dirname(from), specifier)) === undefined ? undefined : join(dirname(from), specifier);
+    }
+
     const base = join(dirname(from), specifier).replace(/\.(?:[mc]?js|[mc]?ts)$/, '');
 
     for (const candidate of [`${base}.d.ts`, `${base}.d.mts`, `${base}.d.cts`, join(base, 'index.d.ts')]) {
@@ -339,11 +385,19 @@ async function packageExports(dir) {
         }
     }
 
-    const entries = typeEntries(manifest);
+    let entries = typeEntries(manifest).filter((path) => !path.includes('*')).map((path) => join(dir, path));
+
+    // no type entry: the declaration files next to the runtime entries; never every declaration file, which
+    // would count tests and internals no consumer can import (no entry at all reads as zero coverage)
+    if (entries.length === 0) {
+        const resolved = await Promise.all(runtimeEntries(manifest).map((path) => resolveDeclaration(join(dir, 'package.json'), `./${path}`)));
+
+        entries = [...new Set(resolved.filter(Boolean))];
+    }
+
     const names = new Map();
 
-    // no declared entry: every declaration file counts (an old package without `exports` types)
-    for (const file of entries.length > 0 ? entries.map((path) => join(dir, path)) : files) {
+    for (const file of entries) {
         for (const [name, info] of await publicNames(file)) {
             const declared = declarations.get(name) ?? declarations.get(info.local);
 
@@ -365,8 +419,21 @@ async function packageExports(dir) {
 
 async function diff(name, from, to) {
     const root = await mkdtemp(join(tmpdir(), 'adopt-upgrades-'));
-    const [oldDir, newDir] = [await unpack(name, from, root), await unpack(name, to, root)];
-    const [before, after] = [await packageExports(oldDir), await packageExports(newDir)];
+    let oldDir;
+    let newDir;
+    let before;
+    let after;
+
+    try {
+        [oldDir, newDir] = [await unpack(name, from, root), await unpack(name, to, root)];
+        [before, after] = [await packageExports(oldDir), await packageExports(newDir)];
+    } catch (err) {
+        // on success the packages stay for reading (`root`); a failed diff leaves nothing behind
+        await rm(root, { recursive: true, force: true });
+
+        throw err;
+    }
+
     const names = compareExports(before.names, after.names);
 
     return {
@@ -390,10 +457,10 @@ async function diff(name, from, to) {
         },
         engines: { from: before.manifest.engines ?? null, to: after.manifest.engines ?? null },
         dirs: { from: oldDir, to: newDir },
+        // delete when done: both versions and their tarballs
+        root,
     };
 }
-
-const LISTED_FILES_MAX = 50;
 
 /**
  * Declaration files whose text changed between two versions, by relative path, most changed lines first. A
@@ -418,13 +485,61 @@ export function declarationChanges(before, after) {
     changed.sort((x, y) => y.lines - x.lines || x.file.localeCompare(y.file));
 
     return {
-        changed: changed.slice(0, LISTED_FILES_MAX),
-        added: [...after.keys()].filter((file) => !before.has(file)).sort().slice(0, LISTED_FILES_MAX),
-        removed: [...before.keys()].filter((file) => !after.has(file)).sort().slice(0, LISTED_FILES_MAX),
+        changed,
+        added: [...after.keys()].filter((file) => !before.has(file)).sort(),
+        removed: [...before.keys()].filter((file) => !after.has(file)).sort(),
     };
 }
 
 // ---- self-test ----
+
+async function writeFiles(dir, files) {
+    for (const [path, text] of Object.entries(files)) {
+        await mkdir(dirname(join(dir, path)), { recursive: true });
+        await writeFile(join(dir, path), text);
+    }
+}
+
+/** Package-level cases: `export type *` is followed; without type entries, only declarations next to the runtime entries count. */
+async function selfTestPackages() {
+    const root = await mkdtemp(join(tmpdir(), 'adopt-upgrades-test-'));
+
+    try {
+        const star = join(root, 'star');
+
+        await writeFiles(star, {
+            'package.json': JSON.stringify({ exports: { '.': { types: './index.d.ts' } } }),
+            'index.d.ts': "export type * from './models.js';\n",
+            'models.d.ts': 'export interface Model {}\n',
+        });
+        assert.deepEqual([...(await packageExports(star)).names.keys()], ['Model']);
+
+        const runtime = join(root, 'runtime');
+
+        await writeFiles(runtime, {
+            'package.json': JSON.stringify({ exports: { '.': './dist/index.js' } }),
+            'dist/index.js': '',
+            'dist/index.d.ts': 'export declare function a(): void;\n',
+            'test/fixture.d.ts': 'export interface Fixture {}\n',
+        });
+        assert.deepEqual([...(await packageExports(runtime)).names.keys()], ['a']);
+
+        const none = join(root, 'none');
+
+        await writeFiles(none, {
+            'package.json': JSON.stringify({ exports: { '.': './dist/index.js' } }),
+            'dist/index.js': '',
+            'test/fixture.d.ts': 'export interface Fixture {}\n',
+        });
+
+        const untyped = await packageExports(none);
+
+        assert.equal(untyped.names.size, 0);
+        assert.equal(untyped.entries, 0);
+    } finally {
+        await rm(root, { recursive: true, force: true });
+    }
+}
 
 function selfTest() {
     assert.equal(bumpKind('1.2.3', '1.2.4'), 'patch');
@@ -432,6 +547,9 @@ function selfTest() {
     assert.equal(bumpKind('1.2.3', '2.0.0'), 'major');
     assert.equal(bumpKind('0.8.1', '0.9.0'), 'major');
     assert.equal(bumpKind('latest', '1.0.0'), 'unknown');
+    assert.equal(bumpKind('2.0.0-beta.1', '2.0.0-beta.2'), 'unknown');
+    assert.equal(bumpKind('2.0.0-rc.1', '2.0.0'), 'unknown');
+    assert.equal(bumpKind('1.9.0', '2.0.0-beta.1'), 'major');
 
     const lock = (zod, chamvi, nested) => ({
         packages: {
@@ -452,6 +570,7 @@ function selfTest() {
             from: '0.8.0',
             to: '0.9.0',
             kind: 'major',
+            workspaces: ['packages/a'],
         },
         {
             name: 'zod',
@@ -459,6 +578,7 @@ function selfTest() {
             from: '4.1.0',
             to: '4.2.0',
             kind: 'minor',
+            workspaces: ['.'],
         },
     ]);
     assert.deepEqual(changedDependencies(lock('4.1.0', '0.9.0'), lock('4.1.0', '0.9.0', '0.9.1')), [
@@ -468,10 +588,11 @@ function selfTest() {
             from: '0.9.0',
             to: '0.9.1',
             kind: 'patch',
+            workspaces: ['packages/a'],
         },
     ]);
 
-    // 10.x sorts after 9.x; an npm alias reports the package it installs; a v1 lockfile is refused
+    // compared per workspace: b moving onto the version a already had is a bump; equal transitions merge
     const multi = (versions) => ({
         packages: {
             '': { dependencies: { x: '*' } },
@@ -483,13 +604,34 @@ function selfTest() {
         },
     });
 
-    assert.deepEqual(changedDependencies(multi(['9.0.0', '10.0.0', '9.0.0']), multi(['10.0.0', '11.0.0', '10.0.0'])), [{
+    assert.deepEqual(changedDependencies(multi(['9.0.0', '10.0.0', '9.0.0']), multi(['10.0.0', '11.0.0', '10.0.0'])), [
+        {
+            name: 'x',
+            package: 'x',
+            from: '9.0.0',
+            to: '10.0.0',
+            kind: 'major',
+            workspaces: ['.', 'packages/b'],
+        },
+        {
+            name: 'x',
+            package: 'x',
+            from: '10.0.0',
+            to: '11.0.0',
+            kind: 'major',
+            workspaces: ['packages/a'],
+        },
+    ]);
+    assert.deepEqual(changedDependencies(multi(['2.0.0', '2.0.0', '1.0.0']), multi(['2.0.0', '2.0.0', '2.0.0'])), [{
         name: 'x',
         package: 'x',
-        from: '10.0.0',
-        to: '11.0.0',
+        from: '1.0.0',
+        to: '2.0.0',
         kind: 'major',
+        workspaces: ['packages/b'],
     }]);
+
+    // an npm alias reports the package it installs; a v1 lockfile is refused
 
     const alias = (target, version) => ({
         packages: {
@@ -504,6 +646,7 @@ function selfTest() {
         from: '7.0.0',
         to: '7.1.0',
         kind: 'minor',
+        workspaces: ['.'],
     }]);
     assert.deepEqual(changedDependencies(alias('string-width', '7.0.0'), alias('other', '7.1.0')), []);
     assert.throws(() => changedDependencies({ lockfileVersion: 1, dependencies: {} }, {}), /package-lock v2\/v3/);
@@ -537,6 +680,10 @@ function selfTest() {
         exports: { '.': { types: './dist/index.d.mts', default: './dist/index.mjs' }, './sub': { import: { types: './dist/sub.d.mts' } } },
     }), ['dist/index.d.mts', 'dist/sub.d.mts', 'dist/index.d.ts']);
     assert.ok(exportsOf("export * as ns from './ns.js';").has('ns'));
+    assert.ok(exportsOf("export type * as models from './models.js';").has('models'));
+    assert.deepEqual(runtimeEntries({ exports: { '.': './dist/index.js', './p/*': './dist/p/*.js' } }), ['dist/index.js']);
+    assert.deepEqual(runtimeEntries({ main: 'lib/main.js' }), ['lib/main.js']);
+    assert.deepEqual(runtimeEntries({}), ['index.js']);
 
     assert.deepEqual(declarationChanges(
         new Map([['a.d.ts', 'x\ny'], ['b.d.ts', 'same'], ['old-1.d.ts', 'z']]),
@@ -562,6 +709,8 @@ process.on('uncaughtException', (err) => {
 
 if (command === '--test') {
     selfTest();
+    await selfTestPackages();
+    console.log('packages ok');
 } else if (command === 'changed' && args[0] && args.length <= 2) {
     console.log(JSON.stringify(await changed(args[0], args[1]), null, 2));
 } else if (command === 'diff' && args.length === 3) {

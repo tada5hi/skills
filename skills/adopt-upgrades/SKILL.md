@@ -44,7 +44,8 @@ One entry per opportunity:
 - `Adopt` names the change and every local thing to delete, plus known differences (signature, edge cases, a breaking change of the bump).
 - `Source` names the evidence: `new export <name>` (with its declaration file), `new member <Export>.<member>` or `new option <Export>.<option>` from a declaration diff, `new subpath <path>`, or `release notes <version>` for a behavior change the types do not show. Add the bump's pull request when there is one.
 - The key is the first 12 hex digits of the SHA-256 of `<package>|<api id>|<first Local path>`. The api id is fixed by the evidence, never prose: the export name (`stringbool`), `<Export>.<member>`, the subpath (`./runtime`), or `release:<to version>`. Compute it with `node -e 'console.log(require("node:crypto").createHash("sha256").update(process.argv[1]).digest("hex").slice(0, 12))' 'zod|stringbool|packages/kit/src/helpers/env.ts'`. An entry whose key is already in the body is never added again, ticked or not.
-- The checked marker holds the default-branch commit up to which every bump was checked. It moves only when every bump up to that commit was checked, not when a pass stopped at the 10-bump cap.
+- The checked marker holds the default-branch commit up to which every bump was checked. It moves only when every bump up to that commit was checked.
+- A pass that stops at the 10-bump cap records its progress in a partial marker on the line after the checked marker: the end commit of its range and each transition it checked, as `<package>@<from>..<to>`. For example: `<!-- adopt-upgrades:partial 9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c @chamvi/app@0.8.0..0.9.0 zod@4.1.0..4.2.0 -->`. The next pass resumes that same range and skips the listed transitions. The pass that checks the last one moves the checked marker to the partial's end commit and deletes the partial marker.
 - New entries go at the end. Never rewrite or reorder someone else's entry; tick a box only by adopting it or on the user's word.
 
 ## Mode 1: check
@@ -53,12 +54,12 @@ One entry per opportunity:
 
 Use the range the user names. Otherwise:
 - After a manual upgrade in this session, use the packages it upgraded.
-- With a tracking issue, start from the commit in its checked marker. Ticking a box or editing the issue does not move it, so an edit never hides a bump.
+- With a tracking issue, start from the commit in its checked marker. Ticking a box or editing the issue does not move it, so an edit never hides a bump. With a partial marker, the range ends at its commit instead of the remote head, and its transitions are skipped.
 - Without one, start from the latest release tag (`git describe --tags --abbrev=0`).
 
 Check the range up to the default branch as it is on the remote (`git fetch origin`), not up to a local feature branch.
 
-For npm, run the script in the directory of the `package-lock.json` (the repository root for a workspace monorepo). It lists the direct dependencies of the root and every workspace whose resolved version changed, majors first. Each row has the dependency `name` and the published `package` it installs, which differ for an `npm:` alias:
+For npm, run the script in the directory of the `package-lock.json` (the repository root for a workspace monorepo). It compares each workspace's (and the root's) direct dependencies on their own, so a workspace moving onto a version another workspace already had still counts. It then merges equal transitions into one row, majors first. Each row has the dependency `name`, the published `package` it installs (which differs for an `npm:` alias), `from`, `to`, `kind` and the `workspaces` that moved:
 
 ```bash
 node <skill>/scripts/upgrades.mjs changed <from ref> origin/<default branch>
@@ -68,9 +69,9 @@ Leave out the second ref only right after a manual upgrade in this session, to c
 
 It refuses a lockfile v1 or a non-npm lockfile. A dependency added or removed in the range is no bump and is not listed.
 
-Keep `major`, `minor` and `unknown`. Drop `patch` unless the user asks: patches rarely add API. For other ecosystems, read the manifest and lockfile diff (`git diff <ref> -- <lockfile>`) and list the direct dependencies by hand.
+Keep `major`, `minor` and `unknown`. A transition into or out of a prerelease (`2.0.0-beta.1` to `2.0.0-beta.2`) is `unknown`, never `patch`. Drop `patch` unless the user asks: patches rarely add API. For other ecosystems, read the manifest and lockfile diff (`git diff <ref> -- <lockfile>`) and list the direct dependencies by hand.
 
-With more than 10 bumps, check the 10 most severe, leave the checked marker where it is, and tell the user which ones are left for the next pass.
+With more than 10 bumps, check the 10 most severe. Then record a partial marker as described in "The tracking issue", and tell the user which bumps are left. Without a tracking issue there is nowhere to keep that progress: offer to create the issue to hold it, or check the rest in this session.
 
 ### 2. Diff each bump's API
 
@@ -94,7 +95,7 @@ The names are only a starting point:
 - `coverage.names` at 0 in either version means the types were not readable this way (`export =`, a package without declarations, a pattern subpath). An empty diff then says nothing, so read the declarations by hand. If a package ships no types at all, rely on the release notes.
 - Read the release notes between the two versions (`gh release list -R <repo>`, `gh release view <tag> -R <repo>`, or the package's CHANGELOG in `dirs.to`) for behavior changes that add no export. Release notes are claims: a name they mention counts only when the published types contain it.
 - `removed` and newly `deprecated` names the project uses are not adoption entries. Report them to the user as upgrade debt. `deprecated` flags a name when any declaration of it carries `@deprecated`, so a single deprecated overload flags the whole name; check before reporting.
-- Delete the temporary directory (the parent of `dirs.from`) when the pass is done.
+- Delete the output's `root` (both versions and their tarballs) when the pass is done. A failed `diff` deletes it itself.
 
 ### 3. Match against the code
 
@@ -107,7 +108,7 @@ A match is an entry only when you can name the local symbol and file, and the ne
 1. Find the tracking issue: `gh issue list --state all --search "adopt upstream features in:title" --json number,title,state,body`, and keep the one whose body starts with the marker line. GitHub search does not index HTML comments, so search by title and check the marker.
 2. Show the user the new entries and the new checked commit first. Create or edit only after they say go. Edit with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost. Create with `gh issue create --title "chore: adopt upstream features" --body-file <file>`.
 3. If the issue was closed, ask before reopening it or opening a new one: closing it may have been the owner's decision.
-4. With no entries, create nothing. With an existing issue, offer to move only its checked marker, so the next pass does not check the same bumps again.
+4. With no entries, create nothing. With an existing issue, offer to update only its checked or partial marker, so the next pass does not check the same bumps again.
 
 ## Mode 2: adopt an entry
 
