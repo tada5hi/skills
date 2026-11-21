@@ -1,7 +1,7 @@
 # upstream-features-adopt
 
-> **Find what new dependency versions let your project delete, and track it in one issue per package group.**
-> Stop merging bumps without checking whether the new release replaces a local helper or workaround.
+> **Find out whether new dependency versions can benefit your project, and track it in one issue per package group.**
+> Stop merging bumps without checking whether the new release simplifies, hardens or improves your code.
 
 [All skills](../../README.md#skills) · [`SKILL.md`](./SKILL.md)
 
@@ -13,7 +13,7 @@ A dependency bump gets checked for whether it is safe, then merged and forgotten
 |---|---|---|
 | **Which bumps to check** | Scroll through merged Dependabot or Renovate PRs | Lists direct npm dependencies that moved since the latest release tag, per workspace, majors first, patches dropped |
 | **What changed** | Read the changelog and hope it is complete | Downloads both versions with `npm pack`, diffs exported names and changed declaration files, then reads the release notes |
-| **What it replaces** | Remember which helper was a workaround | Searches the code for the API's purpose and names up to five local places plus a `git grep` for the rest |
+| **What it brings** | Remember which helper was a workaround | Asks of each new feature whether it simplifies, hardens or improves local code, names up to five places plus a `git grep` for the rest, and the concrete gain |
 | **Keeping track** | Notes in your head or a stray TODO | One `chore: adopt <name> features` issue per group, append only, with a `checked` marker so the next check starts where this one stopped |
 | **Adopting** | Rewrite callers whenever you remember | On request, switches the callers, deletes the local code, runs the checks and ticks the box |
 

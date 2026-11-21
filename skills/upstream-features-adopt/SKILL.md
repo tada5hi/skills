@@ -1,6 +1,6 @@
 ---
 name: upstream-features-adopt
-description: 'Find what new versions of a project''s dependencies let it simplify (a new export or option that replaces a local helper, workaround or hand-written check), record each concrete opportunity in one issue per package group (a scope with its root package), and adopt an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <name> features` issue, or when the user asks "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".'
+description: 'Find out whether new versions of a project''s dependencies can benefit it: features that simplify (replace a local helper, workaround or hand-written check), harden (make existing code more robust or safer) or improve (add a quality the code lacks) its code. Records each concrete opportunity in one issue per package group (a scope with its root package) and adopts an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <name> features` issue, or when the user asks "can we benefit from <package>", "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".'
 license: Apache-2.0
 compatibility: Requires git, the `gh` CLI (authenticated), Node.js 22+ and npm registry access. The API diff covers npm packages; other ecosystems get the bump without a diff.
 metadata:
@@ -11,7 +11,7 @@ allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(node:*) Bash(grep:*) Bash
 
 # upstream-features-adopt
 
-> A dependency bump is checked for "is it safe". This skill asks what the new version lets the project delete: a local helper, workaround or hand-written check that a new API replaces.
+> A dependency bump is checked for "is it safe". This skill reads the new versions so the owner does not have to, and asks of each new feature: can we benefit from it? A feature can simplify the code (replace a local helper, workaround or hand-written check), harden it (make it more robust or safer) or improve it (add a quality it lacks); each concrete case becomes a suggestion for the owner.
 
 Its counterpart is `upstream-fixes-track`: that one records a gap the project still waits on in one of the user's own libraries; this one records what a release of any dependency already shipped. Their issues stay separate.
 
@@ -28,10 +28,10 @@ The body starts with two marker lines and the intro. The marker keeps the word `
 ```markdown
 <!-- upstream-features-adopt:issue scope=chamvi -->
 <!-- upstream-features-adopt:checked @chamvi/app@0.9.0 @chamvi/ui@0.9.0 -->
-New versions of `@chamvi/*` ship features that can replace local code in this repository. Each entry names a feature, a proposal for using it, and the local code it affects; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
+New versions of `@chamvi/*` ship features this repository can benefit from. Each entry names a feature, how the code would use it and where; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
 ```
 
-**The intro** names the covered packages in code spans, from those in the `checked` marker and the new sections: `` `routup` and `@routup/*` `` with both root and scoped packages, `` `@chamvi/*` `` with scoped ones only, `` `zod` `` with the root only. The rest of the text is fixed. On each write, rewrite the intro only while it is the line right after the markers and reads exactly as one of these forms; leave one a person edited.
+**The intro** names the covered packages in code spans, from those in the `checked` marker and the new sections: `` `routup` and `@routup/*` `` with both root and scoped packages, `` `@chamvi/*` `` with scoped ones only, `` `zod` `` with the root only. The rest of the text is fixed. On each write, rewrite the intro only while it is the line right after the markers and reads exactly as one of these forms (or as the earlier text, `ship features that can replace local code in this repository. ...`); leave one a person edited.
 
 **The `checked` marker** lists `<package>@<version>` for each package of the group checked so far, sorted by package name. It is where the next check starts that package's range. It changes only when Mode 1 step 4 writes the issue (sections appended, or the marker-only update); ticking a box or any other edit never moves it. On that write, per package:
 
@@ -44,8 +44,8 @@ Each bump is one section, its heading linking the npmdiff of the range (the pack
 ```markdown
 ### [`@chamvi/app` 0.8.0 → 0.9.0](https://npmdiff.dev/%40chamvi%2Fapp/0.8.0/0.9.0/)
 
-- [ ] **`ValidationError.cause`**: carries the failing value
-  - Proposal: pass the cause to ValidationError and delete the local wrappers that attach it
+- [ ] **`ValidationError.cause`** (hardens): carries the failing value
+  - Proposal: pass the cause, so a failed validation logs the value that failed; the local wrappers drop it today
   - Local (2 of 7):
     - `withCause` in [`packages/kit/src/helpers/errors.ts`](https://github.com/o/r/blob/9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c/packages/kit/src/helpers/errors.ts)
     - [`packages/developer/src/tools/workspace.ts`](https://github.com/o/r/blob/9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c/packages/developer/src/tools/workspace.ts)
@@ -53,8 +53,8 @@ Each bump is one section, its heading linking the npmdiff of the range (the pack
     Find the rest: `git grep -nIF -e "withCause(" 9b8c7d6e5f4a`
   - Source: member of ValidationError, ValidationError.cause in dist/errors.d.mts
   <!-- upstream-features-adopt:entry key=9d54088d29cf -->
-- [ ] **`jobs as components`**: background jobs show in GET /components
-  - Proposal: declare the sweep as a component
+- [ ] **`jobs as components`** (improves): background jobs show in GET /components
+  - Proposal: declare the sweep as a component, so GET /components shows whether it runs
   - Local (0 of 2):
     Find the rest: `git grep -nIF -e "setInterval(" 9b8c7d6e5f4a`
   - Source: [release notes 0.9.0](https://github.com/chamvi/chamvi/releases/tag/%40chamvi%2Fapp%400.9.0)
@@ -63,9 +63,9 @@ Each bump is one section, its heading linking the npmdiff of the range (the pack
 
 One entry per feature, its lines in this order:
 
-- **Box line:** `` - [ ] **`<API>`**: <summary> ``, a few words on what it does.
-- **`Proposal`** (required): how to use the feature here. When the search finds more places than `Local` lists, describe the change in general terms, not file by file.
-- **`Local`:** up to 5 places, each a file path from the repository root (no leading `/`, no `.` or `..` segment, no directory) that exists at the checked commit, linked at that commit's full SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>`), preceded by the symbol in a code span when there is one: `` `<symbol>` in [`<path>`](<link>) ``. Name a symbol only as text the file contains verbatim (the stale block looks for it).
+- **Box line:** `` - [ ] **`<API>`** (<kind>): <summary> ``, the kind label (below), then a few words on what it does. A box line without a kind label (a person's entry) is still an entry.
+- **`Proposal`** (required): how to use the feature here and the concrete gain: what fails or is missing today, or what becomes simpler, safer or clearer. When the search finds more places than `Local` lists, describe the change in general terms, not file by file.
+- **`Local`:** for `simplifies` the code the feature replaces, for `hardens` and `improves` the code where it would apply. Up to 5 places, each a file path from the repository root (no leading `/`, no `.` or `..` segment, no directory) that exists at the checked commit, linked at that commit's full SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>`), preceded by the symbol in a code span when there is one: `` `<symbol>` in [`<path>`](<link>) ``. Name a symbol only as text the file contains verbatim (the stale block looks for it).
 - **Search** (optional): ``Find the rest: `git grep -nIF -e "<pattern>" <sha>` ``, `<sha>` the first 12 hex digits of the checked commit, after a blank line under the items (no blank line without items). Count its files with `git grep -lIF -e "<pattern>" <sha> | wc -l` (tracked files at that commit; if the clone lacks it, `git fetch --depth=1 origin <sha>` first); with no match, drop the search. The heading is `Local (<n> of <m>):` when the search matches more files (`m`) than items listed (`n`), else `Local:`; the agent writes `<m>+` when its listing was cut short. The pattern is 2 to 100 characters, no leading or trailing space, no control character, none of `` ` `` `"` `\` `$` `!`, does not start with `-`, and holds no `<!--` or `-->`.
 - **An entry needs at least one Local item or a matching search.** An opportunity with no local code to point at is not an entry.
 - **`Source`** starts with the evidence kind: `new export` (a name the diff added), `changed export` (a name whose declaration changed), `member of <Export>`, `new subpath`, or `release notes <to>` (a behavior change the types do not show). Optional detail follows after a comma (declaration file, the bump's pull request). For release notes, when the newest release in the range has a GitHub release page, the evidence is that link, once: `[release notes <to>](<release url>)`.
@@ -132,9 +132,19 @@ The names are a starting point:
 
 ### 3. Match against the code
 
-For each new API, search the repository for code that does the same by hand. Search for its purpose (what it parses, validates, retries, formats or wraps), not its name: helpers, utils, wrappers around the package, comments such as `workaround`, `polyfill` and `until <package> supports`, casts a new generic or overload makes unnecessary.
+For each new feature, ask one question: can this repository benefit from it? It can when the feature
 
-A match is an entry only when you can name local code and the new API covers its callers' cases. A partial fit goes in `Proposal` with the difference spelled out, or is left out.
+| Kind | Label | The feature | `Local` names |
+|---|---|---|---|
+| simplify | `simplifies` | replaces code the repository writes by hand | the code it replaces |
+| harden | `hardens` | makes existing code more robust or safer, for example with timeouts, cancellation, validation, error handling or stricter security | the code where it would apply |
+| improve | `improves` | adds a quality the code lacks, for example clearer code, stronger types, better performance or observability | the code where it would apply |
+
+Pick one kind per feature: the first that applies in this order. A feature with several gains is still one entry (its key is per feature).
+
+For `simplify`, search for the feature's purpose (what it parses, validates, retries, formats or wraps), not its name: helpers, utils, wrappers around the package, comments such as `workaround`, `polyfill` and `until <package> supports`, casts a new generic or overload makes unnecessary. For `harden` and `improve`, search for the code the feature would act on: the calls without the new timeout or signal, the unchecked input, the loose types, the unlogged background work.
+
+Propose a feature only with the places it applies to (`Local`, or a search) and the concrete gain there in `Proposal`: what fails or is missing today, or what becomes simpler, safer or clearer. A feature that is new but gives this code nothing concrete is no entry. A partial fit goes in `Proposal` with the difference spelled out, or is left out.
 
 ### 4. Record
 
@@ -152,9 +162,9 @@ Group the entries by group name; each bump is a section in its group's issue (`r
 Only when the user asks for that entry; a check never adopts.
 
 1. Install the version in the section heading in every workspace that declares the package.
-2. Apply `Proposal`: switch the callers in `Local` and those the search finds to the new API, then delete the local code, its spec when only that code needed it, and any `Upstream:` (see `upstream-fixes-track`) or workaround comment.
+2. Apply `Proposal` at the places in `Local` and those the search finds. For `simplifies`, switch the callers to the new API, then delete the local code, its spec when only that code needed it, and any `Upstream:` (see `upstream-fixes-track`) or workaround comment. For `hardens` and `improves`, use the feature there and add a spec for the gain when it is observable (a timeout, a refused input).
 3. Run the project's checks (lint, build, tests, typecheck). Keep the callers' specs green; a spec failing because the new API behaves differently is a difference to report, not to silence.
-4. Tick the entry's box in the same change set (the stale block may be left; the next write re-renders it). Commit as `refactor: adopt <API> from <package> <version>` or per the project's conventions.
+4. Tick the entry's box in the same change set (the stale block may be left; the next write re-renders it). Commit as `refactor: adopt <API> from <package> <version>` (a `hardens` entry that fixes a failure as `fix:`) or per the project's conventions.
 
 A declined entry is ticked with `declined: <reason>` appended to its box line, so later passes skip it.
 
@@ -163,7 +173,9 @@ A declined entry is ticked with `declined: <reason>` appended to its box line, s
 | Mistake | Instead |
 |---|---|
 | A file-by-file `Proposal` when the search finds more places | Describe the change generally; `Find the rest` lists them |
-| Listing every new export | Only exports the code has a local stand-in for |
+| Listing every new export | Only features with a concrete gain for named local code |
+| An entry without a concrete gain ("could use X") | `Proposal` says what fails or is missing today, or what becomes simpler, safer or clearer; otherwise no entry |
+| Only asking what the version lets you delete | Ask whether the code can benefit: simplify, harden or improve |
 | Diffing the changelog only | Diff the published packages; options and subpaths hide there |
 | A second open issue for the group, or separate ones for `routup` and `@routup/*` | Search by title, check the `scope=` marker, append a section |
 | A key with the path in it | `<package>\|<api id>` only (plus `\|<feature>` for a `release:` id) |
