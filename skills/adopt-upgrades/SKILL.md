@@ -33,7 +33,7 @@ The body starts with two marker lines, then this intro, with the scope in a code
 New versions of `@chamvi` ship features that can replace local code in this repository. Each entry names a feature, a proposal for using it, and the local code it affects; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
 ```
 
-- The `checked` marker lists `<package>@<version>` for each package of the scope checked so far, sorted by name. Rewrite it on every write; it is the range start of the next check.
+- The `checked` marker lists `<package>@<version>` for each package of the scope checked so far, sorted by name. Rewrite it on every write; it is the range start of the next check. A package moves to a new version in the marker only once every one of its transitions in the range (one per workspace that moved) is checked, at the highest `to` among them.
 - Each bump is one section, its heading linking the npmdiff of the range (the package URL-encoded: `encodeURIComponent`), the package name in a code span:
 
 ```markdown
@@ -99,7 +99,7 @@ It refuses a lockfile v1 or a non-npm lockfile. A dependency added or removed in
 
 Keep `major`, `minor` and `unknown`. A transition into or out of a prerelease (`2.0.0-beta.1` to `2.0.0-beta.2`) is `unknown`, never `patch`. Drop `patch` unless the user asks: patches rarely add API. For other ecosystems, read the manifest and lockfile diff (`git diff <ref> -- <lockfile>`) and list the direct dependencies by hand.
 
-With more than 10 bumps, check the 10 most severe and tell the user which bumps are left. The `checked` marker of each scope records only the packages checked, so the next pass picks up the rest.
+With more than 10 bumps, check them in batches of 10, most severe first, all in the same session: a session keeps no progress outside the issues, and a scope with no entries gets no issue to hold a marker. Stop early only when the user says so; then tell them which bumps are left, and that the next check starts from the same range for those packages.
 
 ### 2. Diff each bump's API
 
@@ -136,8 +136,8 @@ A match is an entry only when you can name local code (up to 5 places, plus a se
 Record per scope: group the entries by scope, one section per bump, in that scope's issue.
 
 1. Find the scope's issue: `gh issue list --state all --search "chore: adopt <scope> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- adopt-upgrades:issue scope=<scope> -->`, authored by the bot or the owner. GitHub search does not index HTML comments, so search by title and check the marker. Only an open one takes new sections; a closed one only gives its `checked` marker.
-2. Show the user the new sections and the new `checked` marker first. Create or edit only after they say go. Edit with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost: rewrite the marker lines, keep everything after them byte for byte, append the sections, then the done line and the stale block. Create with `gh issue create --title "chore: adopt <scope> features" --label upstream-features --body-file <file>`.
-3. With no entries for a scope, create nothing. With an open issue, offer to update only its `checked` marker, so the next pass does not check the same bumps again.
+2. Show the user the new sections and the new `checked` marker first, and, before the first create in the repository, that the `upstream-features` label will be created if it is missing (`gh label list --search upstream-features --json name`). Create or edit only after they say go. Create a missing label with `gh label create upstream-features --description "Features a new dependency version offers" --color 2f6f4f`. Edit with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost: rewrite the marker lines, keep everything after them byte for byte, append the sections, then the done line and the stale block. Create with `gh issue create --title "chore: adopt <scope> features" --label upstream-features --body-file <file>`.
+3. With no entries for a scope, create nothing. With an open issue, offer to update only its `checked` marker, so the next check does not repeat the same bumps. Without an open issue nothing records that the scope was checked: say so in the report, and the next check repeats those bumps.
 
 ## Mode 2: adopt an entry
 
