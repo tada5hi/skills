@@ -173,7 +173,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | [api-query](skills/api-query/) | Query a live HTTP API from a base URL and credentials, using OpenAPI or rapiq conventions |
 | [package-list-query](skills/package-list-query/) | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
 | [package-list-refresh](skills/package-list-refresh/) | Sync the awesome-style package list with GitHub and npm, then open a PR |
-| [upstream-features-adopt](skills/upstream-features-adopt/) | Find what new versions of your dependencies let you simplify, record each opportunity in one tracking issue per repository, and adopt it on request |
+| [upstream-features-adopt](skills/upstream-features-adopt/) | Find out whether new versions of your dependencies can benefit your code (simplify, harden or improve it), record each concrete suggestion in one issue per package group, and adopt it on request |
 | [upstream-fixes-track](skills/upstream-fixes-track/) | Track the upstream issues a project waits on in your own libraries, in one tracking issue per project, and adopt each fix once it is released |
 | [skills-link](skills/skills-link/) | Link `skills/` into `.claude/skills/` so Claude Code discovers them locally |
 
