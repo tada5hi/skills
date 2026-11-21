@@ -116,7 +116,7 @@ Then start a new session. To pull in new skills, run `codex plugin marketplace u
 
 ## Skills
 
-Skills marked *vendor* are synced from another repository; the source is linked. Skills marked *frozen copy* came from a vendor that has since removed them: they stay as they were and no longer receive updates. *Manual only* skills run when you invoke them (for example `/grill-me`), never on their own.
+Skills marked *vendor* are synced from another repository; the source is linked. Skills marked *frozen copy* came from a vendor that has since removed them: they stay as they were and no longer receive updates. *Manual only* skills run when you invoke them (for example `/grill-me`), never on their own. Each skill written here has a README that explains how to trigger it.
 
 ### Documentation and writing
 
@@ -243,15 +243,17 @@ npm run skills:sync    # Pull the latest and re-sync
 
 1. Create a directory under `skills/` named after the skill, following the `{verb}-{noun}` pattern
 2. Add a `SKILL.md` with YAML frontmatter (`name` matching the directory, `description`) and the instructions
-3. Add the name to the `manual` array in `src/meta.ts`
-4. Run `npm run skills:link` to register it with Claude Code
-5. Add it to the [skills tables](#skills) above
+3. Add a `README.md` for people: what the skill does, how to install it, the phrases and `/<name>` command that trigger it, what it changes, and its limits. Use [`generate-commit-message`](skills/generate-commit-message/README.md) as the model
+4. Add the name to the `manual` array in `src/meta.ts`
+5. Run `npm run skills:link` to register it with Claude Code
+6. Add it to the [skills tables](#skills) above
 
 For skills that grow large, put one concept per file in a `references/` subdirectory and list them from `SKILL.md`; put deterministic helpers the skill runs in `scripts/`:
 
 ```text
 skills/my-skill/
 ├── SKILL.md                # Instructions, index of references
+├── README.md               # For people: what it does, how to trigger it
 ├── references/
 │   ├── core-syntax.md      # One concept per file
 │   └── features-auth.md

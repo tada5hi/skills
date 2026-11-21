@@ -11,7 +11,7 @@
 ## Workflow
 
 - After making changes, run `npm run lint` to check for issues.
-- When adding a new manual skill: create `skills/<skill-id>/SKILL.md`, add the name to the `manual` array in `src/meta.ts`, then run `/link-skills` to register it with Claude Code.
+- When adding a new manual skill: create `skills/<skill-id>/SKILL.md` and a `README.md` modelled on `skills/generate-commit-message/README.md`, add the name to the `manual` array in `src/meta.ts`, then run `/link-skills` to register it with Claude Code.
 - When adding a vendor skill: add the entry to `vendors` in `src/meta.ts`, then run `npm run skills:init` and `npm run skills:sync`.
 - Templates must use `{{placeholder}}` syntax for project-specific values — never hardcode project details.
 - Keep templates generic: project-specific content should always be expressed as placeholders with guiding HTML comments.
@@ -64,7 +64,7 @@ chore: update dependencies
 ## Skill Versioning
 
 - Skill versions use date format: `YYYY.MM.DD`
-- When modifying a skill, bump the `metadata.version` field in its `SKILL.md` frontmatter to the current date.
+- When modifying a skill, bump the `metadata.version` field in its `SKILL.md` frontmatter to the current date, and update its `README.md` when triggers, steps or output change.
 
 ## Best Practices
 

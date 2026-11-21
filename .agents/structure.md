@@ -58,6 +58,7 @@ Every skill lives under `skills/<skill-id>/` and contains:
 | File | Required | Purpose |
 |------|----------|---------|
 | `SKILL.md` | Yes | YAML frontmatter (name, description, version, allowed-tools) + markdown instructions |
+| `README.md` | Manual skills | For people browsing GitHub: what it does, install, trigger phrases and `/<name>`, output, limits. Agents do not load it |
 | `templates/` | No | Template files with `{{placeholder}}` variables for generation |
 | `references/` | No | Individual concept files for large skills (one `.md` per concept) |
 | `scripts/` | No | Executable helpers the skill runs (e.g. previews, validators) instead of inline shell code |
