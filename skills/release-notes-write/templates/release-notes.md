@@ -54,7 +54,7 @@
 ### ⬆️ Upgrading
 
 ```sh
-{{npm install package@^{{version}}}}
+npm install {{package}}@^{{version}}
 ```
 
 📖 [Migration guide {{previous major}} to {{this major}}]({{https://docs.example.com/guide/migration.html}})

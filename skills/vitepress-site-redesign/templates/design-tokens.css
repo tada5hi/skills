@@ -27,7 +27,7 @@
  * beside the theme directory (`../components`), sometimes inside it
  * (`./components`). Check where yours are, then confirm the build actually
  * emitted a utility you use (grep the built CSS for one). */
-@source "{{./components}}";
+@source "{{../components}}";
 
 @theme inline {
     --font-sans: var(--vp-font-family-base);

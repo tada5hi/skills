@@ -7,7 +7,7 @@
 
 ## Why readme-write?
 
-A reader decides in seconds whether to keep reading, and most READMEs only say what a project is, not why anyone would use it. Writing a better one by hand means drawing SVGs that stay readable on GitHub's light and dark themes and on npm, and checking every sample and claim against the code. A visual refresh also tends to drop the reference material readers came back for.
+Most READMEs say what a project is, not why anyone would use it. A better one needs SVGs that stay readable on GitHub's light and dark themes and on npm, samples and claims checked against the code, and a rewrite that keeps the reference material readers came back for.
 
 | Concern | Without it | With readme-write |
 |---|---|---|
@@ -53,7 +53,7 @@ The agent may also use it when a README is just a heading, an install line and a
 ## Requirements
 
 - Headless Chrome or Chromium for SVG previews (set `CHROME=/path/to/binary` if it is not found).
-- perl for the settled renders of animated SVGs.
+- perl for the settled renders of animated SVGs; xmllint (optional) for the well-formedness check.
 - The project's TypeScript toolchain to type-check samples.
 
 ## Output

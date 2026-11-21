@@ -78,6 +78,8 @@ Removed or newly deprecated names your code uses are reported in the chat as upg
 - **Issues are append only.** It never rewrites, reorders or deletes an entry, and never reopens a closed issue; a later version opens a new one.
 - **Declining is recorded.** A declined entry is ticked with `declined: <reason>` so later checks skip it.
 - **Patches are skipped** unless you ask; bumps are checked in batches of ten, most severe first.
+- **The `checked` marker moves only when a package's whole range was checked.** A check stopped early repeats the remaining bumps next time.
+- **Gaps you still wait on** in your own libraries are [upstream-fixes-track](../upstream-fixes-track/).
 
 ## License
 

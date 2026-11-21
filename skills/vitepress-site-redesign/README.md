@@ -7,7 +7,7 @@
 
 ## Why vitepress-site-redesign?
 
-A VitePress site looks like documentation because the default theme is a documentation theme. Replacing that look by hand means learning where VitePress's unlayered CSS beats your overrides, why Tailwind utilities silently do nothing inside page content, and why a transparent nav makes flyout menus unreadable. The skill keeps the default theme and replaces only the parts that carry the "default" signal.
+Replacing the default VitePress look by hand means learning where its unlayered CSS beats your overrides, why Tailwind utilities silently do nothing inside page content, and why a transparent nav makes flyout menus unreadable. The skill keeps the default theme and replaces only the parts that carry the "default" signal.
 
 | Concern | Without it | With vitepress-site-redesign |
 |---|---|---|
@@ -42,7 +42,7 @@ npx skills add tada5hi/skills --skill='vitepress-site-redesign'
 ## What it does
 
 1. Agrees the visual direction, brand colour, typography, hero copy and landing sections with you, and writes the decisions to a plan file in the repository.
-2. Lays the foundation: optionally installs Tailwind v4 with `postcssIsolateStyles`, then sets up design tokens and shared classes in `theme/style.css`, or the plain-CSS equivalent.
+2. Lays the foundation: optionally installs Tailwind v4 with `postcssIsolateStyles`, then sets up design tokens and shared classes in `.vitepress/theme/style.css`, or the plain-CSS equivalent.
 3. Restyles the chrome: a transparent nav while the landing page is at the top, and a footer component that replaces `themeConfig.footer`.
 4. Builds the landing page from frontmatter copy and one component per section, with a motif derived from something the project already owns.
 5. Moves listed metadata (projects, posts, people) into frontmatter read by data loaders, and proves the rendered text did not change.
@@ -53,18 +53,20 @@ npx skills add tada5hi/skills --skill='vitepress-site-redesign'
 - A VitePress 1.x site on the default theme.
 - npm and Node.js to install packages and build the site.
 - Tailwind v4 is optional; the skill covers the Tailwind and the plain-CSS route.
-- Browser automation for the verification phase.
+- A browser automation tool (for example Claude in Chrome or a Playwright MCP) for the verification phase.
 
 ## Output
 
-Changes to your VitePress site, typically:
+Uncommitted changes in your working tree, relative to the directory that holds `.vitepress/`, typically:
 
-- `theme/style.css` with tokens, shared classes and unlayered chrome overrides
-- `theme/Layout.vue` wrapping the default layout with your footer
+- `.vitepress/theme/style.css` with tokens, shared classes and unlayered chrome overrides
+- `.vitepress/theme/Layout.vue` wrapping the default layout with your footer
 - `index.md` with `layout: page`, a `pageClass` and the hero copy in frontmatter
-- `components/home/` with one component per landing section
-- `data/*.data.ts` loaders for listed content
+- `.vitepress/components/home/` with one component per landing section
+- `.vitepress/data/*.data.ts` loaders for listed content
 - a plan file with the agreed design decisions
+
+It does not commit, push or deploy.
 
 ## Notes
 

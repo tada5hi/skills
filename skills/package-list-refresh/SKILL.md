@@ -11,7 +11,7 @@ allowed-tools: Bash(node:*) Bash(gh:*) Bash(git:*) Bash(mktemp:*) Read Edit Writ
 
 # package-list-refresh
 
-> Keep the list true: every public, maintained repository listed once, nothing dead listed, and every exclusion written down so it is not proposed again.
+> Every public, maintained repository listed once, nothing dead listed, every exclusion written down so it is not proposed again.
 
 ## The list
 
@@ -45,7 +45,7 @@ A list without the block: add it first, with `owners:` set to the list's owner p
    ```bash
    node <skill>/scripts/scan.mjs <dir>/README.md
    ```
-   Sections: lines that break the entry format, new repositories (with their public packages), gone/archived/private/renamed, package drift per monorepo, npm problems (deprecated, not published). The scan aborts on a rate limit or network error rather than reporting false findings; re-run it.
+   Sections: lines that break the entry format, new repositories (with their public packages), gone/archived/private/renamed, package drift per monorepo, npm problems (deprecated, not published). On a rate limit or network error it aborts instead of reporting false findings; re-run it. `node <skill>/scripts/scan.mjs --test` runs its offline self-check.
 3. **Decide each finding:**
    | Finding | Action |
    |---------|--------|
@@ -60,7 +60,7 @@ A list without the block: add it first, with `owners:` set to the list's owner p
    | Deprecated npm package | Remove it, or the whole entry when everything is deprecated; name the successor in `exclude:` |
 4. **Keep the format strict**: one line per repository, the backtick marker, an en dash, a description ending in a period. Keep `## Contents` in sync when a section is added or emptied, and remove empty sections.
 5. **Re-run the scan.** Every section should now be empty.
-6. **Open a pull request.** Show the user the diff summary first and wait for their go before pushing, then write a PR body file listing added, removed and excluded repositories and packages (no AI attribution), and run:
+6. **Open a pull request.** Show the user the diff summary and wait for their go. Then write a PR body file (Write tool) listing added, removed and excluded repositories and packages, no AI attribution, and run:
    ```bash
    git -C <dir> commit -am "chore: refresh package list"
    git -C <dir> push -u origin HEAD

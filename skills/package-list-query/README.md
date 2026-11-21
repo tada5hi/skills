@@ -7,8 +7,6 @@
 
 ## Why package-list-query?
 
-When you maintain many packages, it is easy to write a deep merge, an env parser or a migration lock again in a new project, or to let an agent do it. The decision to reuse happens early, while a plan or a subagent brief is written, and a package's README often lags behind what it actually exports.
-
 | Concern | Without it | With package-list-query |
 |---|---|---|
 | **Remembering** | Rely on memory of what you published | Reads your whole awesome-style list (default `tada5hi/awesome`) |
@@ -36,7 +34,7 @@ npx skills add tada5hi/skills --skill='package-list-query'
 - "is there one of my libs that parses env variables"
 - "which of my packages handles database migrations"
 
-The agent should also pick it up without being asked when it is about to implement a generic helper (deep merge, nested path get/set, env parsing, config loading, DI container, HTTP client, validation, error classes, database locks or migrations, i18n, query parsing, Docker/Helm release tooling), when writing a plan or a subagent brief, when porting code from another repository, when adding a dependency, or when reviewing a diff for reinvented helpers.
+The agent should also pick it up unasked when it is about to implement a generic helper, write a plan or subagent brief, port code, add a dependency, or review a diff.
 
 **Invoke it directly.** Type `/package-list-query` (installed with the skills CLI) or `/skills:package-list-query` (Claude Code plugin).
 
@@ -54,7 +52,7 @@ To audit a diff, it lists what the changed code does by need, runs steps 1 to 4,
 
 - Network access to GitHub, and to npm or PyPI for the candidates it verifies.
 - The `gh` CLI, or `curl` to fetch the list without it.
-- npm and Node.js to inspect npm packages; `pip` for PyPI packages.
+- npm and Node.js to inspect npm packages; `pip` and `unzip` for PyPI packages.
 
 ## Output
 

@@ -44,12 +44,12 @@ The agent may also use it after finishing work on a feature branch.
 
 ## What it does
 
-1. Checks `gh` authentication, the current branch and uncommitted changes; commits them with [commit-message-generate](../commit-message-generate/) as atomic Conventional Commits.
+1. Checks `gh` authentication; creates a branch when you are on the default branch; asks before committing uncommitted changes you did not ask it to commit, then commits them as atomic Conventional Commits with [commit-message-generate](../commit-message-generate/).
 2. Fetches the base, lists the commit range, looks for an open PR on the branch and reads the full diff.
 3. Runs the checks that match the changed surfaces (lint, typecheck, focused tests) and records each command and result.
 4. Writes the title and the body, with a before/after screenshot table for UI changes.
 5. Shows you the title, base and body, then pushes to `origin` and runs `gh pr create`, or `gh pr edit` for an existing PR.
-6. Waits until no check is pending, then runs [pr-comments-investigate](../pr-comments-investigate/) on review comments fixes failed checks caused by the PR and pushes the fix, and reports failures the PR did not cause.
+6. Waits until no check is pending, then runs [pr-comments-investigate](../pr-comments-investigate/) on review comments, fixes failed checks caused by the PR and pushes the fix, and reports failures the PR did not cause.
 
 ## Requirements
 

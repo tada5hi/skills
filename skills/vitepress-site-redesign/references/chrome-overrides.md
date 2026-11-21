@@ -133,7 +133,7 @@ inside the open dropdown — in both colour modes, on every dropdown the nav has
 
 `themeConfig.footer` renders one line and sets `display: none` on pages with a sidebar. Replace it:
 
-1. Delete `themeConfig.footer` from `config.mjs`.
+1. Delete `themeConfig.footer` from `.vitepress/config.*`.
 2. Wrap the default layout and mount your footer in `layout-bottom` (see SKILL.md).
 3. The sidebar is `position: fixed`, so decide how the footer relates to it. **Let the footer span the
    full width and paint above the sidebar**, rather than padding it out of the way:

@@ -2,50 +2,65 @@
 name: vitepress-site-redesign
 description: Turn a default-looking VitePress site into a hero-led site with design tokens, a landing page composed of frontmatter-driven sections, and restyled nav and footer chrome. Use when a VitePress site "looks like default VitePress", when a docs site needs a real landing page, when introducing Tailwind v4 into an existing VitePress theme, or when a marketing page and the docs pages drifted apart visually.
 license: Apache-2.0
-compatibility: VitePress 1.x with the default theme. Tailwind v4 optional — the skill covers both the Tailwind and the plain-CSS-variable route. Browser automation is needed for the verification phase.
+compatibility: VitePress 1.x with the default theme. Tailwind v4 optional (the skill covers the Tailwind and the plain-CSS route). Phase 5 needs a browser automation tool (e.g. Claude in Chrome or a Playwright MCP); it is not pre-approved here.
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(npm:*) Bash(git:*) Bash(node:*) Bash(grep:*) Read Write Edit Glob Grep
+allowed-tools: Bash(npm:*) Bash(npx vitepress:*) Bash(git:*) Bash(node:*) Bash(grep:*) Bash(diff:*) Bash(mkdir:*) Read Write Edit Glob Grep
 ---
 
 # vitepress-site-redesign
 
-> A VitePress site looks like documentation because the default theme is a documentation theme. This skill replaces the parts that carry the "default" signal — the markdown start page, the flat nav, the one-line footer — without leaving the theme, and without taking editing away from the people who maintain the content.
+> Replace the parts of the default theme that carry the "default" signal (markdown start page, flat nav, one-line footer) without leaving the theme, and keep the content editable by its maintainers.
 
 ## When to use
 
 - The start page is a markdown document and should be a landing page.
-- The site needs a visual identity (color, motif, rhythm) that the default theme does not give it.
-- A docs site grew a hand-made marketing page whose style no longer matches the rest.
+- The site needs a visual identity (color, motif, rhythm) the default theme does not give it.
+- A hand-made marketing page no longer matches the docs pages.
 - Tailwind should be introduced into an existing VitePress theme.
 
-Skip it for a pure API reference where the default theme is the right answer, and for a site whose content model is the real problem — fix the content first.
+Skip it for a pure API reference, and for a site whose content model is the real problem.
 
-## Do not start with CSS
+## Paths
 
-Agree the direction with the person first: visual direction, brand color, typography, hero copy, which sections the landing page gets, and how far beyond the start page the work goes. Show two or three rendered options per question rather than describing them; a mockup that uses the site's real logo, photos and texts settles in one round what prose argues about for three.
+`<root>` is the VitePress source root: the directory that holds `.vitepress/` (often `docs/`, `src/` or the repository root; find it with Glob `**/.vitepress/config.*`, excluding `node_modules`). All paths below are relative to `<root>`:
 
-Write the decisions down (a plan file in the repo) before implementing. Everything below assumes those answers exist.
+| Path | Content |
+|------|---------|
+| `.vitepress/config.{mjs,ts,mts}` | Site config |
+| `.vitepress/theme/index.{mjs,ts,js}` | Theme entry: imports the entry CSS, registers `Layout` |
+| `.vitepress/theme/style.css` | Entry CSS: tokens, shared classes, unlayered overrides |
+| `.vitepress/theme/Layout.vue` | Wrapper around the default layout (footer) |
+| `.vitepress/components/home/`, `.vitepress/components/layout/` | Landing sections, footer |
+| `.vitepress/data/*.data.ts` | Data loaders |
+| `index.md` | Landing page |
+| `.vitepress/dist/` | Build output (unless `outDir` is set) |
 
-## The shape you are building
+When the project already uses other names or extensions, keep them and adapt the snippets. If `srcDir` is set in the config, markdown pages (`index.md`, loader globs) live under `<root>/<srcDir>`.
 
-| Layer | What it is | Where it lives |
-|-------|-----------|----------------|
+## Agree the direction first
+
+Before any CSS, agree with the user: visual direction, brand color, typography, hero copy, the landing sections, and how far beyond the start page the work goes. Show two or three rendered options per question (mockups with the site's real logo, photos and texts), not descriptions. Write the decisions to a plan file in the repository before implementing.
+
+## Target shape
+
+| Layer | What it is | Where |
+|-------|-----------|-------|
 | Tokens | Color, surface and motif variables; brand variables bridged to your scale | `theme/style.css` |
 | Shared classes | Section rhythm, content column, eyebrow, heading, card, link, dark surface | `theme/style.css` |
 | Chrome | Transparent nav over the hero, site-wide footer | unlayered CSS + `theme/Layout.vue` |
 | Landing page | `layout: page` + one root component composing sections | `index.md`, `components/home/` |
-| Content data | Frontmatter → data loaders → sections | `data/*.data.ts`, `domains/` |
+| Content data | Frontmatter → data loaders → sections | `data/*.data.ts` |
 
-Keep each landing section a separate component with one responsibility, and make the root a thin composition. Sections get added, reordered and removed; a single 800-line page component makes every one of those a merge conflict.
+One component per landing section; the root only composes them.
 
 ## Phase 1 — foundation
 
-**If the site has no Tailwind and you are adding it:** install `tailwindcss` and `@tailwindcss/vite`, register the plugin in `config.mjs` under `vite.plugins`, and import your entry CSS from `theme/index.mjs`. Then add the isolation that makes Tailwind usable inside VitePress at all:
+**Adding Tailwind:** `npm install -D tailwindcss @tailwindcss/vite`, register the plugin in the config under `vite.plugins`, import the entry CSS from the theme entry, and isolate VitePress's unlayered base and doc styles:
 
 ```js
-// config.mjs
+// .vitepress/config.mjs
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, postcssIsolateStyles } from 'vitepress';
 
@@ -54,8 +69,8 @@ export default defineConfig({
         plugins: [tailwindcss()],
         css: {
             postcss: {
-                // VitePress base + doc styles are unlayered and would beat every
-                // Tailwind utility. Exclude them inside `.vp-raw` subtrees.
+                // VitePress base + doc styles are unlayered and beat every Tailwind
+                // utility. Exclude them inside `.vp-raw` subtrees.
                 plugins: [postcssIsolateStyles({ includeFiles: [/base\.css/, /vp-doc\.css/] })],
             },
         },
@@ -63,17 +78,15 @@ export default defineConfig({
 });
 ```
 
-Every component root you render into page content then carries `vp-raw`. Without it, `h-40` on an image or `text-2xl` on a heading silently does nothing.
+Every component root rendered into page content carries `vp-raw`; without it utilities silently do nothing.
 
-**Tokens and shared classes:** copy `templates/design-tokens.css` from this skill directory and fill in the palette. It contains the three things that are easy to get wrong: the bridge from VitePress's brand variables to your own scale, the fixed-dark surface tokens (a hero and footer that stay dark in both color modes), and the shared layout classes the sections use.
+**Tokens and shared classes:** copy [templates/design-tokens.css](templates/design-tokens.css) to `.vitepress/theme/style.css` (or merge it into the existing entry CSS) and fill in the placeholders. It holds the brand-variable bridge, the fixed-dark surface tokens (hero and footer stay dark in both modes) and the shared layout classes. Set its `@source` path relative to the CSS file.
 
-**Without Tailwind:** the same file converts to plain CSS — keep the `:root` variables and the shared classes; delete the `@import "tailwindcss"`, `@custom-variant`, `@source` and `@theme` rules; flatten the `@layer` blocks; replace every `@apply` with the longhand declarations it stands for, turning `sm:`/`md:`/`lg:` variants into `min-width` media queries and `hover:` into `:hover` rules. Then write the section styles as ordinary rules.
+**Without Tailwind:** keep the `:root` variables and shared classes; delete `@import "tailwindcss"`, `@custom-variant`, `@source` and `@theme`; flatten the `@layer` blocks; write each `@apply` out longhand (`sm:`/`md:`/`lg:` as `min-width` media queries, `hover:` as `:hover`).
 
 ## Phase 2 — chrome
 
-Two changes carry most of the "this is not a docs site" effect.
-
-**The nav sits transparently on the hero while the page is at the top.** Mark the landing page with `pageClass` in its frontmatter, then override in the **unlayered** part of your CSS (VitePress's own component CSS is unlayered — an override inside a layer loses):
+**Transparent nav over the hero.** Mark the landing page with `pageClass` and override in the **unlayered** part of the entry CSS (VitePress component CSS is unlayered; an override inside a layer loses):
 
 ```md
 ---
@@ -82,12 +95,12 @@ pageClass: k-home
 ---
 ```
 
-`VPNavBar` carries `.top` while `scrollY === 0`, which is the hook. `references/chrome-overrides.md` in this skill directory has the complete rule set: which variables to re-scope, why they are scoped to the bar's own items rather than the bar (flyout menus inherit and become unreadable otherwise), the two 960px rules that let the hero slide under the fixed nav, and the logo-variant swap.
+`VPNavBar` carries `.top` while `scrollY === 0`. The complete rule set is in [references/chrome-overrides.md](references/chrome-overrides.md): variables re-scoped to the bar's own items (not the bar, or flyout menus become unreadable), the `.VPFlyout:hover` literal-colour leak, the two 960px rules that slide the hero under the fixed nav, and the logo-variant swap.
 
-**The footer becomes a real footer.** VitePress's `themeConfig.footer` renders one line and hides itself on pages with a sidebar. Replace it with your own component mounted through the `layout-bottom` slot of a thin wrapper:
+**Site-wide footer.** `themeConfig.footer` renders one line and hides on pages with a sidebar. Replace it through the `layout-bottom` slot:
 
 ```vue
-<!-- theme/Layout.vue -->
+<!-- .vitepress/theme/Layout.vue -->
 <script lang="ts">
 import DefaultTheme from 'vitepress/theme';
 import { defineComponent } from 'vue';
@@ -106,11 +119,11 @@ export default defineComponent({
 </template>
 ```
 
-Register it as `Layout` in `theme/index.mjs` and delete `themeConfig.footer`. On pages with a sidebar the sidebar is `position: fixed`, so give the footer `position: relative` and a `z-index` above the desktop sidebar but below the mobile drawer, and let its background run the full width — a footer padded to dodge the sidebar stops short of the left edge and reads as a broken layout. Read the actual thresholds out of the installed VitePress (`--vp-z-index-sidebar`, typically 60 with 25 from 960px up); `--vp-z-index-footer` is 10 and is *not* enough.
+Register it as `Layout` in the theme entry and delete `themeConfig.footer`. Give the footer `position: relative`, a full-width background, and a `z-index` above the desktop sidebar but below the mobile drawer; do not pad it to clear the sidebar. Read the thresholds from the installed VitePress (`--vp-z-index-sidebar`, typically 60, 25 from 960px up); `--vp-z-index-footer` (10) is not enough.
 
-Note for a Tailwind setup: the wrapper lives in `theme/`, which your `@source` globs usually do not scan. Keep utility classes out of it and inside the footer component.
+With Tailwind, `theme/` is usually outside the `@source` globs: keep utility classes out of `Layout.vue`.
 
-## Phase 3 — the landing page
+## Phase 3 — landing page
 
 ```md
 ---
@@ -132,11 +145,9 @@ import KHome from './.vitepress/components/home/KHome.vue';
 <KHome />
 ```
 
-Put the copy in frontmatter, not in the components. The people who maintain the site can then change the headline without touching Vue, which is usually the difference between a redesign that survives and one that rots.
-
-Do **not** use VitePress's built-in `layout: home` hero config: that is exactly the look being replaced.
-
-Each section is its own component reading either the page frontmatter (`useData()`) or a data loader. Keep the root thin:
+- Copy lives in frontmatter, not in components, so maintainers edit it without touching Vue.
+- Do **not** use `layout: home` and its hero config: that is the look being replaced.
+- Each section reads the frontmatter (`useData()`) or a data loader; the root stays thin:
 
 ```vue
 <template>
@@ -144,23 +155,20 @@ Each section is its own component reading either the page frontmatter (`useData(
         <KHomeHero />
         <KHomeGroups />
         <KHomeResearch />
-        <KHomePublications />
     </div>
 </template>
 ```
 
-Two details that are cheap now and annoying later: mark decorative glyphs in link text (`→`, `↗`) as
-`aria-hidden` so they stay out of the accessible name, and grep before deleting an asset the redesign made
-obsolete rather than trusting your memory of where it was used.
+- Mark decorative glyphs in link text (`→`, `↗`) `aria-hidden`.
+- Grep before deleting an asset the redesign made obsolete.
+- **Motif:** derive the hero's signature element from something the project owns (logo shape, data, domain), CSS-only where possible. Keep it `aria-hidden`, animate it only if the motion means something, and disable animation under `prefers-reduced-motion`.
 
-**A motif beats a stock illustration.** Derive one element from something the project already owns — the shape in its logo, its data, its domain — and use it as the hero's signature. A CSS-only motif (bars, grid, glow, gradient text) costs nothing at runtime and never looks like a template. Animate it only if it means something, keep it `aria-hidden`, and disable it under `prefers-reduced-motion`.
+## Phase 4 — content data
 
-## Phase 4 — content data model
-
-Sections that list projects, packages, posts or people need their data as data, not as prose. Move the metadata into page frontmatter and read it with `createContentLoader`:
+Sections that list projects, packages, posts or people read their data from page frontmatter through `createContentLoader`:
 
 ```ts
-// data/projects.data.ts
+// .vitepress/data/projects.data.ts
 import { createContentLoader } from 'vitepress';
 
 declare const data: Project[];
@@ -174,15 +182,10 @@ export default createContentLoader('projects/*.md', {
 });
 ```
 
-Keep the mapping (`buildProject`) in a plain module with unit tests, not inside the loader: frontmatter is user input, and a validator that names the page and the offending key turns a broken build into a one-line fix. Where a page previously rendered that metadata as prose, render it from the frontmatter instead through a small component so the data exists once.
-
-Prove the migration changed nothing visible: extract the rendered text from the built HTML before and after, and diff it.
-
-**Anything time-dependent belongs to the build, not to `setup()`.** A section that shows "current" items
-(running projects, upcoming events, recent posts) must not call `new Date()` in a component: `setup()` runs at
-build time to produce the HTML *and* again when a visitor hydrates it, possibly weeks later, and the two answers
-differ the moment an item crosses a boundary — a hydration mismatch and a visible flash. Stamp the reference
-time in the loader and filter against it:
+- Keep the mapping (`buildProject`) in a plain, unit-tested module; its validator names the page and the offending key.
+- Where a page rendered that metadata as prose, render it from frontmatter through a small component so the data exists once.
+- Prove the migration changed nothing visible: diff the text extracted from the built HTML before and after.
+- **Time-dependent lists** ("current" projects, upcoming events) never call `new Date()` in `setup()`: it runs at build and again at hydration, and the answers differ. Stamp the time in the loader and filter against it; a finished item stays listed until the next build.
 
 ```ts
 transform: (raw) => ({
@@ -191,53 +194,41 @@ transform: (raw) => ({
 }),
 ```
 
-The trade is that a finished item stays listed until the next build. On a statically built site that is the same
-staleness as every other word on the page, and it buys deterministic rendering.
-
 ## Phase 5 — verification
 
-Build, typecheck and lint are necessary and not sufficient — every defect this phase catches is a visual one.
-`references/verification.md` in this skill directory has the copy-paste checks: iframe widths, codepoint
-inspection, rendered-class-attribute scan, hydration console check, before/after diff for content migrations,
-and the chrome assertions.
+Build, typecheck and lint are not enough; the defects here are visual. Run the checks in [references/verification.md](references/verification.md) in a browser against the dev server or the built site:
 
-- **Both color modes, every page you touched.** `document.querySelector('.VPSwitchAppearance').click()` toggles.
-- **The nav in both states:** at `scrollY === 0` (transparent, light text, light logo) and after scrolling (opaque, normal text).
-- **Narrow viewports.** Resizing the browser window often does not change the viewport in automation; render the page into same-origin iframes of fixed width instead and assert no horizontal overflow:
-  ```js
-  const f = document.createElement('iframe'); f.width = '390'; f.height = '900'; f.src = path;
-  document.body.append(f); await new Promise((r) => { f.onload = r; });
-  f.contentDocument.documentElement.scrollWidth > f.contentWindow.innerWidth; // must be false
-  ```
-- **Pages with a sidebar:** footer padding matches `VPContent`'s at ≥1440px.
-- **Anchors:** if cards link to headings, grep the built HTML for each generated `id`.
+- Both color modes, every page touched (`document.querySelector('.VPSwitchAppearance').click()` toggles).
+- The nav at `scrollY === 0` (transparent, light text, light logo) and scrolled (opaque, normal text); flyout menus with a real pointer hover.
+- Narrow widths through same-origin iframes (window resizing often does not change the viewport); no horizontal overflow.
+- A page with a sidebar: footer reaches `x = 0` at ≥1440px.
+- Anchors: grep the built HTML for every `id` a card links to.
 
 ## Gotchas
 
 | Symptom | Cause |
 |---------|-------|
-| Tailwind utility does nothing | Component root lacks `vp-raw`, or the file is outside the `@source` globs (`components/` is scanned; `theme/` and markdown usually are not) |
-| **No** utilities at all are generated | An `@source` path that matches nothing fails silently — and it is relative to the CSS file, so `../components` and `./components` are both right depending on whether components sit beside or inside the theme directory. After wiring it up, grep the built CSS for a class you used |
-| An override of VitePress's own styles loses | VitePress ships base, doc and component CSS **unlayered**; anything overriding it must also be unlayered, at the end of the entry CSS |
-| Layout breaks in odd places | The Tailwind `container` utility also matches VitePress's own `.container` elements — never use it |
-| `min-[960px]:` behaves inconsistently | Arbitrary min-width variants can be emitted before `md:`, so `md:` wins; use the standard breakpoints, define a named one, or put VitePress-breakpoint rules in plain CSS |
-| Radii look wrong | A design-system plugin may redefine Tailwind's radius scale (`rounded-xl` = 12px, not 0.75rem); use arbitrary values when the exact radius matters |
-| Flyout/dropdown text unreadable on the transparent nav | Variables were re-scoped on the whole nav bar; scope them to the bar's own items instead |
-| Footer band stops short of the left edge on docs pages | It was padded to clear the fixed sidebar; give it `position: relative` and a `z-index` above the desktop sidebar but below the mobile drawer (see Phase 2 — `--vp-z-index-footer` is too low), and let it run full width instead |
-| A link 404s or a selector matches nothing | `VPLink` normalizes internal links to `.html` when `cleanUrls` is off: `/projects` renders as `/projects.html` |
-| `node:fs` ends up in the browser bundle | A client component imported a runtime value from a domain barrel that also re-exports server-only code; import from the concrete file |
-| Non-ASCII or `\uXXXX` escapes mangled in a regex or string | Editors silently flatten escape text into characters, and a diff cannot show the difference — verify codepoints (`[...line].filter((c) => c.codePointAt(0) > 127)`), never appearance |
-| `no-undef` on `window` in a `.vue` file | Many shared ESLint configs seed only Node globals; add the browser globals scoped to `**/*.vue` |
-| A component references a static asset that does not exist (`/hero.png`) | Nothing fails: the build passes and the browser shows a broken image or a placeholder fallback forever. Confirm the file is really in `public/` — one site shipped a fake skeleton UI to every visitor this way |
-| A rendered `class` attribute contains a newline and indentation | A long static `class="..."` was wrapped across two source lines to satisfy `max-len`. Hoist it to a module-level constant bound with `:class` instead — and write the snippets in your own plan that way, or every task that copies them reproduces it |
-| A "current items" list flashes or warns about hydration | Time-dependent filtering ran in `setup()`; stamp the reference time in the loader (see Phase 4) |
-| Destructured array element is `T \| undefined` | Strict configs set `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple. Tuples like `[string, Person]` are unaffected |
-| Two components drift apart on the same rule | A shared selector (e.g. "active members of a team") was reimplemented inline instead of imported from the domain module that already exports it |
+| Tailwind utility does nothing | Component root lacks `vp-raw`, or the file is outside the `@source` globs (`theme/` and markdown usually are) |
+| **No** utilities generated | `@source` path matches nothing and fails silently; it is relative to the CSS file (`../components` vs `./components`). Grep the built CSS for a utility only a component uses |
+| Override of VitePress styles loses | It sits inside a `@layer`; VitePress CSS is unlayered, so overrides go unlayered at the end of the entry CSS |
+| Layout breaks in odd places | Tailwind's `container` utility also matches VitePress's `.container`; never use it |
+| `min-[960px]:` behaves inconsistently | Arbitrary min-width variants can be emitted before `md:`; use standard breakpoints, a named one, or plain CSS |
+| Radii look wrong | A design-system plugin redefined the radius scale; use arbitrary values where exact radius matters |
+| A link 404s or a selector matches nothing | `VPLink` rewrites internal links to `.html` when `cleanUrls` is off |
+| `node:fs` in the browser bundle | A client component imported from a barrel that re-exports server-only code; import the concrete file |
+| `\uXXXX` escapes or typographic characters mangled | Editors flatten them and diffs hide it; check codepoints, not appearance |
+| `no-undef` on `window` in `.vue` | The ESLint config seeds only Node globals; add browser globals for `**/*.vue` |
+| Missing static asset (`/hero.png`) | Nothing fails; confirm the file exists in `public/` |
+| Rendered `class` contains a newline | A static `class="..."` was wrapped across lines for `max-len`; hoist it to a constant bound with `:class`, and write plan snippets that way too |
+| Destructured array element is `T \| undefined` | `noUncheckedIndexedAccess`; guard, or type the fixture as a tuple |
+| Two components disagree on one rule | A shared selector was reimplemented inline; import it from the module that already exports it |
 
 ## Definition of done
 
-- Start page is hero-led, its copy lives in frontmatter, and its sections are separate components.
-- Nav and footer are part of the design on every page, not just the landing page.
-- Light and dark both verified, at phone width and desktop, on every page touched.
-- Metadata that sections render exists once, validated, with the rendered output proven unchanged where it was migrated.
-- The design decisions are written down in the repo, so the next change argues from them.
+- Start page is hero-led, its copy lives in frontmatter, its sections are separate components.
+- Nav and footer are part of the design on every page.
+- Light and dark verified at phone and desktop width on every page touched.
+- Rendered metadata exists once, validated, proven unchanged where migrated.
+- Design decisions are written down in the repository.
+
+The skill does not commit, push or deploy. It leaves the changes and the plan file in the working tree for the user to review and commit.

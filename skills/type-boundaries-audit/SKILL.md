@@ -6,7 +6,7 @@ compatibility: Requires a TypeScript codebase.
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(npx:*) Bash(npm:*) Bash(git:*) Read Edit Glob Grep Agent AskUserQuestion
+allowed-tools: Read Edit Glob Grep AskUserQuestion
 ---
 
 # type-boundaries-audit
@@ -15,92 +15,60 @@ allowed-tools: Bash(npx:*) Bash(npm:*) Bash(git:*) Read Edit Glob Grep Agent Ask
 
 ## Step 1: Parse arguments
 
-Determine the scope of the audit from `$ARGUMENTS`:
+From `$ARGUMENTS`:
 
-- If a path is provided, scope the audit to that directory or file.
-- If no path is provided, default to the current working directory.
-- Look for optional flags: `--strict` (report every cast, not just mismatches, and include test files), `--fix` (propose a fix per mismatch and apply it with Edit after confirmation; see Step 6).
+- A path scopes the audit to that directory or file; without one, audit the current working directory.
+- `--strict`: report every analyzed cast, not just mismatches, and include test files.
+- `--fix`: propose a concrete fix per mismatch and apply each with Edit only after the user confirms it (Step 6).
 
 ## Step 2: Find type casts
 
-Search for type assertion patterns across the scoped codebase:
-
 ### 2a. `as` casts
 
-```bash
-# Find all `as SomeType` patterns in TypeScript files
-```
+Grep `\bas\s+([A-Z]\w*|\{)` in `*.ts` and `*.tsx` files and collect file paths and line numbers. This matches casts to named types (`as Foo`, `as Partial<Foo>`, `as Foo[]`) and inline object types (`as { realm_id: string }`). It deliberately skips lowercase targets: primitives (`as string`), `as unknown`, `as any`, `as never`, `as const`, `as keyof …` and `as typeof …`, which cannot hide a property name mismatch. In a double cast `x as unknown as Foo`, the `as Foo` part matches and is analyzed. Discard matches in comments and strings.
 
-Use Grep to search for `\bas\s+[A-Z]\w+` across `*.ts` and `*.tsx` files. Collect file paths and line numbers.
+### 2b. Utility calls
 
-### 2b. Utility function calls
-
-Search for common utility patterns that perform implicit type conversions:
-
-- `pickRecord(` — picks properties from an object into a typed result
-- `pick(` — similar property-picking utilities
-- `omit(` — inverse of pick, may also introduce mismatches
-- Spread-into-typed-variable patterns: `{ ...source } as TargetType`
+- `pickRecord(` and `pick(`: pick properties into a typed result.
+- `omit(`: the inverse of pick.
+- Spread into a cast: `{ ...source } as TargetType`.
 
 ### 2c. Filter noise
 
-Skip casts that are unlikely to hide mismatches:
+Skip:
 
-- `as unknown`, `as any`, `as never` — intentional escape hatches
-- `as const` — literal narrowing, not a boundary crossing
-- Casts inside `.d.ts` files — type declarations, not runtime boundaries
-- Test files (`*.spec.ts`, `*.test.ts`) — unless `--strict` is passed (`--strict` keeps the other filters above)
+- Casts to a type parameter of the enclosing generic (`as T`, `as K`): nothing to resolve.
+- Casts inside `.d.ts` files.
+- Test files (`*.spec.ts`, `*.test.ts`), unless `--strict` is passed.
 
 ## Step 3: Resolve types for each cast
 
-For each found cast, read the surrounding code context (at least 10 lines above and below):
+Read at least 10 lines around each cast, then identify:
 
-1. **Identify the source expression** — the value being cast (left side of `as`).
-2. **Identify the target type** — the type after `as`.
-3. **Locate the type definitions** for both source and target:
-   - Use Grep to find `interface TargetType` or `type TargetType =` declarations.
-   - Follow imports to find definitions in other files if needed.
-   - For inline object literals, extract the property names directly from the source code.
+1. **Source**: the value being cast (left of `as`).
+2. **Target**: the type after `as`.
+3. **Definitions** of both: Grep for `interface X` or `type X =`, follow imports into other files, and take property names of inline object literals from the source.
 
-**Important:**
-- If a type extends another type, resolve the full property set including inherited properties.
-- For generic types like `Partial<T>` or `Pick<T, K>`, resolve the concrete properties.
+Resolve the full property set, including inherited properties (`extends`) and generic helpers such as `Partial<T>` or `Pick<T, K>`.
 
 ## Step 4: Compare properties
 
-For each cast where both source and target types were resolved:
+For each cast where both sides were resolved, flag:
 
-1. **Extract property names** from both source and target types.
-2. **Flag mismatches** in these categories:
-   - **Naming convention mismatch**: source has `realmId` (camelCase) but target expects `realm_id` (snake_case), or vice versa.
-   - **Missing properties**: target expects properties that do not exist on the source.
-   - **Extra properties**: source has properties that the target does not declare (may indicate stale casts after refactoring).
-   - **Similar but different names**: properties that look related but differ subtly (e.g., `userId` vs `user_id`, `createdAt` vs `created_at`).
+- **Naming convention mismatch**: `realmId` on the source, `realm_id` on the target, or the reverse. For each unmatched property, check whether a camelCase ↔ snake_case conversion produces a match; if so, it falls in this category.
+- **Missing properties**: the target expects properties the source lacks.
+- **Extra properties**: the source has properties the target does not declare (often a stale cast after a refactor).
+- **Similar but different names**: subtly differing names that look related (`userId` vs `user_id`, `createdAt` vs `created_at`).
 
-3. **Heuristic matching**: for each unmatched property, check if a camelCase-to-snake_case (or reverse) conversion produces a match. If so, flag it as a naming convention mismatch.
+## Step 5: Check utility calls
 
-## Step 5: Check utility function calls
-
-For utility patterns found in Step 2b:
-
-### 5a. `pickRecord(obj, ['prop1', 'prop2'])` and `pick(obj, ['prop1', 'prop2'])`
-
-- Extract the property name list from the second argument.
-- Determine the expected output type (from the variable assignment or return type).
-- Verify that every picked property name exists on the output type.
-- Flag cases where picked property names use a different naming convention than the output type expects.
-
-### 5b. Spread patterns
-
-For `{ ...source, extra: value } as TargetType`:
-
-- Resolve all properties contributed by the spread and any additional properties.
-- Compare the combined property set against the target type.
-- Flag mismatches using the same rules as Step 4.
+- **`pickRecord(obj, ['a', 'b'])` and `pick(obj, ['a', 'b'])`**: take the name list from the second argument and the expected output type from the variable assignment or return type. Flag picked names that do not exist on the output type or use a different naming convention.
+- **`omit(obj, ['a'])`**: flag omitted names that do not exist on the source type.
+- **Spread patterns** (`{ ...source, extra: value } as TargetType`): combine the properties of the spread and the extra keys, then compare against the target type with the rules of Step 4.
 
 ## Step 6: Report
 
-Output a structured report grouped by file:
+Group by file:
 
 ```
 ## Type Boundary Issues Found
@@ -123,7 +91,9 @@ Output a structured report grouped by file:
 - K files affected
 ```
 
-If no issues are found, report that the audit passed cleanly:
+With `--strict`, also list every analyzed cast without a mismatch, and casts whose types could not be resolved.
+
+With no findings:
 
 ```
 ## Type Boundary Audit: Clean
@@ -131,4 +101,4 @@ If no issues are found, report that the audit passed cleanly:
 Analyzed N type casts across K files. No property name mismatches detected.
 ```
 
-If `--fix` was passed, suggest concrete code changes for each mismatch using Edit, but ask the user for confirmation before applying them.
+With `--fix`, propose a concrete code change for each mismatch and apply it with Edit only after the user confirms that change. Without `--fix`, edit nothing.

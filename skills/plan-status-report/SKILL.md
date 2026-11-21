@@ -15,79 +15,49 @@ allowed-tools: Bash(git:*) Bash(ls:*) Bash(npm:*) Read Edit Write Glob Grep Agen
 
 ## Step 1: Locate plan files
 
-Find all plan files to analyze.
-
-1. If `$ARGUMENTS` specifies a file path or glob pattern, use that directly.
-2. Otherwise, scan the `.agents/plans/` directory for Markdown files:
+1. If `$ARGUMENTS` gives a file path or glob, use it.
+2. Otherwise list the Markdown files in `.agents/plans/`:
    ```bash
    ls -1 .agents/plans/*.md 2>/dev/null
    ```
-3. If no plan files are found in either location, inform the user and stop.
-4. List all discovered plan files before proceeding.
+3. If no plan files are found, tell the user and stop.
+4. List the plan files found before proceeding.
 
 ## Step 2: Parse plan structure
 
-Read each plan file and extract its structure.
+Read each plan file in full and extract:
 
-1. **Read the file** in full using the Read tool.
-2. **Parse phases** — identify sections that represent phases:
-   - `##` or `###` headings containing "Phase" (e.g., `## Phase 1: Setup`, `### Phase 2 — Implementation`)
-   - Numbered headings without the word "Phase" that group related tasks (e.g., `## 1. Database layer`)
-   - If no phase headings exist, treat the entire file as a single phase.
-3. **Parse checklist items** within each phase:
-   - `- [ ]` — incomplete task
-   - `- [x]` — complete task
-   - Handle nested checklists (indented sub-tasks under a parent task).
-4. **Record dependencies** — look for notes like "depends on Phase X", "after Phase 1", or "blocked by" within task descriptions.
-5. Build an internal structure: for each phase, track its name, task list (with completion status), and any declared dependencies.
+1. **Phases**: `##` or `###` headings containing "Phase" (`## Phase 1: Setup`, `### Phase 2 — Implementation`), or numbered headings that group tasks (`## 1. Database layer`). Without such headings, the whole file is one phase.
+2. **Checklist items** per phase: `- [ ]` incomplete, `- [x]` complete, including nested sub-tasks.
+3. **Dependencies**: notes such as "depends on Phase X", "after Phase 1", "blocked by".
 
-## Step 3: Verify completion against codebase
+## Step 3: Verify open tasks against the codebase
 
-For each task marked as incomplete (`- [ ]`), attempt to verify whether the work has actually been done:
+For each `- [ ]` task, look for evidence that the work is done:
 
-1. **Extract file paths** mentioned in the task description (e.g., `src/auth.ts`, `tests/auth.test.ts`).
-2. **Check file existence** using Glob — do the referenced files exist?
-3. **Check for expected patterns** using Grep:
-   - If the task says "add function X", grep for `function X` or `const X`.
-   - If the task says "rename X to Y", grep for `Y` and confirm `X` is absent.
-   - If the task says "add test for X", look for test files containing `X`.
-4. **Check build/lint status** if the task involves code changes:
-   - Look at `package.json` for available scripts.
-   - Run `npm run lint` or equivalent if applicable — but only once, not per-task.
-5. **Mark verification result** for each task:
-   - **Verified complete** — evidence found in codebase that work is done
-   - **Incomplete** — no evidence found, task is genuinely pending
-   - **Partially complete** — some evidence found but not all aspects done
-   - **Unable to verify** — task is too abstract to check programmatically
+1. **Files** the task mentions (`src/auth.ts`, `tests/auth.test.ts`): check they exist with Glob.
+2. **Patterns** with Grep: "add function X" → `function X` or `const X`; "rename X to Y" → `Y` present and `X` absent; "add test for X" → test files containing `X`.
+3. **Lint**, when tasks involve code changes: find the script in `package.json` and run it (`npm run lint`) once, not per task.
 
-For tasks already marked complete (`- [x]`), skip verification unless the user specifically requests re-verification.
+Classify each task as **verified complete**, **incomplete**, **partially complete** (some aspects done) or **unable to verify** (too abstract to check).
+
+Do not re-verify `- [x]` tasks unless the user asks.
 
 ## Step 4: Generate status report
 
-Output a structured summary with the following format:
+Per phase:
 
-### Per-phase summary
+- **Name and status**: `COMPLETE` (all tasks marked or verified done), `IN PROGRESS` (at least one done, one remaining), `NOT STARTED` (none done) or `BLOCKED` (depends on an incomplete phase).
+- **Task count**, e.g. `4/7 tasks complete`.
+- Completed tasks as `- [x]`, remaining tasks as `- [ ]`.
+- Tasks verified as done but not yet checked off, listed separately.
 
-For each phase, report:
-- **Phase name and status**: one of `COMPLETE`, `IN PROGRESS`, `NOT STARTED`, or `BLOCKED`
-  - `COMPLETE` — all tasks marked done (or verified done)
-  - `IN PROGRESS` — at least one task done and at least one remaining
-  - `NOT STARTED` — no tasks done
-  - `BLOCKED` — depends on an incomplete phase
-- **Task counts**: e.g., `4/7 tasks complete`
-- **Completed tasks**: list with checkmarks
-- **Remaining tasks**: list with empty checkboxes
-- **Tasks verified as done but not yet checked off**: highlight these separately
+Overall:
 
-### Overall progress
-
-- Total tasks complete vs total tasks
-- Percentage complete
-- **Current phase**: the first phase that is `IN PROGRESS` or `NOT STARTED`
-- **Next actionable task**: the first incomplete task in the current phase that is not blocked
-- **Blocking dependencies**: list any phases that cannot start until others finish
-
-### Example output
+- Tasks complete vs total, and the percentage.
+- **Current phase**: the first phase that is `IN PROGRESS` or `NOT STARTED`.
+- **Next task**: the first incomplete, unblocked task in the current phase.
+- **Blocking dependencies**: phases that cannot start until others finish.
 
 ```
 ## Plan Status: implementation-plan.md
@@ -116,18 +86,15 @@ For each phase, report:
 **Next task: Add authentication middleware**
 ```
 
-## Step 5: Optionally update plan file
+## Step 5: Offer to update the plan file
 
-If any tasks were verified as complete in Step 3 but are still marked `- [ ]` in the plan file:
+If tasks were verified complete in Step 3 but are still `- [ ]`, list them with their evidence and ask before changing anything:
 
-1. Present the list of tasks that appear to be done but are not checked off.
-2. **Ask the user for confirmation** before making any changes:
-   ```
-   The following tasks appear complete based on codebase evidence but are not checked off:
-   - [ ] Create database schema (found: src/db/schema.ts)
-   - [ ] Implement base repository class (found: src/repositories/base.ts)
+```
+The following tasks appear complete based on codebase evidence but are not checked off:
+- [ ] Implement rate limiting (found: src/middleware/rate-limit.ts)
 
-   Would you like me to update the plan file to mark these as complete?
-   ```
-3. Only after the user confirms, update the plan file by replacing `- [ ]` with `- [x]` for the confirmed tasks.
-4. Do NOT update tasks the user declines or tasks you could not verify.
+Would you like me to update the plan file to mark these as complete?
+```
+
+Only after confirmation, replace `- [ ]` with `- [x]` for the confirmed tasks. Never tick tasks the user declined or that could not be verified.

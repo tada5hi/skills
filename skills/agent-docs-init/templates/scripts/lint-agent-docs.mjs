@@ -1,5 +1,5 @@
 /*
- * Ratchet for the agent docs (AGENTS.md, .agents/*.md, .agents/topics/*.md).
+ * Ratchet for the agent docs (AGENTS.md, .agents/*.md, .agents/topics/ recursively).
  *
  * Every file has a byte budget and a history-phrase budget in
  * .agents/budget.json. A file over either budget fails. Budgets only ever go
@@ -45,19 +45,28 @@ function withHeadroom(bytes) {
 function listFiles() {
     const files = fs.existsSync(path.join(ROOT, 'AGENTS.md')) ? ['AGENTS.md'] : [];
 
-    for (const dir of ['.agents', '.agents/topics']) {
+    const walk = (dir, recursive) => {
         const abs = path.join(ROOT, dir);
 
         if (!fs.existsSync(abs)) {
-            continue;
+            return;
         }
 
-        for (const name of fs.readdirSync(abs)) {
-            if (name.endsWith('.md')) {
-                files.push(`${dir}/${name}`);
+        for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+            const rel = `${dir}/${entry.name}`;
+
+            if (entry.isDirectory()) {
+                if (recursive) {
+                    walk(rel, true);
+                }
+            } else if (entry.name.endsWith('.md')) {
+                files.push(rel);
             }
         }
-    }
+    };
+
+    walk('.agents', false);
+    walk('.agents/topics', true);
 
     return files.sort();
 }

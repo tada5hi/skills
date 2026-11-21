@@ -58,7 +58,7 @@ The agent may also use it when announcing a major or minor version, when a stabl
 
 ## Output
 
-A `notes.md` file with the release body, and, once you confirm, a published GitHub release. The body follows this order: lead quote, `📣 Some News`, `👀 Highlights`, `⚠️ Heads-Up Before Upgrading`, `⬆️ Upgrading`, `👉 Changelog`. For an example, see the [`typeorm-extension` v4.0.0 release](https://github.com/tada5hi/typeorm-extension/releases/tag/v4.0.0).
+A `notes.md` file outside the repository with the release body, and, once you confirm, a published GitHub release. The body follows this order: lead quote, `📣 Some News`, `👀 Highlights`, `⚠️ Heads-Up Before Upgrading`, `⬆️ Upgrading`, `👉 Changelog`. For an example, see the [`typeorm-extension` v4.0.0 release](https://github.com/tada5hi/typeorm-extension/releases/tag/v4.0.0).
 
 ## Notes
 

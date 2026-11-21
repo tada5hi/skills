@@ -32,5 +32,5 @@ Search for every old name at once (a plain `grep -w` also matches `plan-status` 
 
 ```bash
 names=$(sed -n 's/^| `\([a-z-]*\)` | `.*$/\1/p' <skill-dir>/references/renamed-skills.md | paste -sd'|' -)
-grep -rnE "(^|[^a-z-])($names)([^a-z-]|$)" CLAUDE.md AGENTS.md .agents
+grep -rnE "(^|[^a-z-])($names)([^a-z-]|$)" $(ls -d CLAUDE.md AGENTS.md .agents .claude 2>/dev/null)
 ```

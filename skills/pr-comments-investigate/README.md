@@ -38,21 +38,25 @@ npx skills add tada5hi/skills --skill='pr-comments-investigate'
 
 The agent may also use it after a PR review to triage and act on reviewer feedback.
 
-**Invoke it directly.** Type `/pr-comments-investigate` (installed with the skills CLI) or `/skills:pr-comments-investigate` (Claude Code plugin). Pass `--dry-run` to get the classification only, without fixes or resolved threads: `/pr-comments-investigate --dry-run`.
+**Invoke it directly.** Type `/pr-comments-investigate` (installed with the skills CLI) or `/skills:pr-comments-investigate` (Claude Code plugin). Arguments: `[<number>] [--dry-run]`. Without a number it takes the PR of the current branch; for another PR it asks before checking out its branch. `--dry-run` gives the classification only, without fixes, issues or resolved threads:
+
+```text
+/pr-comments-investigate
+/pr-comments-investigate 42 --dry-run
+```
 
 ## What it does
 
-1. Reads the PR for the current branch with `gh pr view` and fetches all inline review comments and review threads into temp files.
-2. Filters out comments whose thread is already resolved.
-3. Reads the code behind each remaining comment and classifies it: real issue, pre-existing issue, already fixed, invalid, stylistic or uncertain.
-4. Asks you about each uncertain comment before it fixes or dismisses it.
-5. Fixes real issues, then runs the linter on changed files and the relevant tests.
-6. Handles pre-existing issues: a small fix in the PR, a new GitHub issue, or a note in the related plan file in `.agents/plans/`.
-7. Resolves the review threads it fixed and reports a summary table.
+1. Finds the PR (the given number or the current branch's) with `gh pr view`, fetches all inline review comments and review threads into temp files, and keeps the comments whose thread is unresolved.
+2. Reads the code behind each remaining comment and classifies it: real issue, pre-existing issue, already fixed, invalid, stylistic or uncertain.
+3. Asks you about each uncertain comment before it fixes or dismisses it.
+4. Fixes real issues, then runs the linter on changed files and the relevant tests.
+5. Handles pre-existing issues: a small fix in the PR, a new GitHub issue, or a note in the related plan file in `.agents/plans/`.
+6. Resolves the review threads it fixed and reports a summary table.
 
 ## Requirements
 
-- A git repository with an open pull request for the current branch.
+- A git repository with an open pull request, for the current branch or given by number.
 - The `gh` CLI, authenticated for the repository.
 - Node.js, used to parse the JSON from `gh api`; `jq` is not needed.
 

@@ -13,21 +13,17 @@ allowed-tools: Bash(git:*) Bash(gh:*) Bash(awk:*) Bash(grep:*) Read Edit Glob Gr
 
 > Make every package of a linked release-please group land at the same version, by touching only the packages that would not.
 
-release-please computes a version per component from that component's own commits. The `linked-versions` plugin then aligns the group, but a package without a direct bump-worthy commit can still miss it: with a `release-as` prerelease pin, the `node-workspace` plugin bumps a dependency-only package to the next patch prerelease (`1.0.1-beta.30`) instead of the pinned `1.0.0-beta.31`. A direct `fix:` commit inside the package makes release-please treat it like the rest.
+The `linked-versions` plugin aligns a group, but a package without its own bump-worthy commit can still miss it: with a `release-as` prerelease pin, the `node-workspace` plugin bumps a dependency-only package to the next patch prerelease (`1.0.1-beta.30`) instead of the pinned `1.0.0-beta.31`. A direct `fix:` commit inside the package fixes that.
 
-The skill checks first and touches nothing when the release PR is already consistent.
+Check first; touch nothing when the release PR is already consistent.
 
 ## Step 1: Read the release setup
 
-```bash
-cat release-please-config.json .release-please-manifest.json
-```
-
-Note:
+Read `release-please-config.json` and `.release-please-manifest.json`. Note:
 
 - The packages (`packages` keys, each a path) and their `component` names.
-- The `linked-versions` plugin and its `components`. Without one, the packages are released independently by design: stop and tell the user that this skill does not apply.
-- A top-level or per-package `release-as`, and whether the manifest versions are prereleases (`-beta.N`). That is the setup in which packages fall behind.
+- The `linked-versions` plugin and its `components`. Without one, the packages are released independently by design: stop and tell the user this skill does not apply.
+- A top-level or per-package `release-as`, and whether the manifest versions are prereleases (`-beta.N`).
 
 ## Step 2: Check the open release PR
 
@@ -35,9 +31,9 @@ Note:
 gh pr list --state open --label "autorelease: pending" --json number,title,url
 ```
 
-No open release PR: there is nothing to compare yet, so touch nothing. Wait until release-please opens or updates it (any `fix:` or `feat:` on the default branch does). Packages without own commits usually get the group version anyway, so a list of untouched packages alone is no reason to touch them.
+No open release PR: touch nothing. Under `linked-versions` packages without own commits usually get the group version anyway; wait until release-please opens the PR (any `fix:` or `feat:` on the default branch does).
 
-Otherwise list the version every `package.json` and the manifest get in that PR:
+Otherwise list the version every `package.json` and the manifest get in it:
 
 ```bash
 gh pr diff <number> | awk '
@@ -47,41 +43,48 @@ gh pr diff <number> | awk '
 '
 ```
 
-The group version is the `release-as` version when one is set, else the highest version in the PR (`linked-versions` aligns the group to its highest member). The PR title (`chore: release <branch>`) names no version. Never fall back to the highest version while a `release-as` pin exists: the wrongly bumped `1.0.1-beta.30` sorts above the pinned `1.0.0-beta.31`. Collect every package of the linked group whose version differs from it, and every package of the group that is missing from the PR entirely.
+The group version is the `release-as` version when one is set, else the highest version in the PR (the PR title names none). Never take the highest version while a `release-as` pin exists: the wrong `1.0.1-beta.30` sorts above the pinned `1.0.0-beta.31`. Collect every package of the linked group whose version differs from it or that is missing from the PR.
 
-**All versions equal and every package present: stop.** Report the version and that no bump is needed. Do not touch packages "to be safe": every extra `fix:` commit is a changelog entry the user has to explain.
+**All versions equal and every package present: stop.** Report the version. Do not touch packages "to be safe": each extra `fix:` commit is a changelog entry.
 
 ## Step 3: Find packages without a bump-worthy commit
 
-Only when Step 2 found a gap. release-please bumps a component only for `fix:`, `feat:` and breaking commits (`<type>!:` or a `BREAKING CHANGE:` footer) that touch its path.
+release-please bumps a component only for `fix:`, `feat:` and breaking commits (`<type>!:` or a `BREAKING CHANGE:` footer) that touch its path.
 
-The range starts at the tag of the last release: `v<version>` with `include-component-in-tag: false`, else `<component>-v<version>`, with the version from the manifest. Do not search for the release commit by its subject (the title pattern is configurable, `chore(main): release ...` for single-package setups) or by the last change to the manifest (a hand edit moves it). Stop when the tag is missing: an empty base turns the range into `HEAD..HEAD`, and every package would look untouched.
+The range starts at the last release tag: `v<version>` with `include-component-in-tag: false`, else `<component>-v<version>`, the version from the manifest. Do not locate the release by commit subject (configurable) or by the last manifest change (a hand edit moves it). Stop when the tag is missing: an empty base makes the range `HEAD..HEAD` and every package looks untouched.
+
+Compare against the target branch as release-please sees it, not the checked-out branch (`git fetch origin` first):
 
 ```bash
 base=$(git rev-parse -q --verify "refs/tags/<tag>^{commit}") || { echo "release tag <tag> not found"; exit 1; }
 for pkg in <package paths from the config>; do
-    git log "$base"..HEAD --format=%s -- "$pkg" | grep -qE '^((fix|feat)(\([^)]*\))?!?|[a-z]+(\([^)]*\))?!):' && continue
-    git log "$base"..HEAD --format=%B -- "$pkg" | grep -qE '^BREAKING[ -]CHANGE:' && continue
+    git log "$base"..origin/<target branch> --format=%s -- "$pkg" | grep -qE '^((fix|feat)(\([^)]*\))?!?|[a-z]+(\([^)]*\))?!):' && continue
+    git log "$base"..origin/<target branch> --format=%B -- "$pkg" | grep -qE '^BREAKING[ -]CHANGE:' && continue
     echo "$pkg"
 done
 ```
 
-For the root component (`.`), add `':(exclude)<path>'` for every other package path after `-- .`: release-please gives each commit to the most specific package path, so a commit inside a package does not count for the root.
+Do not name the loop variable `path`: zsh ties it to `PATH`. For the root component (`.`), add `':(exclude)<path>'` for every other package path after `-- .`: release-please gives each commit to the most specific package path.
 
-The packages to touch are the ones Step 2 flagged that this loop also prints. A package that already has a `fix:` or `feat:` commit and still shows another version points at a configuration problem (a component missing from `linked-versions`, a per-package `release-as`): report it instead of touching it.
+Touch the packages that Step 2 flagged and this loop prints. A flagged package that already has a `fix:` or `feat:` commit points at a configuration problem (a component missing from `linked-versions`, a per-package `release-as`): report it, do not touch it.
 
 ## Step 4: Touch each package
 
-In each package, update the year of the copyright header in its entry file (`src/index.ts`, else the first file under `src/` that has one) to the current year:
+In each package, update the copyright year in its entry file (`src/index.ts`, else the first file under `src/` with a header) to the current year:
 
 ```diff
 - * Copyright (c) 2022-2025.
 + * Copyright (c) 2022-2026.
 ```
 
-A single year becomes a range (`2025.` to `2025-2026.`). When the header is already current, or the package has no header, pick another change that ships nothing: a comment line in the entry file. Never change the `version` field, the changelog or the manifest: release-please owns them.
+A single year becomes a range (`2025.` to `2025-2026.`). When the header is current or missing, add a comment line to the entry file instead. Never change `version` fields, the changelog or the manifest: release-please owns them.
 
 ## Step 5: Commit, then verify
+
+The commit must reach the branch release-please watches (its target branch, usually the default branch) as a `fix:` commit; `chore:` and `refactor:` do not count. Decide where it goes from the repository's own rules (agent docs, `CONTRIBUTING`, branch protection; no AI attribution in the commit or PR):
+
+- **Direct commits to the default branch allowed**, and it is checked out: commit there.
+- **Changes go through a pull request**, or another branch is checked out: before Step 4, with a clean working tree, branch off the target (`git switch -c <branch> origin/<target branch>`), then commit there and offer to open the PR (`pr-create`). Its title is the same `fix:` message, so a squash merge keeps it.
 
 One commit for every touched package:
 
@@ -89,20 +92,14 @@ One commit for every touched package:
 git commit --only -m "fix: ensure consistent version for release" -- <touched files>
 ```
 
-`--only` with the paths commits exactly those files, so changes the user had staged elsewhere stay out of the commit. Check `git diff --cached -- <touched files>` first: anything staged in those files beyond the header change goes in too.
+`--only` keeps changes staged in other files out of the commit; anything already staged in the touched files goes in, so check `git diff --cached -- <touched files>` first.
 
-It has to be `fix:`: release-please ignores `chore:` and `refactor:` for the version. Follow the repository's own rules (branch protection, a pull request per change, no AI attribution).
-
-Pushing is the user's call. Once the commit is on the default branch, wait for release-please to update the PR, then run Step 2 again and report each package's version. A package still behind goes back to Step 3.
+Never push or open the PR without the user's go-ahead. Once the commit is on the target branch, wait for release-please to update its PR, run Step 2 again and report each package's version. A package still behind goes back to Step 3.
 
 ## Common mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| Touching every package on every release | Check the release PR first; touch only the packages behind |
-| Touching packages before the release PR exists | Wait for the PR: under `linked-versions` most untouched packages get the group version anyway |
-| Naming the loop variable `path` | zsh ties `path` to `PATH`; use another name |
-| A `chore:` or `refactor:` commit for the touch | release-please only counts `fix:`/`feat:`; use `fix:` |
-| Editing `package.json` versions or the manifest by hand | Leave them to release-please; touch source files only |
+| Touching every package on every release | Touch only the packages behind in the release PR |
+| Touching packages before the release PR exists | Wait for the PR |
 | Running it on independently versioned packages | Without `linked-versions`, different versions are intended |
-| Finding the last release by commit subject or manifest change | Start the range at the release tag; stop when it is missing |

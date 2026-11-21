@@ -1,10 +1,10 @@
 # Verification toolkit
 
-Copy-paste checks for a VitePress redesign. Each one exists because the corresponding defect shipped
-past a build, a lint run and a reading of the diff on a real project.
+Copy-paste checks for a VitePress redesign. `<root>` is the directory that holds `.vitepress/`; the build
+output is `<root>/.vitepress/dist` unless `outDir` is set. Browser snippets run in the page's console
+through the browser automation tool; shell snippets run from the repository root.
 
-The rule behind all of them: **a diff shows you what a file looks like, not what it contains or renders.**
-Verify bytes and computed values, not appearance.
+A diff shows what a file looks like, not what it contains or renders: verify bytes and computed values.
 
 ## Viewport widths (window resizing does not work)
 
@@ -37,12 +37,11 @@ getComputedStyle(r[1].doc.querySelector('.k-research-grid')).gridTemplateColumns
 ## Codepoints, not glyphs
 
 Editors and write tools silently flatten `\uXXXX` escape text into the character it denotes — and flatten
-typographic characters into ASCII lookalikes. A diff renders all three identically. This ate two fix rounds
-on one project: a slug function's character class lost its curly quotes (`“ ” ‘ ’` → `" "`), and the fix
-report claimed a second line had been corrected when it had never been touched.
+typographic characters into ASCII lookalikes (a slug function's `“ ” ‘ ’` becoming `" "`). A diff renders
+them identically.
 
-```js
-// what does this line actually contain?
+```bash
+# what does this line actually contain? (replace PATH and IDENT)
 node -e 'const l=require("node:fs").readFileSync(PATH,"utf8").split("\n").find((x)=>x.includes(IDENT));
 console.log(JSON.stringify(l), [...l].filter((c)=>c.codePointAt(0)>127).map((c)=>"U+"+c.codePointAt(0).toString(16).toUpperCase()))'
 ```
@@ -56,7 +55,7 @@ A static `class="..."` whose value wraps across two source lines embeds a newlin
 into the rendered attribute. Browsers tolerate it, so nothing fails — it just leaves garbage in the DOM and
 tempts the next person to copy the pattern.
 
-```js
+```bash
 node -e 'const fs=require("node:fs");for (const f of FILES) {
   const s=fs.readFileSync(f,"utf8");
   console.log(f, [...s.matchAll(/class="[^"]*\n[^"]*"/g)].length);  // must be 0
@@ -77,7 +76,8 @@ and shows up as a flash of the stale content.
 When metadata moves from prose into frontmatter, prove the rendered text is unchanged rather than arguing it:
 
 ```bash
-# before the change, and again after — then diff
+# DIR = <root>/.vitepress/dist; run before the change into before.txt, after it into after.txt
+mkdir -p .temp
 node -e 'const fs=require("node:fs");for (const f of fs.readdirSync(DIR).filter((x)=>x.endsWith(".html")).sort()) {
   const m=fs.readFileSync(DIR+"/"+f,"utf8").match(PATTERN); console.log(f,"|",m?m[1]:"MISSING");
 }' > .temp/before.txt
@@ -123,7 +123,7 @@ itself and which is emitted even when `@source` matches nothing:
 
 ```bash
 # e.g. an arbitrary value or a utility no other file uses
-grep -l "{{utility-only-used-in-a-component}}" src/.vitepress/dist/assets/*.css
+grep -l "{{utility-only-used-in-a-component}}" <root>/.vitepress/dist/assets/*.css
 ```
 
 ## Deleting assets
@@ -131,5 +131,5 @@ grep -l "{{utility-only-used-in-a-component}}" src/.vitepress/dist/assets/*.css
 Grep before removing an image or file the redesign made obsolete — and let the grep, not memory, decide:
 
 ```bash
-grep -rn "abi.jpg\|tbi.jpg" src --include='*.vue' --include='*.md' --include='*.ts'
+grep -rn "{{asset-name}}" <root> --include='*.vue' --include='*.md' --include='*.ts' --include='*.css'
 ```

@@ -7,8 +7,6 @@
 
 ## Why package-list-refresh?
 
-A package list drifts the moment you publish a new repository, archive an old one or deprecate a package on npm. Keeping it accurate by hand means walking every owner's repositories, every monorepo's packages and every npm entry, and remembering which repositories you already decided to leave out. The skill runs a read-only scan, decides each finding with you, and opens one pull request.
-
 | Concern | Without it | With package-list-refresh |
 |---|---|---|
 | **New repositories** | Remember to add each one after publishing | The scan lists every public repository of the configured owners that is not on the list |
@@ -58,15 +56,7 @@ The agent may also use it after you publish a new package, or when the [package-
 
 ## Output
 
-A pull request against the list repository titled `chore: refresh package list`, with a body that lists the added, removed and excluded repositories and packages. A list without a `package-list` config comment gets one as the first change, with `owners:` set to the list's owner plus every org already linked from its entries and an empty `exclude:`. After a few runs it looks like this:
-
-```md
-<!-- package-list
-owners: tada5hi, authup, routup
-exclude:
-- tada5hi/typescript-template: template
--->
-```
+A pull request against the list repository titled `chore: refresh package list`, with a body that lists the added, removed and excluded repositories and packages. A list without a `package-list` config comment gets one as the first change, with `owners:` set to the list's owner plus every org already linked from its entries and an empty `exclude:`.
 
 ## Notes
 

@@ -7,12 +7,12 @@
 
 ## Why commit-message-generate?
 
-A good commit message needs the right type and scope, an imperative description under 72 characters, and a `BREAKING CHANGE` footer when a public API changed. Writing it by hand means reading the diff again, checking the last few commits for the repository's style, and noticing when one diff contains two unrelated changes.
+A good commit message needs the right type and scope, an imperative description under 72 characters, and a breaking-change marker when a public API changed. Writing it by hand means rereading the diff, checking recent commits for the house style, and noticing when one diff holds two unrelated changes.
 
 | Concern | Without it | With commit-message-generate |
 |---|---|---|
-| **What goes in** | Remember whether you staged everything | Uses the staged changes when something is staged, otherwise all unstaged changes, and says which |
-| **Type and scope** | Guess between `fix`, `refactor` and `chore` | Picks the type from the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) table and the scope from the affected area |
+| **What goes in** | Remember whether you staged everything | Uses the staged changes when something is staged, otherwise all unstaged changes and new files, and says which |
+| **Type and scope** | Guess between `fix`, `refactor` and `chore` | Picks a standard [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) type and the scope from the affected area |
 | **Breaking changes** | Spotted only when a consumer breaks | Looks for removed exports, changed signatures and config format changes, and marks them with `!` or a `BREAKING CHANGE:` footer |
 | **Mixed changes** | One commit with a fix and a feature | Recommends splitting and writes one message per commit |
 | **House style** | Varies by author | Matches the style of the last ten commits |
@@ -65,7 +65,7 @@ BREAKING CHANGE: `parse()` now returns an object instead of a string
 
 - **It never commits.** The skill only presents the message; you decide when and how to run `git commit`.
 - **Staged changes win.** With both staged and unstaged changes, the message covers only the staged ones, and the skill tells you the unstaged changes are left out.
-- **Nothing to commit, nothing generated.** With no staged and no unstaged changes (untracked files alone do not count) it tells you so and stops.
+- **Nothing to commit, nothing generated.** With no staged, unstaged or new files it tells you so and stops. New files alone get a message, with a reminder to `git add` them.
 - **No AI attribution.** It never adds a `Co-Authored-By` trailer for the agent.
 
 ## License

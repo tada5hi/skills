@@ -2,281 +2,129 @@
 name: pr-comments-investigate
 description: Fetch PR review comments from GitHub, investigate each one against the actual codebase, and fix real issues. Use after a PR review to triage and act on reviewer feedback, or when asked to "check PR comments", "handle review feedback", or "investigate PR".
 license: Apache-2.0
-compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
+compatibility: Requires a git repository, the gh CLI authenticated, Node.js, and an open PR (the current branch's, or one given by number).
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(gh:*) Bash(node:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
+allowed-tools: Bash(gh:*) Bash(git:*) Bash(node:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep AskUserQuestion
 ---
 
 # pr-comments-investigate
 
-> Fetch all review comments on the current PR, investigate each one against the actual code, and fix real issues.
+> Fetch the unresolved inline review comments on a PR, investigate each against the code, fix the real issues and resolve their threads.
 
-## Re-invocation behaviour
+## Arguments
 
-When this skill is run more than once on the same PR (e.g. after a follow-up review), always:
+`$ARGUMENTS`: `[<number>] [--dry-run]`
 
-1. Re-fetch all comments from scratch — do not rely on prior parsed output.
-2. Fetch the current state of review threads and **filter out already-resolved threads** before investigating (see Step 1e).
-3. Only investigate comments whose threads are still unresolved. This avoids re-litigating fixes that were already applied and resolved in a previous run.
+- `<number>`: the PR to investigate. Default: the PR of the current branch. Fixes go to the checked-out branch, so when the PR's `headRefName` differs from `git branch --show-current`, ask before running `gh pr checkout <number>`, or continue as `--dry-run`.
+- `--dry-run`: classify and report only. Skip Steps 3 and 4: no edits, issues, plan notes or resolved threads.
 
-## Step 1: Fetch PR comments
+Every run starts from scratch: re-fetch everything and investigate only unresolved threads, so fixes resolved in an earlier run are not re-litigated.
 
-Fetch comments using `gh api` and write full output to temp files for processing.
+## Step 1: Fetch unresolved comments
 
-**Important:**
-- Always pass `--paginate --slurp` to `gh api` calls. Without `--paginate`, only the first page (30 items) is returned, silently dropping comments on busy PRs. Without `--slurp`, paginated output is multiple JSON documents concatenated back-to-back (e.g. `][` for REST arrays, `}{` for GraphQL), which `JSON.parse` cannot handle. `--slurp` wraps all pages into a single valid JSON array — flatten it with `.flat()` (REST arrays) or iterate page-by-page (GraphQL objects).
-- `jq` may not be available. Use `node -e` for JSON parsing.
-- On Windows (MINGW), `gh api` paths must NOT start with `/` (MINGW rewrites them to filesystem paths).
-- **Never truncate comment bodies** (e.g. `.substring(0, 200)`). Reviewers embed suggested diffs, reasoning, and fixes in the body — truncation destroys actionable content.
-- On Windows, `/dev/stdin` does not work with `node -e`. Use `process.stdin` piping or read from a temp file instead.
-- Use a portable temp directory: `${TMPDIR:-${TEMP:-/tmp}}` in shell, and `process.env.TMPDIR || process.env.TEMP || '/tmp'` in Node. Hardcoding `/tmp` breaks on Windows.
-
-### 1a. Get PR metadata
-
-```bash
-gh pr view --json number,headRepository
-```
-
-### 1b. Fetch and save full comments to temp files
-
-Save raw JSON to a temp file first, then parse. This avoids terminal overflow on PRs with many or long comments. `--paginate --slurp` ensures all pages are fetched and produces a single valid JSON array.
-
-This skill focuses on **inline review comments** (the comments tied to a file and line). Issue-level PR comments — typically bot walkthroughs and general discussion — are intentionally not fetched here; if you need to handle a specific issue-level comment, fetch it separately.
+Only **inline review comments** (tied to a file and line) are fetched, from any author, bots included. Issue-level PR comments (bot walkthroughs, discussion) are not; fetch a specific one separately if needed.
 
 ```bash
 TMP="${TMPDIR:-${TEMP:-/tmp}}"
-gh api --paginate --slurp repos/{owner}/{repo}/pulls/{number}/comments > "$TMP/pr-review-comments.json"
+gh pr view <number> --json number,headRefName       # omit <number> for the current branch; compare headRefName (Arguments)
+N=$(gh pr view <number> --json number --jq .number)
+gh api --paginate --slurp "repos/{owner}/{repo}/pulls/$N/comments" > "$TMP/pr-review-comments.json"
+gh api graphql --paginate --slurp -F owner='{owner}' -F repo='{repo}' -F number="$N" -f query='
+  query($owner: String!, $repo: String!, $number: Int!, $endCursor: String) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $number) {
+        reviewThreads(first: 100, after: $endCursor) {
+          pageInfo { hasNextPage endCursor }
+          nodes { id isResolved comments(first: 100) { nodes { databaseId } } }
+        }
+      }
+    }
+  }' > "$TMP/pr-review-threads.json"
 ```
 
-### 1c. Parse comments with full bodies
-
-Process the saved JSON file with `node -e`, reading from the file path (not stdin). The `--slurp` output is an array of pages — flatten it before mapping. Persist the parsed output to a temp file so later steps can re-read it without re-parsing.
+`gh` fills `{owner}` and `{repo}` from the current repository.
 
 ```bash
 node -e "
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs'), path = require('path');
 const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
-const pages = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-review-comments.json'), 'utf8'));
-const comments = pages.flat();
-const parsed = comments.map(c => ({
-  id: c.id,
-  user: c.user.login,
-  path: c.path || null,
-  line: c.line || c.original_line || null,
-  createdAt: c.created_at,
-  body: c.body
-}));
-fs.writeFileSync(path.join(tmp, 'pr-comments-parsed.json'), JSON.stringify(parsed, null, 2));
-console.log(JSON.stringify(parsed, null, 2));
-"
-```
-
-Inline review comments are kept regardless of author — bots like Copilot or CodeRabbit leave substantive line-level feedback that warrants investigation. `createdAt` lets you distinguish new comments from a follow-up review against ones that were present in earlier runs.
-
-### 1d. Extract structured fields (optional)
-
-For AI reviewer comments (e.g. CodeRabbit) that use severity labels, extract structured sections:
-
-```bash
-node -e "
-const fs = require('fs');
-const path = require('path');
-const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
-const pages = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-review-comments.json'), 'utf8'));
-const comments = pages.flat();
-const parsed = comments.map(c => {
-  const severityMatch = c.body.match(/\[([Cc]ritical|[Mm]ajor|[Mm]inor|[Nn]it)\]/);
-  const suggestionMatch = c.body.match(/\`\`\`suggestion\n([\s\S]*?)\`\`\`/);
-  return {
-    id: c.id,
-    path: c.path || null,
-    line: c.line || c.original_line || null,
-    createdAt: c.created_at,
-    severity: severityMatch ? severityMatch[1].toLowerCase() : null,
-    hasSuggestion: !!suggestionMatch,
-    suggestion: suggestionMatch ? suggestionMatch[1] : null,
-    body: c.body
-  };
+const read = f => JSON.parse(fs.readFileSync(path.join(tmp, f), 'utf8'));
+const thread = {};
+for (const page of read('pr-review-threads.json'))
+  for (const t of page.data.repository.pullRequest.reviewThreads.nodes)
+    for (const c of t.comments.nodes) thread[c.databaseId] = t;
+const all = read('pr-review-comments.json').flat();
+const open = all.filter(c => !(thread[c.id] && thread[c.id].isResolved)).map(c => {
+  const sev = c.body.match(/\[(critical|major|minor|nit)\]/i);
+  const sug = c.body.match(/\`\`\`suggestion\n([\s\S]*?)\`\`\`/);
+  return { id: c.id, threadId: thread[c.id] ? thread[c.id].id : null, user: c.user.login,
+    path: c.path, line: c.line || c.original_line || null, createdAt: c.created_at,
+    severity: sev ? sev[1].toLowerCase() : null, suggestion: sug ? sug[1] : null, body: c.body };
 });
-fs.writeFileSync(path.join(tmp, 'pr-comments-parsed.json'), JSON.stringify(parsed, null, 2));
-console.log(JSON.stringify(parsed, null, 2));
+fs.writeFileSync(path.join(tmp, 'pr-comments-unresolved.json'), JSON.stringify(open, null, 2));
+console.log('Total: ' + all.length + ', resolved: ' + (all.length - open.length) + ', to investigate: ' + open.length);
 "
 ```
 
-### 1e. Filter out already-resolved threads
+Then read `pr-comments-unresolved.json`. Rules for these commands:
 
-Before investigating, drop comments whose review thread is already resolved. This is essential on re-invocation: previously fixed-and-resolved comments must not be re-investigated.
+- Keep `--paginate --slurp`: without `--paginate` only the first 30 items arrive; without `--slurp` the pages are concatenated JSON documents that `JSON.parse` rejects.
+- Use `node`, not `jq` (may be missing; `gh --jq` cannot be combined with `--slurp`).
+- Never truncate comment bodies; they carry suggested diffs and reasoning.
+- Windows: `gh api` paths must not start with `/` (MINGW rewrites them), `node -e` cannot read `/dev/stdin`, and `/tmp` does not exist, hence the `TMP` fallbacks.
 
-1. Fetch review threads with their resolution state and the comment IDs they contain (redefine `TMP` so this step is runnable on its own):
-
-   ```bash
-   TMP="${TMPDIR:-${TEMP:-/tmp}}"
-   gh api graphql --paginate --slurp -f query='
-     query($owner: String!, $repo: String!, $number: Int!, $endCursor: String) {
-       repository(owner: $owner, name: $repo) {
-         pullRequest(number: $number) {
-           reviewThreads(first: 100, after: $endCursor) {
-             pageInfo { hasNextPage endCursor }
-             nodes {
-               id
-               isResolved
-               comments(first: 100) {
-                 nodes { databaseId }
-               }
-             }
-           }
-         }
-       }
-     }
-   ' -F owner=<owner> -F repo=<repo> -F number=<number> > "$TMP/pr-review-threads.json"
-   ```
-
-2. Build a set of resolved comment IDs and filter `pr-comments-parsed.json`:
-
-   ```bash
-   node -e "
-   const fs = require('fs');
-   const path = require('path');
-   const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
-   // --slurp produces an array of per-page response objects; iterate them.
-   const pages = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-review-threads.json'), 'utf8'));
-   const resolvedIds = new Set();
-   for (const doc of pages) {
-     for (const t of doc.data.repository.pullRequest.reviewThreads.nodes) {
-       if (t.isResolved) for (const c of t.comments.nodes) resolvedIds.add(c.databaseId);
-     }
-   }
-   const parsed = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-comments-parsed.json'), 'utf8'));
-   const unresolved = parsed.filter(c => !resolvedIds.has(c.id));
-   fs.writeFileSync(path.join(tmp, 'pr-comments-unresolved.json'), JSON.stringify(unresolved, null, 2));
-   console.log(\`Total: \${parsed.length}, resolved: \${parsed.length - unresolved.length}, to investigate: \${unresolved.length}\`);
-   "
-   ```
-
-Investigate only the comments in `pr-comments-unresolved.json`.
-
-### Batch processing for large PRs
-
-For PRs with many comments (20+), process in batches to keep context manageable:
-1. Use the parsed output saved at `${TMPDIR:-${TEMP:-/tmp}}/pr-comments-unresolved.json`.
-2. Sort by severity (critical > major > minor > nit) and by file path.
-3. Investigate one file at a time in Step 2, reading the parsed comments for that file.
+With 20 or more comments, sort by severity (critical > major > minor > nit) and path, and investigate one file at a time.
 
 ## Step 2: Investigate each comment
 
-For each review comment (skip bot summaries, walkthrough comments, and pure markdown-lint suggestions on non-code files):
+Skip bot summaries, walkthroughs and markdown-lint suggestions on non-code files. For each other comment, read the referenced file and line, check `CLAUDE.md` and `.agents/*.md` for constraints that explain the code (plan files in `.agents/plans/` are working documents, not shipped code), and classify:
 
-1. **Read the referenced file and line** to understand the current state of the code.
-2. **Evaluate the comment** against the actual code:
-   - Is the issue still present, or was it already fixed in a later commit?
-   - Is the concern valid given the project's architecture and constraints?
-   - Does the suggested fix make sense, or does it misunderstand the design?
-3. **Classify** the comment:
-   - **Real issue** — the code has a bug, security flaw, or correctness problem
-   - **Pre-existing issue** — a valid concern (bug, flaw, or pattern) that existed before this PR and was not introduced by it
-   - **Already fixed** — the issue was addressed in a subsequent commit
-   - **Invalid** — the reviewer misunderstood the design, constraints, or context
-   - **Stylistic** — a genuine style preference or formatting choice, not a correctness concern. Never classify a valid bug or design flaw as Stylistic solely because it is pre-existing — use **Pre-existing issue** instead
-   - **Uncertain** — you cannot confidently classify the comment
+- **Real issue**: a bug, security flaw or correctness problem introduced by this PR.
+- **Pre-existing issue**: a valid concern that existed before this PR.
+- **Already fixed**: addressed by a later commit.
+- **Invalid**: the reviewer misread the design, constraints or context.
+- **Stylistic**: a style or formatting preference, not a correctness concern. A valid bug is never Stylistic because it is pre-existing; that is **Pre-existing issue**.
+- **Uncertain**: you cannot classify it confidently (ambiguous code, a design trade-off, missing domain knowledge). Do not guess: show the user the comment, the code and your analysis, and fix or dismiss only after they decide.
 
-4. **If uncertain, ask the user.** When the code context is ambiguous, the reviewer's concern involves a design trade-off, or you lack domain knowledge to judge correctness — do NOT guess. Present the comment, the relevant code, your analysis so far, and ask the user to decide. Only proceed with a fix or dismissal after the user confirms.
+## Step 3: Fix
 
-### Context to consider when evaluating
+**Real issue**: apply the fix, run the project linter on the changed files and the relevant tests.
 
-- Check `.agents/*.md` and `CLAUDE.md` for architectural decisions and constraints that may explain the code.
-- Plan files in `.agents/plans/` are working documents, not shipped code.
+**Pre-existing issue**, by scope:
 
-## Step 3: Fix real issues and handle pre-existing issues
-
-For each comment classified as a **real issue**:
-
-1. Apply the fix.
-2. Run the project linter on changed files.
-3. Run relevant tests to verify the fix.
-
-For each comment classified as a **pre-existing issue**, choose one of the following based on scope:
-
-1. **Small, scoped fix** — if the fix is small (a few lines), localized to files already touched by this PR, and unlikely to cause regressions, fix it directly in the current PR. Apply the fix, lint, and test as with real issues.
-2. **Larger or out-of-scope fix** — if the fix is non-trivial, touches files outside the PR's scope, or carries regression risk, create a GitHub issue instead:
+1. **Small** (a few lines, in files this PR already touches, low regression risk): fix it like a real issue.
+2. **Larger or out of scope**: create an issue instead, with no AI-attribution line:
    ```bash
-   gh issue create --title "<concise description of the pre-existing issue>" --body "$(cat <<'EOF'
+   gh issue create --title "<concise description>" --body "$(cat <<'EOF'
    ## Pre-existing issue found during PR review
 
    **Reported in:** PR #<number>, review comment by @<user>
    **File:** `<path>#<line>`
 
    ## Description
-   <explain the issue and why it matters>
+   <the issue and why it matters>
 
    ## Suggested fix
-   <outline the fix approach>
+   <the approach>
    EOF
    )"
    ```
-   Do **not** add AI-attribution lines (e.g. `🤖 Generated with ...`) to issue titles or bodies.
-3. **Related to an ongoing plan** — if the issue relates to a plan file in `.agents/plans/`, append a note to the relevant plan file linking to the review comment and describing the concern. This ensures the issue is tracked in context.
+3. **Related to a plan in `.agents/plans/`**: append a note to that plan file linking the review comment and describing the concern.
 
-## Step 4: Resolve fixed threads on GitHub
+## Step 4: Resolve fixed threads
 
-For each comment classified as **Real issue** that was successfully fixed, resolve the review thread on GitHub:
+Resolve the thread (`threadId` from Step 1) of every real issue fixed and every pre-existing issue fixed in this PR. A comment with `threadId: null` has no thread to resolve; say so in the summary:
 
-1. Fetch all review thread IDs via GraphQL (`first: 100` and `--paginate --slurp` to cover PRs with many threads and produce a single valid JSON array of pages):
-   ```bash
-   TMP="${TMPDIR:-${TEMP:-/tmp}}"
-   gh api graphql --paginate --slurp -f query='
-     query($owner: String!, $repo: String!, $number: Int!, $endCursor: String) {
-       repository(owner: $owner, name: $repo) {
-         pullRequest(number: $number) {
-           reviewThreads(first: 100, after: $endCursor) {
-             pageInfo { hasNextPage endCursor }
-             nodes {
-               id
-               isResolved
-               comments(first: 1) {
-                 nodes { databaseId body path }
-               }
-             }
-           }
-         }
-       }
-     }
-   ' -F owner=<owner> -F repo=<repo> -F number=<number> > "$TMP/pr-thread-ids.json"
-   ```
+```bash
+gh api graphql -f query='mutation { resolveReviewThread(input: { threadId: "<threadId>" }) { thread { isResolved } } }'
+```
 
-2. Match each fixed comment to its thread. The slurped output is an array of per-page response objects — flatten across pages, then match by `databaseId` (preferred, exact) or by `path` + body content:
-
-   ```bash
-   node -e "
-   const fs = require('fs');
-   const path = require('path');
-   const tmp = process.env.TMPDIR || process.env.TEMP || '/tmp';
-   const pages = JSON.parse(fs.readFileSync(path.join(tmp, 'pr-thread-ids.json'), 'utf8'));
-   const threads = pages.flatMap(d => d.data.repository.pullRequest.reviewThreads.nodes);
-   // Build commentId -> threadId map (use databaseId from the first comment in each thread)
-   const map = {};
-   for (const t of threads) {
-     for (const c of t.comments.nodes) map[c.databaseId] = t.id;
-   }
-   console.log(JSON.stringify(map, null, 2));
-   "
-   ```
-
-3. Resolve only the threads corresponding to fixed issues:
-   ```bash
-   gh api graphql -f query='mutation { resolveReviewThread(input: { threadId: "<thread_id>" }) { thread { isResolved } } }'
-   ```
-
-Do NOT resolve threads for comments classified as Invalid, Stylistic, or Already fixed — only resolve threads where a code fix was applied. For pre-existing issues fixed in the current PR, resolve the thread. For pre-existing issues where a GitHub issue was created, do NOT resolve the thread.
+Leave threads open for Invalid, Stylistic and Already fixed comments, and for pre-existing issues that got a GitHub issue or plan note.
 
 ## Step 5: Report
-
-Present a summary table of all comments:
 
 | Comment | File | Verdict | Action |
 |---------|------|---------|--------|
 | Short description | `path#line` | Real issue / Pre-existing issue / Already fixed / Invalid / Stylistic | Fixed + Resolved / Fixed / Issue #N created / Note added to plan / None |
-
-If `--dry-run` was passed as `$ARGUMENTS`, skip Steps 3–4 and only report the classification without making changes or resolving threads.

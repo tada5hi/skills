@@ -6,78 +6,51 @@ compatibility: Requires git, Node.js >= 22, npm, and network access to fetch the
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Read Write Edit Bash(git:*) Bash(npm:*) Bash(mkdir:*) Bash(ls:*) Bash(rm:*) Bash(mv:*) Glob Grep
+allowed-tools: Read Write Edit Bash(git:*) Bash(npm:*) Bash(rm:*) Bash(ls:*) Glob Grep
 ---
 
 # ts-project-init
 
-> Scaffold a new TypeScript library by cloning [tada5hi/typescript-template](https://github.com/tada5hi/typescript-template), renaming all template references to the new package name, and verifying the build.
-
-## Overview
-
-Bootstraps a new TypeScript package by:
-
-1. Fetching the template repository contents (without history).
-2. Replacing every `typescript-template` / `Tada5hi/typescript-template` reference with the new package coordinates.
-3. Updating `package.json` metadata (name, description, keywords, repository URL).
-4. Updating `README.MD` badges and install instructions.
-5. Updating `.github/ISSUE_TEMPLATE/config.yml` discussion URL.
-6. Installing dependencies and verifying the build.
-
-## When to Use
-
-- Creating a new TypeScript library inside the `tada5hi` GitHub organization (e.g., `eldin`, `orkos`).
-- Bootstrapping a one-off TypeScript package that follows the same tooling conventions (`tsdown`, `vitest`, `eslint`, `husky`, release-please).
-- When the user says: "init ts project", "scaffold a new typescript library", "create a new package from the template", or similar.
+> Scaffold a new TypeScript library from [tada5hi/typescript-template](https://github.com/tada5hi/typescript-template): copy it without history, rename every template reference, install, lint, build and commit once.
 
 ## Inputs
 
-Collect these from the user before starting. If any are missing, ask once and proceed.
-
 | Input | Required | Default | Notes |
 |-------|----------|---------|-------|
-| `name` | Yes | — | Package name (npm name + repo name). Must be lowercase, kebab-case. |
-| `description` | Yes | — | One-line description for `package.json` and `README.MD`. |
-| `keywords` | No | `[]` | Comma-separated list inserted into `package.json#keywords`. |
-| `target` | No | `./<name>` | Target directory. Must not exist or must be empty. |
-| `template` | No | `https://github.com/tada5hi/typescript-template` | Source template repository. |
-| `org` | No | `tada5hi` | GitHub organization for repository URL and badges. May be supplied in any case (e.g. `Tada5hi`). |
-| `license` | No | `MIT` | SPDX identifier written to `package.json#license`. |
+| `name` | Yes | none | npm and repository name, lowercase kebab-case. |
+| `description` | Yes | none | One line for `package.json` and `README.MD`. |
+| `keywords` | No | `[]` | Comma-separated, written to `package.json#keywords`. |
+| `target` | No | `./<name>` | Must not exist, or be empty. |
+| `template` | No | `https://github.com/tada5hi/typescript-template` | Source repository. |
+| `org` | No | `tada5hi` | GitHub owner for URLs and badges, any case (e.g. `Tada5hi`). |
+| `license` | No | `MIT` | SPDX identifier. |
 
-**Derived values:**
+If `name` or `description` is missing, ask for both in one question before starting. Do not ask about optional inputs; use the defaults unless the user gave a value.
 
-- `<org-lowercase>` — `org` lowercased. Used wherever GitHub paths must be lowercase (npm-style URLs, badge slugs, `repository.url`). `<org>` preserves the user-supplied casing for human-facing strings (e.g. README badge alt text).
+`<org-lowercase>` is `org` lowercased, used where GitHub paths must be lowercase (`repository.url`). `<org>` keeps the user's casing.
 
 ## Process
 
-### 1. Validate inputs
+### 1. Validate
 
-- Confirm `name` matches `^[a-z][a-z0-9-]*$`.
-- Confirm `target` does not exist, or is an empty directory. If it exists and is non-empty, stop and ask the user.
-- Confirm `git` and `npm` are available.
+- `name` matches `^[a-z][a-z0-9-]*$`.
+- `target` does not exist or is empty (`ls -A "$TARGET"` prints nothing; Glob misses dotfiles). Otherwise stop and ask the user.
+- `git` and `npm` are available.
 
 ### 2. Fetch the template
 
-Clone the template into the target directory without carrying its history:
-
 ```bash
 git clone --depth=1 "$TEMPLATE" "$TARGET"
-rm -rf "$TARGET/.git"
+rm -rf "$TARGET/.git" "$TARGET/node_modules" "$TARGET/dist"
 rm -f  "$TARGET/package-lock.json"
-rm -rf "$TARGET/node_modules" "$TARGET/dist"
-```
-
-Initialize a fresh git repository in the target directory:
-
-```bash
 git -C "$TARGET" init -b master
 ```
 
-Do **not** copy the template's tags or remotes.
-
 ### 3. Rewrite template references
 
-Apply these replacements across all text files in the target (skip `node_modules`, `dist`, `.git`). **Apply rules in the listed order** — the namespaced patterns must match before the bare `typescript-template` rule, otherwise the slash-prefixed variants will already be partially rewritten and won't match:
+First delete the `## Using This Template` section from `.agents/conventions.md` (it describes bootstrapping from the template, which this skill does), and make sure `.release-please-manifest.json` is `{ ".": "0.0.0" }`.
+
+Then, across all text files in the target (skip `node_modules`, `dist`, `.git`), replace in this order, so the namespaced forms match before the bare name does:
 
 | Find | Replace with |
 |------|--------------|
@@ -85,36 +58,26 @@ Apply these replacements across all text files in the target (skip `node_modules
 | `tada5hi/typescript-template` | `<org-lowercase>/<name>` |
 | `typescript-template` | `<name>` |
 
-Use `Edit` per file. For larger surfaces, locate occurrences with `Grep` (excluding binary paths) and apply repeated `Edit` operations — never shell out to `sed`/`find`, which are not in `allowed-tools`. Always verify the diff before continuing.
+Find occurrences with Grep and change them with Edit; `sed` and `find` are not in `allowed-tools`. This covers the README heading, badges and install line, `package.json#name`, `repository.url` and the discussions URL in `.github/ISSUE_TEMPLATE/config.yml`.
+
+The new repository has no commit yet, so `git diff` shows nothing. Verify instead: a case-insensitive Grep for `typescript-template` in the target returns no matches.
 
 ### 4. Update `package.json`
 
-Edit `package.json` and set:
+- `description`: `<description>`
+- `keywords`: array form of `keywords`
+- `license`: `<license>`, only when the user gave one
 
-- `name` → `<name>`
-- `description` → `<description>` (replace the empty string)
-- `keywords` → array form of the user's `keywords` input (or `[]`)
-- `repository.url` → `https://github.com/<org-lowercase>/<name>.git`
-- `license` → `<license>` (only if the user changed the default)
-
-Leave `version`, `author`, `engines`, `scripts`, `devDependencies`, and `publishConfig` untouched — they are template-wide defaults.
+Leave `version`, `author`, `engines`, `scripts`, `devDependencies` and `publishConfig` as the template has them.
 
 ### 5. Update `README.MD`
 
-In `README.MD`:
-
-- Replace the H1 (`# typescript-template 🚀`) with `# <name> 🚀`.
 - Replace the `This is a package to ...` placeholder with `<description>`.
-- Replace `npm install typescript-template --save` with `npm install <name> --save`.
-- Update every badge link reference at the bottom of the file (`badge.fury.io`, `codecov.io`, `github.com/Tada5hi/...`, `snyk.io/test/github/Tada5hi/...`) so the slug points at `<org>/<name>`.
+- Remove the `?token=...` query from the Codecov badge URL; the token belongs to the template's Codecov project.
 
-### 6. Update `.github/ISSUE_TEMPLATE/config.yml`
+### 6. Install and verify
 
-Replace `https://github.com/Tada5hi/typescript-template/discussions` with `https://github.com/<org>/<name>/discussions`.
-
-### 7. Install and verify
-
-Run, in order, from the target directory:
+From the target directory, in order:
 
 ```bash
 npm install
@@ -122,32 +85,26 @@ npm run lint
 npm run build
 ```
 
-If any step fails, surface the failure to the user and stop — do not silently retry or skip.
+If one fails, stop: do not retry, skip or commit. Report the target path, the failing command and its output.
 
-### 8. Initial commit
-
-Stage everything and create a single conventional commit on `master`:
+### 7. Initial commit
 
 ```bash
 git -C "$TARGET" add -A
 git -C "$TARGET" commit -m "chore: initial commit from typescript-template"
 ```
 
-Do **not** add a `Co-Authored-By` trailer or any other AI-attribution to the commit message.
+No `Co-Authored-By` trailer or other AI attribution.
 
-### 9. Report
-
-Print a short summary listing:
+### 8. Report
 
 - Target directory (absolute path)
-- Package name and resulting repository URL
-- Build status (passed/failed)
-- Suggested next steps: create the GitHub repo (`gh repo create <org>/<name> --source=<target> --push`), run `agent-docs-init` so the File Organization rules (module folders, one class per file, own-folder barrels) are in place before the first source file, write `src/index.ts`, and replace the README's `## Usage` placeholder.
+- Package name and repository URL
+- Next steps: create the GitHub repository (`gh repo create <org>/<name> --source=<target> --push`); rewrite `AGENTS.md` and `.agents/*.md`, which still describe the template (for example with `agent-docs-init`); write `src/index.ts`; replace the README's `## Usage` placeholder.
 
 ## Guidelines
 
-- **Never modify the template repository itself.** All edits happen inside the target directory.
-- **Keep the template's tooling intact.** Do not bump `devDependencies`, change `tsconfig.json`, or alter `eslint.config.js`/`tsdown.config.ts` as part of scaffolding — those are the template's contract.
-- **Do not write source code.** Leave `src/index.ts` and `test/` as-is so the user controls the initial implementation.
-- **Stop on first error.** A failing `npm install` or `npm run build` indicates a template-side issue or a missing prerequisite — do not paper over it.
-- **One commit only.** The initial commit should be a clean snapshot, not a series of "rename", "update package.json", "fix readme" commits.
+- Never modify the template repository; all edits happen in the target.
+- Keep the template's tooling: do not bump `devDependencies` or change `tsconfig.json`, `eslint.config.js` or `tsdown.config.ts`.
+- Do not write source code. `src/` and `test/` stay as the template has them.
+- One commit only, not a series of rename commits.

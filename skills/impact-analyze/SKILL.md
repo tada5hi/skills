@@ -6,147 +6,115 @@ compatibility: Requires a TypeScript monorepo with package.json files.
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(npx:*) Bash(npm:*) Bash(git:*) Read Edit Glob Grep Agent AskUserQuestion
+allowed-tools: Read Glob Grep AskUserQuestion
 ---
 
 # impact-analyze
 
-> Perform cross-package impact analysis for a type, function, or constant in a TypeScript monorepo, tracing all consumers and property accesses.
+> Trace every consumer of a type, function or constant across the packages of a TypeScript monorepo, and how each one uses it. Report only: this skill edits nothing and runs no commands.
 
-## Step 1: Parse arguments
+## Arguments
 
-Extract the symbol name from `$ARGUMENTS`.
+`$ARGUMENTS`: `<symbol> [--property <prop>]`
 
-**Supported flags:**
-- `--property <prop>` — highlight accesses to a specific property and include breaking change analysis
+- `<symbol>`: the symbol to trace. If missing, ask which symbol to analyze.
+- `--property <prop>`: also list every access to `<prop>` and add the breaking change analysis (Step 5).
 
-**Examples:**
-- `MyInterface` — analyze all consumers of `MyInterface`
-- `MyInterface --property oldName` — analyze consumers and highlight accesses to `.oldName`
+## Step 1: Find the definition
 
-If no symbol name is provided, ask the user which symbol to analyze.
+Search `*.ts`/`*.tsx` with Grep (exclude `node_modules` and `dist`):
 
-## Step 2: Find the definition
-
-Search for the symbol definition across the monorepo:
-
-```bash
-# Search for type/interface/class/function/const declarations
-grep -rn "export\s\+\(type\|interface\|class\|function\|const\|enum\)\s\+<symbol>" --include="*.ts" --include="*.tsx"
+```text
+export\s+(declare\s+)?(abstract\s+)?(type|interface|class|function|const|let|enum)\s+<symbol>\b
 ```
 
-Use Grep to locate all matching declarations. For each candidate:
+For each match:
 
-1. **Read the file** to confirm it is the primary definition (not a re-export).
-2. **Identify the package** by finding the nearest `package.json` ancestor.
-3. **Record the definition shape** — list its properties, methods, parameters, or members so you can match them against consumer usage in later steps.
+1. Read the file and confirm it is the primary definition, not a re-export.
+2. Find its package: the nearest `package.json` ancestor.
+3. Record the shape (properties, methods, parameters or members) to match against usage later.
 
-**Important:**
-- If the symbol is defined in multiple packages, ask the user which definition to trace.
-- If no definition is found, broaden the search to include non-exported declarations and type aliases.
+- Defined in several packages: ask which definition to trace.
+- Nothing found: search non-exported declarations as well.
 
-## Step 3: Trace imports
+## Step 2: Trace imports and re-exports
 
-Search for all imports of the symbol across the entire monorepo:
+Search with Grep, `multiline: true` (imports often span several lines):
 
-```bash
-# Direct named imports
-grep -rn "import.*{[^}]*<symbol>[^}]*}" --include="*.ts" --include="*.tsx"
+- named imports, including `as` aliases and a default import before the braces: `import\s+(type\s+)?([\w$]+\s*,\s*)?\{[^}]*\b<symbol>\b[^}]*\}\s*from`
+- named re-exports: `export\s+(type\s+)?\{[^}]*\b<symbol>\b[^}]*\}`
+- star re-exports of the defining module: `export\s+\*(\s+as\s+\w+)?\s+from\s+['"][^'"]*<module>(\.[cm]?[jt]s|/index(\.[cm]?[jt]s)?)?['"]`, where `<module>` is the defining file's path without its extension (a directory barrel `types/index.ts` matches as `types`)
+- inline type imports: `import\(['"][^'"]+['"]\)\.<symbol>\b`
 
-# Re-exports
-grep -rn "export.*{[^}]*<symbol>[^}]*}" --include="*.ts" --include="*.tsx"
-grep -rn "export.*from" --include="*.ts" --include="*.tsx" | grep "<symbol>"
-```
+Then:
 
-Use Grep to find all import and re-export statements. For each match:
+- Star re-exports (`export * from './types'`) do not name the symbol. Follow them from the defining file up to each package entry point, so the symbol counts as exported by every package on that chain.
+- For each package that exports the symbol, also check namespace imports (`import * as ns from '<package>'`) and look for `ns.<symbol>` in those files.
+- Classify each match as a **direct import** (from the defining package), a **re-export** (barrel or intermediate package) or a **barrel import** (from a barrel that re-exports it), and record the file, its package and the import path. If it is imported under an alias (`<symbol> as X`), record the alias; Step 3 searches for it.
 
-1. **Classify the import type:**
-   - **Direct import** — imports the symbol from the defining package
-   - **Re-export** — re-exports the symbol through a barrel file (`index.ts`) or intermediate package
-   - **Barrel import** — imports the symbol from a barrel file that re-exports it
+## Step 3: Analyze usage
 
-2. **Track the import chain** — if the symbol is re-exported through intermediate packages, trace the full chain from definition to final consumer. This ensures you do not miss indirect consumers who import from a barrel or wrapper package.
+For each consumer file, read the code around each use of the symbol (or its alias) and record:
 
-3. **Record each consumer file** with its package name and import path.
+- property accesses (`obj.prop`, `Type['prop']`) and method calls
+- construction (`new X()`)
+- type annotations and generic arguments (`param: X`, `Foo<X>`)
+- spread and destructuring (`const { a, b: renamed } = obj`)
 
-## Step 4: Analyze property accesses
+With `--property`, search each consumer file for:
 
-For each consumer file identified in Step 3:
+- `\.<prop>\b` and `\[['"]<prop>['"]\]`: accesses
+- `\b<prop>\s*:`: object literal keys and `{ <prop>: alias }` destructuring
+- `\{[^}]*\b<prop>\b[^}]*\}\s*=` (multiline): shorthand destructuring
 
-1. **Read the relevant code** around each import and usage site.
-2. **Identify how the symbol is used:**
-   - Property accesses (e.g., `obj.prop`, `Type['prop']`)
-   - Method calls (e.g., `obj.method()`)
-   - Construction (e.g., `new ClassName()`)
-   - Type annotations (e.g., `param: MyInterface`)
-   - Spread or destructuring (e.g., `{ prop1, prop2 } = obj`)
-   - Generic type parameters (e.g., `SomeType<MyInterface>`)
+**Limit:** these searches cover only the files found in Step 2. A file that receives a value of the type without importing the symbol (an inferred return value, a callback parameter) and reads `<prop>` from it is missed. Run the `\.<prop>\b` search across the whole monorepo too (excluding `node_modules` and `dist`) and list hits outside the consumer files as **unconfirmed** candidates. Only `tsc --noEmit` after the rename (Step 5) is complete.
 
-3. **If `--property` flag was provided**, specifically search for accesses to that property:
-   ```bash
-   # Property access patterns
-   grep -n "\.<property>" <file>
-   grep -n "\['<property>'\]" <file>
-   grep -n "<property>:" <file>
-   ```
-
-4. **Record the accessed properties/methods** for each consumer file.
-
-## Step 5: Group and report
-
-Present results grouped by package using the following format:
+## Step 4: Report
 
 ```markdown
-## Impact Analysis: <symbol-name>
+## Impact Analysis: <symbol>
 
 ### Definition
 - **Package:** <package-name>
-- **File:** <file-path>:<line-number>
+- **File:** <file-path>:<line>
 - **Kind:** type | interface | class | function | const | enum
-- **Shape:** <brief description of properties/methods>
+- **Shape:** <properties/methods>
 
 ### Consumers (N files across M packages)
 
 #### <package-name> (N files)
-- `<file-path>` — accesses: `.prop1`, `.prop2`
-- `<file-path>` — constructs `<symbol-name>`
-- `<file-path>` — type annotation only
-
-#### <package-name> (N files)
-- `<file-path>` — accesses: `.prop1`, `.method()`
-- `<file-path>` — destructures: `{ prop1, prop2 }`
+- `<file-path>`: accesses `.prop1`, `.method()`
+- `<file-path>`: constructs `<symbol>`
+- `<file-path>`: destructures `{ prop1, prop2 }`
+- `<file-path>`: type annotation only
 
 ### Re-export Chain
 <package-a> -> <package-b> -> <package-c>
 ```
 
-**Important:**
-- Sort packages alphabetically.
-- Within each package, sort files alphabetically.
-- If a consumer only uses the symbol as a type annotation (no property access), note "type annotation only".
-- If no consumers are found, report that explicitly.
+- Sort packages, and files within each package, alphabetically.
+- A consumer that only uses the symbol as a type gets "type annotation only".
+- No consumers: say so explicitly.
 
-## Step 6: Breaking change analysis
-
-**Only perform this step if `--property` was specified.**
-
-Compile a focused report on the impact of renaming or removing the specified property:
+## Step 5: Breaking change analysis (only with `--property`)
 
 ```markdown
-### Breaking Change Analysis: `<symbol-name>.<property>`
+### Breaking Change Analysis: `<symbol>.<prop>`
 
 **Affected locations (N files across M packages):**
 
 | Package | File | Line | Usage |
 |---------|------|------|-------|
-| <pkg> | `<file>` | <line> | `obj.<property>` |
-| <pkg> | `<file>` | <line> | `{ <property> } = obj` |
+| <pkg> | `<file>` | <line> | `obj.<prop>` |
+| <pkg> | `<file>` | <line> | `{ <prop> } = obj` |
+
+**Unconfirmed candidates:** <hits outside the consumer files, or "none">
 
 **Migration approach:**
-1. Update the definition in `<defining-file>`
-2. Update re-exports if the property is part of a mapped type
-3. Update each consumer file listed above
-4. Run `npx tsc --noEmit` to verify no remaining type errors
+1. Update the definition in `<defining-file>`.
+2. Update re-exports if the property is part of a mapped type.
+3. Update each consumer file listed above.
+4. Run `npx tsc --noEmit` in each affected package to find remaining errors.
 ```
 
-If the number of affected locations is large (20+), suggest using a codemod or find-and-replace strategy instead of manual updates.
+With 20 or more affected locations, suggest a codemod or find-and-replace instead of manual updates.

@@ -7,7 +7,7 @@
 
 ## Why release-versions-align?
 
-release-please computes a version per component from that component's own commits. With the `linked-versions` plugin and a `release-as` prerelease pin, a package that only has dependency bumps or `chore:` commits can still land on the wrong version. Fixing it by hand means reading the release PR diff, finding the last release tag, and checking each package's commits since then.
+With the `linked-versions` plugin and a `release-as` prerelease pin, a package that only has dependency bumps or `chore:` commits can land on the wrong version. Fixing it by hand means reading the release PR diff, finding the last release tag and checking each package's commits since.
 
 | Concern | Without it | With release-versions-align |
 |---|---|---|
@@ -46,8 +46,8 @@ The agent may also use it when a release PR shows mixed versions, or when packag
 3. Determines the group version and the packages that differ from it or are missing from the PR.
 4. For those packages, checks the commits since the last release tag for a `fix:`, `feat:` or breaking commit.
 5. Updates the copyright year in each remaining package's entry file, or adds a comment line when the header is current or missing.
-6. Commits exactly those files with `git commit --only` as `fix: ensure consistent version for release`. Other staged work stays out, but anything already staged in those files goes in too.
-7. After you push and release-please updates the PR, checks the versions again and reports each one.
+6. Commits exactly those files with `git commit --only` as `fix: ensure consistent version for release`: on the default branch when the repository allows direct commits, else on a new branch for a pull request. Anything already staged in those files goes in too.
+7. After you push (or merge the PR) and release-please updates its PR, checks the versions again and reports each one.
 
 ## Requirements
 
@@ -57,19 +57,13 @@ The agent may also use it when a release PR shows mixed versions, or when packag
 
 ## Output
 
-A report of the version each package gets, and, only when some packages are behind, one local commit:
-
-```diff
-- * Copyright (c) 2022-2025.
-+ * Copyright (c) 2022-2026.
-```
+A report of the version each package gets, and, only when some packages are behind, one local commit that bumps the copyright year (`2022-2025.` to `2022-2026.`) in each of them.
 
 ## Notes
 
-- **It checks before it touches.** When every version in the release PR matches and every package is present, it reports the version and changes nothing.
-- **No release PR, no changes.** It waits until release-please opens one.
+- **It checks before it touches.** With no release PR, or one where every package is present at the group version, it changes nothing.
 - **Only linked groups.** Without `linked-versions`, different versions are intended and the skill stops.
-- **It never pushes.** Pushing the commit is your call.
+- **It never pushes.** Pushing the commit or opening the pull request is your call.
 - **It never edits versions.** `version` fields, the changelog and the manifest are left to release-please.
 - **Configuration problems are reported, not patched.** A package that already has a `fix:` or `feat:` commit and still shows another version points at the config.
 - **It stops on a missing release tag** rather than treating every package as untouched.

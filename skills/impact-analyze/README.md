@@ -12,9 +12,9 @@ Renaming a shared interface or one of its properties touches every package that 
 | Concern | Without it | With impact-analyze |
 |---|---|---|
 | **Definition** | Guess which of several declarations is the real one | Finds the primary definition, its package and its shape, and asks you when several packages define the symbol |
-| **Consumers** | Search each package separately | Finds direct imports, re-exports and barrel imports, and follows the re-export chain to the final consumers |
+| **Consumers** | Search each package separately, miss multi-line and star re-exports | Finds named, aliased, namespace and multi-line imports, follows `export *` chains to each package entry point |
 | **Usage** | Open each file to see how it is used | Records property accesses, method calls, construction, destructuring, type annotations and generic parameters per file |
-| **Renaming a property** | Count call sites by hand | With `--property`, lists every affected file and line and outlines a migration |
+| **Renaming a property** | Count call sites by hand | With `--property`, lists every affected file and line, plus unconfirmed hits elsewhere, and outlines a migration |
 
 ## Installation
 
@@ -49,12 +49,11 @@ Without a symbol name, it asks you which symbol to analyze.
 
 ## What it does
 
-1. Reads the symbol name and the optional `--property` flag.
-2. Finds the definition, its package (the nearest `package.json`) and its shape.
-3. Traces direct imports, re-exports and barrel imports across the monorepo, following each re-export chain.
-4. Reads each consumer and records how it uses the symbol.
-5. Reports the consumers grouped by package, sorted alphabetically, with the re-export chain.
-6. With `--property`, adds a table of every affected location and a migration approach.
+1. Finds the definition, its package (the nearest `package.json`) and its shape.
+2. Traces imports and re-exports across the monorepo, including multi-line, aliased, namespace and `export *` chains.
+3. Reads each consumer and records how it uses the symbol (or its alias).
+4. Reports the consumers grouped by package, sorted alphabetically, with the re-export chain.
+5. With `--property`, adds a table of every affected location, unconfirmed hits outside the consumer files, and a migration approach.
 
 ## Requirements
 
@@ -84,7 +83,8 @@ A report in the chat:
 
 ## Notes
 
-- **It reports, it does not edit.** The migration approach lists the steps, including `npx tsc --noEmit` to verify; you run them.
+- **It reports, it does not edit.** It only reads and searches files. The migration approach lists the steps, including `npx tsc --noEmit` to verify; you run them.
+- **Text search has a limit.** A file that gets a value of the type without importing it (an inferred return value, a callback parameter) is not a consumer it can find. With `--property`, repo-wide hits for `.<prop>` outside the consumer files are listed as unconfirmed; only `tsc --noEmit` after the rename is complete.
 - **Ambiguous definitions are your call.** When several packages define the symbol, it asks which one to trace.
 - **No consumers is a result.** When nothing imports the symbol, the report says so.
 - **Large renames get a different plan.** With 20 or more affected locations it suggests a codemod or find-and-replace instead of manual updates.

@@ -423,7 +423,7 @@ async function packageExports(dir) {
 }
 
 async function diff(name, from, to) {
-    const root = await mkdtemp(join(tmpdir(), 'adopt-upgrades-'));
+    const root = await mkdtemp(join(tmpdir(), 'upstream-features-adopt-'));
     let oldDir;
     let newDir;
     let before;
@@ -507,7 +507,7 @@ async function writeFiles(dir, files) {
 
 /** Package-level cases: `export type *` is followed; without type entries, only declarations next to the runtime entries count. */
 async function selfTestPackages() {
-    const root = await mkdtemp(join(tmpdir(), 'adopt-upgrades-test-'));
+    const root = await mkdtemp(join(tmpdir(), 'upstream-features-adopt-test-'));
 
     try {
         const star = join(root, 'star');

@@ -6,7 +6,7 @@ compatibility: Requires a git repository that already has CLAUDE.md/AGENTS.md an
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Read Write Edit Glob Grep Bash(node:*) Bash(npx eslint:*) Bash(npm:*) Bash(git:*) Bash(gh:*) Bash(wc:*)
+allowed-tools: Read Write Edit Glob Grep Bash(node:*) Bash(npx eslint:*) Bash(npm:*) Bash(git:*) Bash(gh:*) Bash(wc:*) Bash(cp:*) Bash(grep:*) Bash(sed:*) Bash(paste:*) Bash(ls:*) Skill
 ---
 
 # agent-docs-migrate
@@ -15,13 +15,13 @@ allowed-tools: Read Write Edit Glob Grep Bash(node:*) Bash(npx eslint:*) Bash(np
 
 ## Overview
 
-Agent docs that grow by one paragraph per task end up loaded whole into every session (one project reached 715 KB in four months). [agent-docs-init](../agent-docs-init/SKILL.md) defines the target layout for new projects; this skill moves an existing project there:
+[agent-docs-init](../agent-docs-init/SKILL.md) defines the target layout; this skill moves an existing project there:
 
 - A small always-loaded core: `AGENTS.md` and the `.agents/*.md` guides `CLAUDE.md` imports.
 - `.agents/topics/<name>.md`: per-subsystem detail and module maps, read on demand, never imported by `CLAUDE.md`.
-- The "Writing agent docs" rule in `AGENTS.md`, and the `agentDocs` checks of `@tada5hi/eslint-config` (3.3.1 or later) or the fallback ratchet script that enforce it.
+- The "Writing agent docs" rule in `AGENTS.md`, enforced by the `agentDocs` checks of `@tada5hi/eslint-config` 3.3.1+ or the fallback ratchet script.
 
-Moving and rewriting are separate steps, ideally separate pull requests. The move is mechanical and reviewable as "nothing lost"; condensing needs judgement and reading the code.
+Moving (mechanical, reviewable as "nothing lost") and condensing (judgement, reading the code) are separate steps, ideally separate pull requests.
 
 ## Process
 
@@ -36,15 +36,15 @@ Moving and rewriting are separate steps, ideally separate pull requests. The mov
 5. **Fix what lint and the move broke.**
    - History phrases: delete `(plan NNN)` citations (or replace them with the issue or PR number) and state "no longer" facts in the present tense.
    - Links: an in-page anchor in moved text (`(#channels)`) now points into another file, and a relative link from `.agents/` needs `../` from `.agents/topics/`. Check every relative Markdown link resolves.
-   - Skill names: the docs may name skills by their old verb-first names (`query-package-list`, `create-pull-request`). Search for them with the command in [references/renamed-skills.md](references/renamed-skills.md) and replace each with its new name.
+   - Skill names: the docs may name skills by their old verb-first names (`query-package-list`, `create-pull-request`). Find them with the command in [references/renamed-skills.md](references/renamed-skills.md) (replace `<skill-dir>` with this skill's directory) and replace each with its new name.
    - The lint script must reach the docs: `eslint .` does, a script listing directories needs `CLAUDE.md AGENTS.md .agents` added.
 6. **Lock it in.** When the core still exceeds a default, set `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` just above the current size, with a comment to lower it as the docs shrink (fallback: run the ratchet once with `--init`). Run the project's full lint.
-7. **Open the pull request** with a before/after size table (loaded every session, each core file, topic files) and the commands run. Say that text was moved, not condensed or re-checked.
+7. **Open the pull request** with [pr-create](../pr-create/SKILL.md) (it branches, commits and asks first), with a before/after size table (loaded every session, each core file, topic files) and the commands run. Say that text was moved, not condensed or re-checked.
 8. **Condense and verify (follow-up).** Per file, keep invariants, silent traps and rejected alternatives (verdict plus one-line reason); cut history, before/after narration, spec lists, measurements and walkthroughs of what the code shows. Check each kept claim against the code: stale symbol names and misattributed checks are common. Lower the lint limits afterwards.
 
 ## Guidelines
 
-- **Never lose a rule in the move.** Compare total bytes before and after the split (topics plus core should match within the added headings); the script's dry run shows it.
+- **Never lose a rule in the move.** Topics plus core must match the bytes before the split, give or take the added headings; the dry run shows both.
 - **Keep headings when condensing**, so `architecture.md → *Section*` pointers keep resolving.
 - **Do not raise a limit to fit new text.** Move the detail into a topic file instead; raising a limit is a policy change for the PR description.
 - **Topic files are not imported**, not even one "important" one: the core's Cross-cutting Rules carry what every session needs.

@@ -24,10 +24,12 @@ git branch --show-current
 gh repo view --json nameWithOwner,defaultBranchRef --jq '.nameWithOwner + " " + .defaultBranchRef.name'
 ```
 
-- **Not authenticated**: tell the user to run `gh auth login` and stop.
-- **On the default branch**: create a branch first (`git switch -c <type>/<short-topic>`), never open a PR from the default branch.
-- **Uncommitted changes**: run `/commit-message-generate` and commit them as atomic Conventional Commits, one logical change per commit. Do not lump unrelated changes into one commit. Ask the user before committing if they have not asked for it.
-- Read `AGENTS.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE*` if present. Their rules win over this skill.
+Handle the results in this order:
+
+1. **Not authenticated**: tell the user to run `gh auth login` and stop.
+2. **On the default branch**: create a branch (`git switch -c <type>/<short-topic>`) before committing anything. Never open a PR from the default branch.
+3. **Uncommitted changes**: if the user has not asked you to commit them, ask first; if they decline, continue with the committed work only, and stop when the branch has no commits ahead of the base. Then split them into atomic commits, one logical change each, with messages from `/commit-message-generate`.
+4. Read `AGENTS.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE*` if present. Their rules win over this skill.
 
 ## Step 2: Base, range and existing PR
 
@@ -120,14 +122,14 @@ gh pr create --base <base> --title "<title>" --body-file "${TMPDIR:-/tmp}/pr-bod
 
 Do not end the task at the PR URL. Automated reviewers (CodeRabbit, Copilot, Qodo and similar) and CI need a few minutes, and their findings belong to the same piece of work.
 
-Wait until no check on the PR is pending, for at most 30 minutes. Run the wait in the background when your agent supports it (for example `run_in_background` in Claude Code) and keep working or report progress meanwhile; otherwise run it in the foreground:
+Wait until no check on the PR is pending, for at most 30 minutes. Run the wait in the background when your agent supports it (in Claude Code, `run_in_background`; a foreground Bash call times out after 10 minutes); otherwise run it in the foreground:
 
 ```bash
 pr=$(gh pr view --json number --jq .number)
 sleep 60  # checks register a few seconds to a minute after the push
 for i in $(seq 1 58); do
-  pending=$(gh pr checks "$pr" --json bucket --jq '[.[] | select(.bucket == "pending")] | length' 2>/dev/null || echo 0)
-  [ "$pending" = 0 ] && break
+  pending=$(gh pr checks "$pr" --json bucket --jq '[.[] | select(.bucket == "pending")] | length' 2>/dev/null)
+  [ "${pending:-0}" = 0 ] && break  # empty: no checks reported
   sleep 30
 done
 gh pr checks "$pr"

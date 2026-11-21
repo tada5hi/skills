@@ -6,101 +6,48 @@ compatibility: Requires git repository with uncommitted changes.
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(git:*) Read Glob Grep Agent
+allowed-tools: Bash(git:*) Read Glob Grep
 ---
 
 # commit-message-generate
 
-> Analyze uncommitted changes in the working directory and generate a commit message following the [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification.
-
-## Conventional Commits Format
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-
-| Type | When to use |
-|------|-------------|
-| `feat` | A new feature (SemVer MINOR) |
-| `fix` | A bug fix (SemVer PATCH) |
-| `build` | Changes to the build system or external dependencies |
-| `chore` | Maintenance tasks that don't modify src or test files |
-| `ci` | Changes to CI configuration files and scripts |
-| `docs` | Documentation-only changes |
-| `style` | Formatting, whitespace, semicolons — no code logic change |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf` | A code change that improves performance |
-| `test` | Adding or correcting tests |
-
-### Breaking changes
-
-Indicate breaking changes (SemVer MAJOR) by either:
-- Adding `!` after the type/scope: `feat(api)!: remove deprecated endpoint`
-- Adding a `BREAKING CHANGE:` footer (must be uppercase)
+> Analyze uncommitted changes in the working directory and generate a commit message following [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Step 1: Gather changes
 
-Run these commands to understand the current state:
-
 ```bash
-# Check what's staged vs unstaged
 git status --short
-
-# Show staged changes (if any)
-git diff --cached --stat
-git diff --cached
-
-# Show unstaged changes (if any)
-git diff --stat
-git diff
-
-# Show untracked files that might be relevant
-git ls-files --others --exclude-standard
-
-# Get recent commit messages for style reference
-git log --oneline -10
+git diff --cached --stat && git diff --cached      # staged
+git diff --stat && git diff                        # unstaged
+git ls-files --others --exclude-standard           # untracked (new files)
+git log --oneline -10                              # house style
 ```
 
-**Important:**
-- If there are **no staged changes and no unstaged changes**, inform the user there is nothing to commit and stop.
-- If there are both staged and unstaged changes, generate the message based on **staged changes only** (what `git commit` would include). Mention that unstaged changes exist but won't be included.
-- If nothing is staged but there are unstaged changes, generate the message for **all unstaged changes** and note that the user will need to stage them first.
+- Nothing staged, unstaged or untracked: tell the user there is nothing to commit and stop.
+- Something staged: base the message on the staged changes only (what `git commit` would include) and mention that unstaged and untracked changes are left out.
+- Nothing staged: base the message on all unstaged changes and untracked files (read the new files) and note that the user has to stage them first (`git add`).
 
 ## Step 2: Analyze the changes
 
-Read the diffs carefully and determine:
+Determine from the diffs (read the surrounding source when the purpose is unclear):
 
-1. **What changed** — which files, functions, or modules were modified, added, or removed.
-2. **Why it changed** — infer the purpose from the diff context, file names, and surrounding code. If the purpose is ambiguous, read the relevant source files for context.
-3. **Scope** — identify if changes are confined to a single module/package/area. If so, use it as the scope. If changes span multiple areas, omit the scope or use the most prominent one.
-4. **Breaking changes** — look for removed public APIs, changed function signatures, renamed exports, deleted files, or config format changes that would break consumers.
-5. **Single or multiple commits** — if the changes clearly address multiple unrelated concerns (e.g., a bug fix AND a new feature), recommend splitting into separate commits and provide a message for each.
+1. **What changed and why.**
+2. **Scope**: the module, package or area the changes are confined to. Omit it, or use the most prominent area, when they span several.
+3. **Breaking changes**: removed public APIs, changed signatures, renamed exports, deleted files, config format changes that break consumers.
+4. **Split**: if the changes address unrelated concerns (e.g. a fix and a feature), recommend separate commits and write a message for each.
 
 ## Step 3: Compose the message
 
-Follow these rules:
-
-- **Description**: Use imperative mood ("add", "fix", "remove", not "added", "fixes", "removed"). Keep it under 72 characters. Do not end with a period. Start with lowercase.
-- **Scope**: Use a noun describing the affected area (e.g., `parser`, `auth`, `cli`, `deps`). Omit if changes are broad.
-- **Body**: Include only if the description alone doesn't convey the full picture. Separate from description with a blank line. Wrap at 72 characters. Explain *what* and *why*, not *how*.
-- **Footer**: Use for breaking changes (`BREAKING CHANGE: ...`), issue references (`Closes #123`), or co-authors.
-- Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer.
-- Match the style and conventions of recent commits in the repository.
+- **Type**: `feat` (new feature, SemVer minor), `fix` (bug fix, patch), `refactor` (neither fixes nor adds), `perf`, `test`, `docs`, `ci`, `build` (build system or external dependencies), `style` (formatting only, no logic change), `chore` (maintenance outside src and test files). Mark a breaking change with `!` after the type/scope, a `BREAKING CHANGE:` footer, or both.
+- **Description**: imperative mood, lowercase start, under 72 characters, no trailing period.
+- **Scope**: a noun for the affected area (`parser`, `auth`, `cli`, `deps`).
+- **Body**: only when the description is not enough. Blank line after the description, wrapped at 72 characters, explains what and why, not how.
+- **Footer**: `BREAKING CHANGE: ...` (uppercase), issue references (`Closes #123`), co-authors.
+- Never add a `Co-Authored-By: Claude ...` or any other AI-attribution trailer.
+- Match the style of the recent commits.
 
 ## Step 4: Present to the user
 
-Present the generated commit message in a fenced code block:
+Show the message in a fenced code block. For a recommended split, show one block per commit with a note on which changes belong to it.
 
-```
-<the generated message>
-```
-
-If you recommended splitting into multiple commits, present each message separately with a brief note on which changes belong to each commit.
-
-Do NOT automatically run `git commit`. The user decides when and how to commit.
+Never run `git commit`; the user decides when and how to commit.
