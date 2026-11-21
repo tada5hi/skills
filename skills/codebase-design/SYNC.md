@@ -1,5 +1,5 @@
 # Sync Info
 
 - **Source:** `vendor/mattpocock-skills/skills/engineering/codebase-design`
-- **Git SHA:** `59db609eb1e18aaf59b63284d0e52255aff0c63c`
-- **Synced:** 2026-10-28
+- **Git SHA:** `abeeaf95660ba9e8b7c753eb38f441ca707a8823`
+- **Synced:** 2026-11-21
