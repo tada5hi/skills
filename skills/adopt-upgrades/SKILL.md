@@ -1,6 +1,6 @@
 ---
 name: adopt-upgrades
-description: Find what new versions of a project's dependencies let it simplify (a new export or option that replaces a local helper, workaround or hand-written check), record each concrete opportunity in one issue per package scope, and adopt an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <scope> features` issue, or when the user asks "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".
+description: Find what new versions of a project's dependencies let it simplify (a new export or option that replaces a local helper, workaround or hand-written check), record each concrete opportunity in one issue per package group (a scope with its root package), and adopt an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <name> features` issue, or when the user asks "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".
 license: Apache-2.0
 compatibility: Requires git, the `gh` CLI (authenticated), Node.js 22+ and npm registry access. The API diff covers npm packages; other ecosystems get the bump without a diff.
 metadata:
@@ -19,21 +19,22 @@ It is the reverse of `track-upstream`. track-upstream records a gap the project 
 
 ## The issues
 
-There is one open issue per package scope, in the repository: `@scope` for a scoped package (every `@chamvi/*` shares one issue), else the package name. The title is `chore: adopt <scope> features` (`chore: adopt @chamvi features`, `chore: adopt zod features`) and the label `upstream-features`, set on create. The maintainer agent of tada5hi/agents-dev writes the same format from its daily sweep, so entries from a session and from the agent share one issue.
+There is one open issue per package group, in the repository. The group is the bare root name: a scoped package's scope without the `@`, else the package name, so a scope and its root package share one issue (`routup` and `@routup/basic` are `routup`, every `@chamvi/*` is `chamvi`, `@types/node` is `types`, `zod` is `zod`). The title is `chore: adopt <name> features` (`chore: adopt routup features`, `chore: adopt chamvi features`, `chore: adopt zod features`) and the label `upstream-features`, set on create. The maintainer agent of tada5hi/agents-dev writes the same format from its daily sweep, so entries from a session and from the agent share one issue.
 
-- **Created only when the scope has at least one entry.** A later bump of the same scope appends a section to its open issue.
+- **Created only when the group has at least one entry.** A later bump of the same group appends a section to its open issue.
 - **Append only.** Add sections at the end; never rewrite, reorder or delete an entry, yours or someone else's. Tick a box only by adopting it or on the user's word.
-- **A ticked box or a closed issue is final.** The owner closes an issue when done with it. A later version of a closed scope opens a new issue for the new range; never reopen the closed one.
+- **A ticked box or a closed issue is final.** The owner closes an issue when done with it. A later version of a closed group opens a new issue for the new range; never reopen the closed one.
 
-The body starts with two marker lines, then this intro, with the scope in a code span:
+The body starts with two marker lines, then this intro. The marker keeps the word `scope`; its value is the group's name, an npm name without `@`:
 
 ```markdown
-<!-- adopt-upgrades:issue scope=@chamvi -->
+<!-- adopt-upgrades:issue scope=chamvi -->
 <!-- adopt-upgrades:checked @chamvi/app@0.9.0 @chamvi/ui@0.9.0 -->
-New versions of `@chamvi` ship features that can replace local code in this repository. Each entry names a feature, a proposal for using it, and the local code it affects; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
+New versions of `@chamvi/*` ship features that can replace local code in this repository. Each entry names a feature, a proposal for using it, and the local code it affects; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
 ```
 
-- The `checked` marker lists `<package>@<version>` for each package of the scope checked so far, sorted by name. Rewrite it on every write; it is the range start of the next check. A package moves to a new version in the marker only once every one of its transitions in the range (one per workspace that moved) is checked, at the highest `to` among them.
+- The intro names what the issue covers, in code spans, from the packages it has sections for (those in the `checked` marker and those of the new sections): `` `routup` and `@routup/*` `` with both the root package and scoped ones, `` `@chamvi/*` `` with scoped ones only, `` `zod` `` with the root package only. The text after the names never changes. On each write, rewrite the intro with the marker lines while it is the line right after them and reads exactly as one of these forms; one a person edited stays as it is.
+- The `checked` marker lists `<package>@<version>` for each package of the group checked so far, sorted by name. Rewrite it on every write; it is the range start of the next check. A package moves to a new version in the marker only once every one of its transitions in the range (one per workspace that moved) is checked, at the highest `to` among them.
 - Each bump is one section, its heading linking the npmdiff of the range (the package URL-encoded: `encodeURIComponent`), the package name in a code span:
 
 ```markdown
@@ -83,7 +84,7 @@ The stale block never ticks or edits an entry; the reason is `` `<path>` no long
 
 Use the range the user names. Otherwise:
 - After a manual upgrade in this session, use the packages it upgraded.
-- Otherwise list the bumps from the latest release tag (`git describe --tags --abbrev=0`) with the script below. Then, per package, the range starts at the version in the `checked` marker of its scope's open issue (or, with none open, its most recent closed one), when the marker lists it; else at the row's `from`. Skip a package whose checked version is its `to`. A package a marker lists that moved before the tag counts too: compare its checked version with the one in the remote head's lockfile (`git show origin/<default branch>:package-lock.json`). Ticking a box or editing the issue does not move the marker, so an edit never hides a bump.
+- Otherwise list the bumps from the latest release tag (`git describe --tags --abbrev=0`) with the script below. Then, per package, the range starts at the version in the `checked` marker of its group's open issue (or, with none open, its most recent closed one), when the marker lists it; else at the row's `from`. Skip a package whose checked version is its `to`. A package a marker lists that moved before the tag counts too: compare its checked version with the one in the remote head's lockfile (`git show origin/<default branch>:package-lock.json`). Ticking a box or editing the issue does not move the marker, so an edit never hides a bump.
 
 Check the range up to the default branch as it is on the remote (`git fetch origin`), not up to a local feature branch.
 
@@ -99,7 +100,7 @@ It refuses a lockfile v1 or a non-npm lockfile. A dependency added or removed in
 
 Keep `major`, `minor` and `unknown`. A transition into or out of a prerelease (`2.0.0-beta.1` to `2.0.0-beta.2`) is `unknown`, never `patch`. Drop `patch` unless the user asks: patches rarely add API. For other ecosystems, read the manifest and lockfile diff (`git diff <ref> -- <lockfile>`) and list the direct dependencies by hand.
 
-With more than 10 bumps, check them in batches of 10, most severe first, all in the same session: a session keeps no progress outside the issues, and a scope with no entries gets no issue to hold a marker. Stop early only when the user says so; then tell them which bumps are left, and that the next check starts from the same range for those packages.
+With more than 10 bumps, check them in batches of 10, most severe first, all in the same session: a session keeps no progress outside the issues, and a group with no entries gets no issue to hold a marker. Stop early only when the user says so; then tell them which bumps are left, and that the next check starts from the same range for those packages.
 
 ### 2. Diff each bump's API
 
@@ -133,11 +134,11 @@ A match is an entry only when you can name local code (up to 5 places, plus a se
 
 ### 4. Record
 
-Record per scope: group the entries by scope, one section per bump, in that scope's issue.
+Record per group: group the entries by their group's name, one section per bump, in that group's issue (`routup` and `@routup/basic` bumps are two sections of one issue).
 
-1. Find the scope's issue: `gh issue list --state all --search "chore: adopt <scope> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- adopt-upgrades:issue scope=<scope> -->`, authored by the bot or the owner. GitHub search does not index HTML comments, so search by title and check the marker. Only an open one takes new sections; a closed one only gives its `checked` marker.
-2. Show the user the new sections and the new `checked` marker first, and, before the first create in the repository, that the `upstream-features` label will be created if it is missing (`gh label list --search upstream-features --json name`). Create or edit only after they say go. Create a missing label with `gh label create upstream-features --description "Features a new dependency version offers" --color 2f6f4f`. Edit with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost: rewrite the marker lines, keep everything after them byte for byte, append the sections, then the done line and the stale block. Create with `gh issue create --title "chore: adopt <scope> features" --label upstream-features --body-file <file>`.
-3. With no entries for a scope, create nothing. With an open issue, offer to update only its `checked` marker, so the next check does not repeat the same bumps. Without an open issue nothing records that the scope was checked: say so in the report, and the next check repeats those bumps.
+1. Find the group's issue: `gh issue list --state all --search "chore: adopt <name> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- adopt-upgrades:issue scope=<name> -->`, authored by the bot or the owner. GitHub search does not index HTML comments, so search by title and check the marker. Only an open one takes new sections; a closed one only gives its `checked` marker.
+2. Show the user the new sections and the new `checked` marker first, and, before the first create in the repository, that the `upstream-features` label will be created if it is missing (`gh label list --search upstream-features --json name`). Create or edit only after they say go. Create a missing label with `gh label create upstream-features --description "Features a new dependency version offers" --color 2f6f4f`. Edit with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost: rewrite the marker lines and the intro (when it is unedited), keep everything after them byte for byte, append the sections, then the done line and the stale block. Create with `gh issue create --title "chore: adopt <name> features" --label upstream-features --body-file <file>`.
+3. With no entries for a group, create nothing. With an open issue, offer to update only its `checked` marker, so the next check does not repeat the same bumps. Without an open issue nothing records that the group was checked: say so in the report, and the next check repeats those bumps.
 
 ## Mode 2: adopt an entry
 
@@ -159,7 +160,7 @@ If the user declines an entry, tick it with a short reason appended to its box l
 | Trusting the release notes for a name | A name counts only when the published types export it |
 | Listing every new export | Only exports the code has a local stand-in for |
 | Diffing the changelog only | Diff the published packages; options and subpaths hide there |
-| A second open issue for the same scope | Search by title and check the `scope=` marker; append a section |
+| A second open issue for the same group, or one for `routup` and another for `@routup/*` | Search by title and check the `scope=` marker; append a section |
 | Reopening or appending to a closed issue | A closed issue is final; a later version opens a new one |
 | A package name such as `@scope/name` outside a code span | GitHub reads it as a team mention; always a code span |
 | A key with the path in it | `<package>\|<api id>` only, one key per feature |
