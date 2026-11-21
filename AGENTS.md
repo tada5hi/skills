@@ -33,7 +33,7 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 
 | Skill | Type | Description |
 |-------|------|-------------|
-| [adopt-upgrades](skills/adopt-upgrades/) | Manual | Find what new dependency versions let a project simplify, track it in one issue per repository, adopt on request |
+| [adopt-upgrades](skills/adopt-upgrades/) | Manual | Find what new dependency versions let a project simplify, track it in one issue per package scope, adopt on request |
 | [audit-type-boundaries](skills/audit-type-boundaries/) | Manual | Audit type boundary mismatches from casts and utility calls in TypeScript |
 | [create-pull-request](skills/create-pull-request/) | Manual | Open a pull request with a Conventional Commits title and evidence-based body, then await review and checks |
 | [generate-commit-message](skills/generate-commit-message/) | Manual | Generate a Conventional Commits message for uncommitted changes |
