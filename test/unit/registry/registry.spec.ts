@@ -10,9 +10,9 @@ describe('registry', () => {
         it('should include all manual skills', () => {
             const expected = getExpectedSkillNames();
 
-            expect(expected.has('init-agent-docs')).toBe(true);
-            expect(expected.has('update-agent-docs')).toBe(true);
-            expect(expected.has('link-skills')).toBe(true);
+            expect(expected.has('agent-docs-init')).toBe(true);
+            expect(expected.has('agent-docs-update')).toBe(true);
+            expect(expected.has('skills-link')).toBe(true);
         });
 
         it('should return a Set', () => {
@@ -45,9 +45,9 @@ describe('registry', () => {
         it('should return existing skill directory names', () => {
             const names = getExistingSkillNames();
 
-            expect(names).toContain('init-agent-docs');
-            expect(names).toContain('update-agent-docs');
-            expect(names).toContain('link-skills');
+            expect(names).toContain('agent-docs-init');
+            expect(names).toContain('agent-docs-update');
+            expect(names).toContain('skills-link');
         });
 
         it('should return an array of strings', () => {

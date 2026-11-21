@@ -51,7 +51,7 @@ npx skills add tada5hi/skills --skill='prd-to-plan'
 
 ## Requirements
 
-- A PRD, pasted into the conversation or in a file. [write-a-prd](../write-a-prd/) produces one with the numbered user stories this skill maps to phases.
+- A PRD, pasted into the conversation or in a file. [prd-write](../prd-write/) produces one with the numbered user stories this skill maps to phases.
 
 ## Output
 

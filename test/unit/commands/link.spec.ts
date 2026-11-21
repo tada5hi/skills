@@ -20,7 +20,7 @@ describe('commands/link', () => {
     it('should link all skills that have SKILL.md', () => {
         cmdLink();
 
-        const expected = ['init-agent-docs', 'update-agent-docs', 'link-skills'];
+        const expected = ['agent-docs-init', 'agent-docs-update', 'skills-link'];
 
         for (const name of expected) {
             const skillMd = join(targetDir, name, 'SKILL.md');
@@ -36,7 +36,7 @@ describe('commands/link', () => {
     });
 
     describe('with a removed link', () => {
-        const testSkill = 'link-skills';
+        const testSkill = 'skills-link';
         const testTarget = join(targetDir, testSkill);
 
         beforeEach(() => {

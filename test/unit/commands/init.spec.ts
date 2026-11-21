@@ -9,7 +9,7 @@ import { cmdInit } from '../../../src/commands/init.ts';
 
 // Mock meta.ts to test with fake vendor config
 vi.mock('../../../src/meta.ts', () => ({
-    manual: ['init-agent-docs', 'update-agent-docs', 'link-skills'],
+    manual: ['agent-docs-init', 'agent-docs-update', 'skills-link'],
     vendors: {},
 }));
 

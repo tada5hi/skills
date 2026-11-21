@@ -50,7 +50,7 @@ npx skills add tada5hi/skills --skill='prd-to-issues'
 ## Requirements
 
 - An authenticated `gh` CLI with permission to create issues in the repository.
-- A PRD filed as a GitHub issue, for example by [write-a-prd](../write-a-prd/).
+- A PRD filed as a GitHub issue, for example by [prd-write](../prd-write/).
 
 ## Output
 

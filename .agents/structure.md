@@ -18,7 +18,7 @@ skills/
 │       ├── cleanup.ts                 # Remove stale entries
 │       └── link.ts                    # Create .claude/skills/ links
 ├── skills/                            # Skill definitions (the core content)
-│   ├── init-agent-docs/               # Skill: scaffold agent documentation
+│   ├── agent-docs-init/               # Skill: scaffold agent documentation
 │   │   ├── SKILL.md                   # Skill definition & instructions
 │   │   └── templates/                 # Template files for generation
 │   │       ├── CLAUDE.md              # Root manifest template
@@ -28,9 +28,9 @@ skills/
 │   │           ├── architecture.md    # Architecture patterns template
 │   │           ├── testing.md         # Testing setup template
 │   │           └── conventions.md     # Code conventions template
-│   ├── update-agent-docs/             # Skill: propose template improvements via PR
+│   ├── agent-docs-update/             # Skill: propose template improvements via PR
 │   │   └── SKILL.md                   # Skill definition & instructions
-│   └── link-skills/                   # Skill: link skills/ into .claude/skills/ for discovery
+│   └── skills-link/                   # Skill: link skills/ into .claude/skills/ for discovery
 │       └── SKILL.md                   # Skill definition & instructions
 ├── test/
 │   ├── vitest.config.ts               # Vitest configuration
@@ -68,7 +68,7 @@ Every skill lives under `skills/<skill-id>/` and contains:
 
 ```yaml
 ---
-name: <skill-id>              # Must match directory name. Use {verb}-{noun} pattern (e.g., init-agent-docs).
+name: <skill-id>              # Must match directory name. Use {noun}-{verb} pattern (e.g., agent-docs-init).
 description: <description>    # What it does + when to use it. Front-load trigger phrases.
 license: Apache-2.0
 compatibility: <requirements>
@@ -98,10 +98,10 @@ allowed-tools: <tool-list>    # Space-delimited list of pre-approved tools.
 | `src/registry.ts` | Resolves expected skill names from meta.ts |
 | `src/submodule.ts` | Git submodule operations (add, remove, query) |
 | `src/utils.ts` | Shared helpers: shell exec, logging, path constants |
-| `skills/init-agent-docs/SKILL.md` | Instructions for agents to analyze a project and generate tailored documentation |
-| `skills/init-agent-docs/templates/` | Markdown templates with placeholders for CLAUDE.md, AGENTS.md, and .agents/ guides |
-| `skills/update-agent-docs/SKILL.md` | Instructions for agents to compare project docs against templates and propose improvements via PR |
-| `skills/link-skills/SKILL.md` | Instructions for agents to link `skills/` into `.claude/skills/` for Claude Code discovery |
+| `skills/agent-docs-init/SKILL.md` | Instructions for agents to analyze a project and generate tailored documentation |
+| `skills/agent-docs-init/templates/` | Markdown templates with placeholders for CLAUDE.md, AGENTS.md, and .agents/ guides |
+| `skills/agent-docs-update/SKILL.md` | Instructions for agents to compare project docs against templates and propose improvements via PR |
+| `skills/skills-link/SKILL.md` | Instructions for agents to link `skills/` into `.claude/skills/` for Claude Code discovery |
 
 ## Separation of Concerns
 

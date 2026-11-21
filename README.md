@@ -59,10 +59,10 @@ codex plugin marketplace add tada5hi/skills
 codex plugin add skills@tada5hi
 ```
 
-Then ask for the task, for example "write a commit message for my changes", and the agent picks up `generate-commit-message`.
+Then ask for the task, for example "write a commit message for my changes", and the agent picks up `commit-message-generate`.
 
 <p align="center">
-    <img src="./.github/assets/architecture.svg" alt="The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example &quot;write a commit message for my changes&quot; matching generate-commit-message, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them." width="100%" />
+    <img src="./.github/assets/architecture.svg" alt="The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example &quot;write a commit message for my changes&quot; matching commit-message-generate, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them." width="100%" />
 </p>
 
 **Table of Contents**
@@ -86,7 +86,7 @@ The [skills CLI](https://github.com/vercel-labs/skills) installs into any agent 
 npx skills add tada5hi/skills --skill='*'
 
 # Install a specific skill
-npx skills add tada5hi/skills --skill='init-agent-docs'
+npx skills add tada5hi/skills --skill='agent-docs-init'
 
 # Install globally (available across all projects)
 npx skills add tada5hi/skills --skill='*' -g
@@ -122,44 +122,44 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 
 | Skill | Use it to |
 |---|---|
-| [init-agent-docs](skills/init-agent-docs/) | Scaffold `CLAUDE.md`, `AGENTS.md` and `.agents/*.md` for a repository |
-| [update-agent-docs](skills/update-agent-docs/) | Propose improvements to the `init-agent-docs` templates back to this repository |
-| [migrate-agent-docs](skills/migrate-agent-docs/) | Move an existing project's oversized agent docs into on-demand topic files with lint-enforced size limits |
-| [write-readme](skills/write-readme/) | Write a hero-led README with a "Why …?" section, theme-aware SVGs and verified samples |
-| [write-release-notes](skills/write-release-notes/) | Write highlights-first GitHub release notes above the generated changelog |
-| [generate-commit-message](skills/generate-commit-message/) | Generate a Conventional Commits message for uncommitted changes |
-| [redesign-vitepress-site](skills/redesign-vitepress-site/) | Turn a default-looking VitePress site into a hero-led site with design tokens, landing sections and restyled chrome |
+| [agent-docs-init](skills/agent-docs-init/) | Scaffold `CLAUDE.md`, `AGENTS.md` and `.agents/*.md` for a repository |
+| [agent-docs-update](skills/agent-docs-update/) | Propose improvements to the `agent-docs-init` templates back to this repository |
+| [agent-docs-migrate](skills/agent-docs-migrate/) | Move an existing project's oversized agent docs into on-demand topic files with lint-enforced size limits |
+| [readme-write](skills/readme-write/) | Write a hero-led README with a "Why …?" section, theme-aware SVGs and verified samples |
+| [release-notes-write](skills/release-notes-write/) | Write highlights-first GitHub release notes above the generated changelog |
+| [commit-message-generate](skills/commit-message-generate/) | Generate a Conventional Commits message for uncommitted changes |
+| [vitepress-site-redesign](skills/vitepress-site-redesign/) | Turn a default-looking VitePress site into a hero-led site with design tokens, landing sections and restyled chrome |
 
 ### Planning
 
 | Skill | Use it to |
 |---|---|
-| [write-a-prd](skills/write-a-prd/) | Write a PRD through an interview and codebase exploration, filed as a GitHub issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [prd-write](skills/prd-write/) | Write a PRD through an interview and codebase exploration, filed as a GitHub issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [prd-to-plan](skills/prd-to-plan/) | Turn a PRD into a multi-phase plan in `./plans/` (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [prd-to-issues](skills/prd-to-issues/) | Break a PRD into independently grabbable GitHub issues (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [request-refactor-plan](skills/request-refactor-plan/) | Plan a refactor as tiny commits and file it as an issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [refactor-plan-request](skills/refactor-plan-request/) | Plan a refactor as tiny commits and file it as an issue (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [grilling](skills/grilling/) | Get interviewed about a plan until every branch of the decision tree is resolved (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [grill-me](skills/grill-me/) | Start a `grilling` session on demand (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [plan-status](skills/plan-status/) | Report progress on a plan file against the current codebase |
+| [plan-status-report](skills/plan-status-report/) | Report progress on a plan file against the current codebase |
 
 ### Development workflow
 
 | Skill | Use it to |
 |---|---|
 | [tdd](skills/tdd/) | Build features or fix bugs with red-green-refactor loops (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [triage-issue](skills/triage-issue/) | Find a bug's root cause and file an issue with a TDD fix plan (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
-| [create-pull-request](skills/create-pull-request/) | Open a pull request from the current branch with a Conventional Commits title and an evidence-based body, then await review and checks and investigate the feedback |
-| [investigate-pr-comments](skills/investigate-pr-comments/) | Check each PR review comment against the code and fix the real issues |
-| [release-please-version-bump](skills/release-please-version-bump/) | Give packages behind a linked release-please group a no-op `fix:` commit so they all release at the same version |
+| [issue-triage](skills/issue-triage/) | Find a bug's root cause and file an issue with a TDD fix plan (frozen copy from [mattpocock/skills](https://github.com/mattpocock/skills)) |
+| [pr-create](skills/pr-create/) | Open a pull request from the current branch with a Conventional Commits title and an evidence-based body, then await review and checks and investigate the feedback |
+| [pr-comments-investigate](skills/pr-comments-investigate/) | Check each PR review comment against the code and fix the real issues |
+| [release-versions-align](skills/release-versions-align/) | Give packages behind a linked release-please group a no-op `fix:` commit so they all release at the same version |
 | [ponytail](skills/ponytail/) | Force the smallest solution that works: YAGNI, standard library first (*vendor*, [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)) |
 
 ### Code analysis
 
 | Skill | Use it to |
 |---|---|
-| [audit-type-boundaries](skills/audit-type-boundaries/) | Find `as` casts and utility calls that hide property name mismatches in TypeScript |
+| [type-boundaries-audit](skills/type-boundaries-audit/) | Find `as` casts and utility calls that hide property name mismatches in TypeScript |
 | [security-audit](skills/security-audit/) | Audit trust boundaries with coverage-led hunting, independent validation and source-grounded reports (*vendor*, [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)) |
-| [impact-analysis](skills/impact-analysis/) | Trace every consumer of a type, function or constant across a TypeScript monorepo |
+| [impact-analyze](skills/impact-analyze/) | Trace every consumer of a type, function or constant across a TypeScript monorepo |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Find deepening opportunities, present them as an HTML report, then grill through the one you pick (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [codebase-design](skills/codebase-design/) | Shared vocabulary for deep modules, seams and interfaces, used by `tdd` and `improve-codebase-architecture` (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 
@@ -167,13 +167,13 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 
 | Skill | Use it to |
 |---|---|
-| [init-ts-project](skills/init-ts-project/) | Scaffold a TypeScript project from [`tada5hi/typescript-template`](https://github.com/tada5hi/typescript-template) |
-| [query-api](skills/query-api/) | Query a live HTTP API from a base URL and credentials, using OpenAPI or rapiq conventions |
-| [query-package-list](skills/query-package-list/) | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
-| [refresh-package-list](skills/refresh-package-list/) | Sync the awesome-style package list with GitHub and npm, then open a PR |
-| [adopt-upgrades](skills/adopt-upgrades/) | Find what new versions of your dependencies let you simplify, record each opportunity in one tracking issue per repository, and adopt it on request |
-| [track-upstream](skills/track-upstream/) | Track the upstream issues a project waits on in your own libraries, in one tracking issue per project, and adopt each fix once it is released |
-| [link-skills](skills/link-skills/) | Link `skills/` into `.claude/skills/` so Claude Code discovers them locally |
+| [ts-project-init](skills/ts-project-init/) | Scaffold a TypeScript project from [`tada5hi/typescript-template`](https://github.com/tada5hi/typescript-template) |
+| [api-query](skills/api-query/) | Query a live HTTP API from a base URL and credentials, using OpenAPI or rapiq conventions |
+| [package-list-query](skills/package-list-query/) | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
+| [package-list-refresh](skills/package-list-refresh/) | Sync the awesome-style package list with GitHub and npm, then open a PR |
+| [upstream-features-adopt](skills/upstream-features-adopt/) | Find what new versions of your dependencies let you simplify, record each opportunity in one tracking issue per repository, and adopt it on request |
+| [upstream-fixes-track](skills/upstream-fixes-track/) | Track the upstream issues a project waits on in your own libraries, in one tracking issue per project, and adopt each fix once it is released |
+| [skills-link](skills/skills-link/) | Link `skills/` into `.claude/skills/` so Claude Code discovers them locally |
 
 ## CLI Manager
 
@@ -241,9 +241,9 @@ npm run skills:sync    # Pull the latest and re-sync
 
 ## Adding New Skills
 
-1. Create a directory under `skills/` named after the skill, following the `{verb}-{noun}` pattern
+1. Create a directory under `skills/` named after the skill, following the `{noun}-{verb}` pattern (`agent-docs-init`, `package-list-query`)
 2. Add a `SKILL.md` with YAML frontmatter (`name` matching the directory, `description`) and the instructions
-3. Add a `README.md` for people: what the skill does, how to install it, the phrases and `/<name>` command that trigger it, what it changes, and its limits. Use [`generate-commit-message`](skills/generate-commit-message/README.md) as the model
+3. Add a `README.md` for people: what the skill does, how to install it, the phrases and `/<name>` command that trigger it, what it changes, and its limits. Use [`commit-message-generate`](skills/commit-message-generate/README.md) as the model
 4. Add the name to the `manual` array in `src/meta.ts`
 5. Run `npm run skills:link` to register it with Claude Code
 6. Add it to the [skills tables](#skills) above
@@ -286,6 +286,7 @@ skills/
 - **Vendor skills are overwritten on every sync.** `skills:sync` deletes and re-copies each declared vendor skill directory. Local edits to a vendor skill are lost; change it upstream or turn it into a manual skill.
 - **`skills:cleanup` deletes.** Any directory under `skills/` that is not declared in `src/meta.ts` is removed, together with undeclared submodules. Register a new skill before running it.
 - **`skills:link` skips existing entries.** A `.claude/skills/<name>` that already contains a `SKILL.md` is left as it is, even when it is a copy rather than a link.
+- **Skill names are noun-first.** Related skills share a prefix (`agent-docs-*`, `package-list-*`, `upstream-*`, `pr-*`, `prd-*`). Earlier versions used verb-first names: `init-agent-docs` is now `agent-docs-init`, `create-pull-request` is now `pr-create`, `adopt-upgrades` is now `upstream-features-adopt`, `track-upstream` is now `upstream-fixes-track`.
 - **The plugin tracks `master`.** It has no pinned version, so an update brings in whatever `master` holds, including skill changes you have not reviewed.
 
 ## License

@@ -1,6 +1,6 @@
 <svg width="960" height="380" viewBox="0 0 960 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ska-title ska-desc">
     <title id="ska-title">How an agent picks and loads a skill</title>
-    <desc id="ska-desc">The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example "write a commit message for my changes" matching generate-commit-message, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them.</desc>
+    <desc id="ska-desc">The agent keeps only the frontmatter of every installed skill loaded: its name and description. When your request matches a description, for example "write a commit message for my changes" matching commit-message-generate, the agent loads that skill's full SKILL.md. Files in references/ and scripts/ are read only when a step of the skill needs them.</desc>
 
     <style>
         :root {
@@ -54,17 +54,17 @@
     <text class="label" x="316" y="44">always loaded: frontmatter</text>
 
     <rect class="card" x="316" y="60" width="280" height="36" rx="10"/>
-    <text class="code muted" x="332" y="83" font-size="12">name: write-readme</text>
+    <text class="code muted" x="332" y="83" font-size="12">name: readme-write</text>
 
     <rect x="316" y="106" width="280" height="64" rx="10" fill="#16A34A" fill-opacity="0.1" stroke="#16A34A" stroke-width="1.5"/>
-    <text class="code" x="332" y="131" font-size="12">name: generate-commit-message</text>
+    <text class="code" x="332" y="131" font-size="12">name: commit-message-generate</text>
     <text class="code muted" x="332" y="153" font-size="11">description: Generate a Conventional…</text>
 
     <rect class="card" x="316" y="180" width="280" height="36" rx="10"/>
     <text class="code muted" x="332" y="203" font-size="12">name: tdd</text>
 
     <rect class="card" x="316" y="226" width="280" height="36" rx="10"/>
-    <text class="code muted" x="332" y="249" font-size="12">name: plan-status</text>
+    <text class="code muted" x="332" y="249" font-size="12">name: plan-status-report</text>
 
     <text class="muted" x="316" y="284" font-size="12">one entry per installed skill</text>
 
@@ -75,7 +75,7 @@
     <rect class="card" x="676" y="60" width="248" height="224" rx="12" stroke="#16A34A" stroke-width="1.5"/>
     <rect x="676" y="60" width="248" height="34" rx="12" fill="#16A34A" fill-opacity="0.12"/>
     <text class="code" x="692" y="82" font-size="12">SKILL.md</text>
-    <text class="code" x="692" y="118" font-size="12"># generate-commit-message</text>
+    <text class="code" x="692" y="118" font-size="12"># commit-message-generate</text>
     <rect class="skel" x="692" y="132" width="200" height="7" rx="3.5"/>
     <rect class="skel" x="692" y="146" width="170" height="7" rx="3.5"/>
     <rect class="skel" x="692" y="160" width="186" height="7" rx="3.5"/>

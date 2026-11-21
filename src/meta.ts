@@ -5,36 +5,37 @@ import type { IVendorSkillMeta } from './types.ts';
  * Hand-maintained skills authored in this repository.
  * Each entry must match a directory under `skills/`.
  *
- * prd-to-issues, prd-to-plan, request-refactor-plan, triage-issue and write-a-prd are
- * frozen copies of mattpocock/skills@fb3629d (MIT, see their LICENSE.md). Upstream removed
+ * prd-to-issues, prd-to-plan, refactor-plan-request, issue-triage and prd-write are
+ * frozen copies of mattpocock/skills@fb3629d (MIT, see their LICENSE.md), the last three
+ * renamed from request-refactor-plan, triage-issue and write-a-prd. Upstream removed
  * them; its successors need an issue tracker set up through /setup-matt-pocock-skills.
  */
 export const manual: string[] = [
-    'adopt-upgrades',
-    'audit-type-boundaries',
-    'create-pull-request',
-    'generate-commit-message',
-    'impact-analysis',
-    'init-agent-docs',
-    'init-ts-project',
-    'investigate-pr-comments',
-    'link-skills',
-    'migrate-agent-docs',
-    'plan-status',
+    'agent-docs-init',
+    'agent-docs-migrate',
+    'agent-docs-update',
+    'api-query',
+    'commit-message-generate',
+    'impact-analyze',
+    'issue-triage',
+    'package-list-query',
+    'package-list-refresh',
+    'plan-status-report',
+    'pr-comments-investigate',
+    'pr-create',
     'prd-to-issues',
     'prd-to-plan',
-    'query-api',
-    'query-package-list',
-    'redesign-vitepress-site',
-    'refresh-package-list',
-    'release-please-version-bump',
-    'request-refactor-plan',
-    'track-upstream',
-    'triage-issue',
-    'update-agent-docs',
-    'write-a-prd',
-    'write-readme',
-    'write-release-notes',
+    'prd-write',
+    'readme-write',
+    'refactor-plan-request',
+    'release-notes-write',
+    'release-versions-align',
+    'skills-link',
+    'ts-project-init',
+    'type-boundaries-audit',
+    'upstream-features-adopt',
+    'upstream-fixes-track',
+    'vitepress-site-redesign',
 ];
 
 /**

@@ -17,7 +17,7 @@ const mockExistsSync = vi.fn();
 const mockVendors: Record<string, IVendorSkillMeta> = {};
 
 vi.mock('../../../src/meta.ts', () => ({
-    manual: ['init-agent-docs', 'update-agent-docs', 'link-skills'],
+    manual: ['agent-docs-init', 'agent-docs-update', 'skills-link'],
     get vendors() {
         return mockVendors;
     },

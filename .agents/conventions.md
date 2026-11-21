@@ -11,7 +11,7 @@
 ## Workflow
 
 - After making changes, run `npm run lint` to check for issues.
-- When adding a new manual skill: create `skills/<skill-id>/SKILL.md` and a `README.md` modelled on `skills/generate-commit-message/README.md`, add the name to the `manual` array in `src/meta.ts`, then run `/link-skills` to register it with Claude Code.
+- When adding a new manual skill: create `skills/<skill-id>/SKILL.md` and a `README.md` modelled on `skills/commit-message-generate/README.md`, add the name to the `manual` array in `src/meta.ts`, then run `/skills-link` to register it with Claude Code.
 - When adding a vendor skill: add the entry to `vendors` in `src/meta.ts`, then run `npm run skills:init` and `npm run skills:sync`.
 - Templates must use `{{placeholder}}` syntax for project-specific values — never hardcode project details.
 - Keep templates generic: project-specific content should always be expressed as placeholders with guiding HTML comments.
@@ -28,19 +28,21 @@
 
 ## Skill Naming
 
-Skill names follow a **`{verb}-{noun}`** pattern using lowercase letters and hyphens only:
+Skill names follow a **`{noun}(-{subnoun}…)-{verb}`** pattern using lowercase letters and hyphens only, so related skills sort next to each other:
 
-- `init-agent-docs` — verb: init, noun: agent-docs
-- `update-agent-docs` — verb: update, noun: agent-docs
+- `agent-docs-init` — noun: agent-docs, verb: init
+- `upstream-fixes-track` — noun: upstream, subnoun: fixes, verb: track
+- `prd-to-plan` — a conversion is named `{source}-to-{target}`
 
 Rules:
 - **No `-skill` suffix.** The directory is already under `skills/` — adding `-skill` is redundant.
 - **Directory name = `name` field.** The `name` in SKILL.md frontmatter must exactly match the directory name.
-- **H1 title = `name` field.** The `# heading` in SKILL.md must match the `name` field exactly (e.g., `# init-agent-docs`), not Title Case.
+- **H1 title = `name` field.** The `# heading` in SKILL.md must match the `name` field exactly (e.g., `# agent-docs-init`), not Title Case.
+- **Vendor skills keep their upstream names.** Their content calls other vendor skills by those names, and a sync overwrites local edits.
 - **No leading/trailing/consecutive hyphens.** Only `a-z`, `0-9`, and single `-` separators.
 - **Max 64 characters** (agentskills.io spec constraint).
 
-When skills share a noun (e.g., `agent-docs`), they form a logical group distinguished by their verb (`init-`, `update-`, `validate-`, etc.).
+When skills share a noun (e.g., `agent-docs`, `package-list`, `upstream`, `pr`, `prd`), they form a logical group distinguished by their verb (`-init`, `-update`, `-migrate`, etc.).
 
 ## File Organization
 

@@ -33,38 +33,38 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 
 | Skill | Type | Description |
 |-------|------|-------------|
-| [adopt-upgrades](skills/adopt-upgrades/) | Manual | Find what new dependency versions let a project simplify, track it in one issue per package scope, adopt on request |
-| [audit-type-boundaries](skills/audit-type-boundaries/) | Manual | Audit type boundary mismatches from casts and utility calls in TypeScript |
-| [create-pull-request](skills/create-pull-request/) | Manual | Open a pull request with a Conventional Commits title and evidence-based body, then await review and checks |
-| [generate-commit-message](skills/generate-commit-message/) | Manual | Generate a Conventional Commits message for uncommitted changes |
-| [impact-analysis](skills/impact-analysis/) | Manual | Cross-package impact analysis for TypeScript monorepo symbols |
-| [init-agent-docs](skills/init-agent-docs/) | Manual | Initialize a project with structured AI agent documentation |
-| [init-ts-project](skills/init-ts-project/) | Manual | Scaffold a new TypeScript project from `tada5hi/typescript-template` |
-| [investigate-pr-comments](skills/investigate-pr-comments/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
-| [link-skills](skills/link-skills/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
-| [migrate-agent-docs](skills/migrate-agent-docs/) | Manual | Move oversized agent docs into on-demand topic files and lint-enforced limits |
-| [plan-status](skills/plan-status/) | Manual | Read plan files and report progress against codebase state |
-| [query-api](skills/query-api/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
-| [query-package-list](skills/query-package-list/) | Manual | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
-| [redesign-vitepress-site](skills/redesign-vitepress-site/) | Manual | Turn a default-looking VitePress site into a hero-led site with tokens, sections and restyled chrome |
-| [refresh-package-list](skills/refresh-package-list/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
-| [release-please-version-bump](skills/release-please-version-bump/) | Manual | Align a linked release-please group by touching only the packages behind the group version |
-| [track-upstream](skills/track-upstream/) | Manual | Track upstream issues of your own libraries in one tracking issue per project, adopt fixes once released |
-| [update-agent-docs](skills/update-agent-docs/) | Manual | Propose template improvements back to this repository via PR |
-| [write-readme](skills/write-readme/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
-| [write-release-notes](skills/write-release-notes/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
-| [security-audit](skills/security-audit/) | Vendor | Source-first security audits with coverage-led hunting and independent validation |
+| [agent-docs-init](skills/agent-docs-init/) | Manual | Initialize a project with structured AI agent documentation |
+| [agent-docs-migrate](skills/agent-docs-migrate/) | Manual | Move oversized agent docs into on-demand topic files and lint-enforced limits |
+| [agent-docs-update](skills/agent-docs-update/) | Manual | Propose template improvements back to this repository via PR |
+| [api-query](skills/api-query/) | Manual | Query a live HTTP API from a base URL + credentials via OpenAPI or rapiq conventions |
+| [commit-message-generate](skills/commit-message-generate/) | Manual | Generate a Conventional Commits message for uncommitted changes |
+| [impact-analyze](skills/impact-analyze/) | Manual | Cross-package impact analysis for TypeScript monorepo symbols |
+| [issue-triage](skills/issue-triage/) | Manual (frozen) | Investigate bugs, identify root causes, and file issues with fix plans |
+| [package-list-query](skills/package-list-query/) | Manual | Look up your own published packages in an awesome-style list before writing, porting or planning code, and audit diffs for duplicates |
+| [package-list-refresh](skills/package-list-refresh/) | Manual | Sync the awesome-style package list with GitHub and npm, then open a PR |
+| [plan-status-report](skills/plan-status-report/) | Manual | Read plan files and report progress against codebase state |
+| [pr-comments-investigate](skills/pr-comments-investigate/) | Manual | Fetch PR review comments, investigate against codebase, and fix real issues |
+| [pr-create](skills/pr-create/) | Manual | Open a pull request with a Conventional Commits title and evidence-based body, then await review and checks |
+| [prd-to-issues](skills/prd-to-issues/) | Manual (frozen) | Break PRDs into independently-grabbable GitHub issues |
+| [prd-to-plan](skills/prd-to-plan/) | Manual (frozen) | Convert PRDs into multi-phase implementation plans |
+| [prd-write](skills/prd-write/) | Manual (frozen) | Create a PRD through interactive interview and codebase exploration |
+| [readme-write](skills/readme-write/) | Manual | Write a hero-led README with a "Why …?" section, theme-aware SVG logo and diagrams, verified samples |
+| [refactor-plan-request](skills/refactor-plan-request/) | Manual (frozen) | Create detailed refactor plans with tiny commits via user interview |
+| [release-notes-write](skills/release-notes-write/) | Manual | Write highlights-first GitHub release notes above the generated changelog |
+| [release-versions-align](skills/release-versions-align/) | Manual | Align a linked release-please group by touching only the packages behind the group version |
+| [skills-link](skills/skills-link/) | Manual | Link skills into `.claude/skills/` for Claude Code discovery |
+| [ts-project-init](skills/ts-project-init/) | Manual | Scaffold a new TypeScript project from `tada5hi/typescript-template` |
+| [type-boundaries-audit](skills/type-boundaries-audit/) | Manual | Audit type boundary mismatches from casts and utility calls in TypeScript |
+| [upstream-features-adopt](skills/upstream-features-adopt/) | Manual | Find what new dependency versions let a project simplify, track it in one issue per package scope, adopt on request |
+| [upstream-fixes-track](skills/upstream-fixes-track/) | Manual | Track upstream issues of your own libraries in one tracking issue per project, adopt fixes once released |
+| [vitepress-site-redesign](skills/vitepress-site-redesign/) | Manual | Turn a default-looking VitePress site into a hero-led site with tokens, sections and restyled chrome |
 | [codebase-design](skills/codebase-design/) | Vendor | Shared deep-module vocabulary used by tdd and improve-codebase-architecture |
 | [grill-me](skills/grill-me/) | Vendor | Manual-only shortcut that starts a grilling session |
 | [grilling](skills/grilling/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Find deepening opportunities and report them as HTML (manual only) |
 | [ponytail](skills/ponytail/) | Vendor | Force the laziest solution that actually works — YAGNI, stdlib-first, minimal code |
-| [prd-to-issues](skills/prd-to-issues/) | Manual (frozen) | Break PRDs into independently-grabbable GitHub issues |
-| [prd-to-plan](skills/prd-to-plan/) | Manual (frozen) | Convert PRDs into multi-phase implementation plans |
-| [request-refactor-plan](skills/request-refactor-plan/) | Manual (frozen) | Create detailed refactor plans with tiny commits via user interview |
+| [security-audit](skills/security-audit/) | Vendor | Source-first security audits with coverage-led hunting and independent validation |
 | [tdd](skills/tdd/) | Vendor | Test-driven development with red-green-refactor loops |
-| [triage-issue](skills/triage-issue/) | Manual (frozen) | Investigate bugs, identify root causes, and file issues with fix plans |
-| [write-a-prd](skills/write-a-prd/) | Manual (frozen) | Create a PRD through interactive interview and codebase exploration |
 
 ## Detailed Guides
 
