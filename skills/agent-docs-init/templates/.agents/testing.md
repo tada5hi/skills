@@ -39,9 +39,9 @@
 <!-- Adapt the paths to the real layout. In a single-package repo drop the last two bullets. -->
 
 - The testing target of `{{package_test_dir}}` is that package's source code. To test it, tests may import anything the package declares as a dependency: other packages of the repo it depends on, test kits, the test runner and other libraries. Fixtures live under its test directory.
-- Tests assert on behavior, never on files: no checks that agent docs, a `Dockerfile`, CI workflows or a dependency manifest exist or contain something. CI running those files is their test.
-- A test never imports an undeclared package, or one that depends on the package under test. Declaring such a package as a test dependency to make a test pass reverses the dependency graph.
-- Other packages are imported by their package or module name, never by a relative path into their directory.
+- Tests check what the code does, not what is in the repository. Never write a test that checks whether agent docs, a `Dockerfile`, CI workflows or the dependency manifest exist or what they contain; the tools that use those files already check them.
+- Tests never import a package the package under test does not depend on. If `b` depends on `a`, the tests of `a` never import `b`, and adding `b` as a test dependency of `a` to make it work creates a circular dependency.
+- Import other packages by name, as any consumer would, never through a relative path such as `../other-package/src`.
 
 ## Test Helpers & Fixtures
 
