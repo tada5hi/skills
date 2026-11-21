@@ -153,16 +153,16 @@ Pick one kind per feature: the first that applies in this order. A feature with 
 
 For `simplify`, search for the feature's purpose (what it parses, validates, retries, formats or wraps), not its name: helpers, utils, wrappers around the package, comments such as `workaround`, `polyfill` and `until <package> supports`, casts a new generic or overload makes unnecessary. For `harden`, search for the calls without the new timeout or signal, the unchecked input, the swallowed error. For `improve`, search for the loose types (casts, `any`), the hand-rolled formatting, the unlogged background work.
 
-Propose a feature only with the places it applies to (`Local`, or a search) and the concrete gain there in `Proposal`: what fails or is missing today, or what becomes simpler, safer or clearer. A partial fit goes into `Proposal` with the difference spelled out, or is left out. If you cannot name what fails or is missing at a named place, write no entry: a feature that is new but gives this code nothing concrete is no entry.
+Propose a feature only with the places it applies to (`Local`, or a search) and the concrete gain there in `Proposal`: what fails or is missing today, or what becomes simpler, safer or clearer. A partial fit goes into `Proposal` with the difference spelled out, or is left out. If you cannot name the concrete gain at a named place (what fails or is missing, or what becomes simpler), write no entry. A feature that is new but gives this code nothing concrete is no entry.
 
 ### 4. Record
 
 Group the entries by group name; each bump is a section in its group's issue (`routup` and `@routup/basic` bumps are two sections of one issue).
 
-1. Find the group's issue: `gh issue list --state all --search "chore: adopt <name> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- upstream-features-adopt:issue scope=<name> -->`, authored by the bot or the owner (search does not index HTML comments). Only an open one takes new sections; a closed one only supplies its `checked` marker.
+1. Find the group's issue: `gh issue list --state all --search "chore: adopt <name> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- upstream-features-adopt:issue scope=<name> -->` (or `<!-- adopt-upgrades:issue scope=<name> -->` on an older issue), authored by the bot or the owner (search does not index HTML comments). Only an open one takes new sections; a closed one only supplies its `checked` marker.
 2. Show the user the new sections and the new `checked` marker, and, before the first create in the repository, that the `upstream-features` label will be created if missing (`gh label list --search upstream-features --json name`). Write only after they say go:
    - Missing label: `gh label create upstream-features --description "Features a new dependency version offers" --color 2f6f4f`.
-   - Open issue: read the current body, rewrite the marker lines and the intro (when unedited), keep everything after them byte for byte, append the sections, then the done line and the stale block; `gh issue edit <n> --body-file <file>`.
+   - Open issue: read the current body, rewrite the marker lines and the intro (when unedited), keep everything after them byte for byte (except that earlier `adopt-upgrades:` key lines move to the `upstream-features-adopt:` prefix, as the marker lines do), append the sections, then the done line and the stale block; `gh issue edit <n> --body-file <file>`.
    - No open issue: `gh issue create --title "chore: adopt <name> features" --label upstream-features --body-file <file>`.
 3. A group with no entries gets no issue. With an open issue, offer to update only its `checked` marker so the next check does not repeat these bumps. Without one, report that nothing records the check and the next check repeats those bumps.
 
