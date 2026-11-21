@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires git repository with package.json or similar project manifest.
 metadata:
   author: tada5hi
-  version: "2026.11.07"
-allowed-tools: Read Write Bash(ls:*) Bash(mkdir:*) Glob Grep
+  version: "2026.11.21"
+allowed-tools: Read Write Edit Bash(ls:*) Bash(mkdir:*) Bash(cp:*) Bash(node:*) Bash(npm:*) Glob Grep
 ---
 
 # init-agent-docs

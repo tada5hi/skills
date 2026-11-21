@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires Node.js >= 18, git and the `gh` CLI authenticated with push access to the list repository.
 metadata:
   author: tada5hi
-  version: "2026.11.06"
-allowed-tools: Bash(node:*) Bash(gh:*) Bash(git:*) Read Edit Write AskUserQuestion
+  version: "2026.11.21"
+allowed-tools: Bash(node:*) Bash(gh:*) Bash(git:*) Bash(mktemp:*) Read Edit Write AskUserQuestion
 ---
 
 # refresh-package-list
@@ -60,7 +60,7 @@ A list without the block: add it first, with `owners:` set to the list's owner p
    | Deprecated npm package | Remove it, or the whole entry when everything is deprecated; name the successor in `exclude:` |
 4. **Keep the format strict**: one line per repository, the backtick marker, an en dash, a description ending in a period. Keep `## Contents` in sync when a section is added or emptied, and remove empty sections.
 5. **Re-run the scan.** Every section should now be empty.
-6. **Open a pull request.** Show the user the diff summary first, then write a PR body file listing added, removed and excluded repositories and packages (no AI attribution), and run:
+6. **Open a pull request.** Show the user the diff summary first and wait for their go before pushing, then write a PR body file listing added, removed and excluded repositories and packages (no AI attribution), and run:
    ```bash
    git -C <dir> commit -am "chore: refresh package list"
    git -C <dir> push -u origin HEAD

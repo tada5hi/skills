@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires the `gh` CLI (authenticated) and npm registry access.
 metadata:
   author: tada5hi
-  version: "2026.11.20"
-allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(grep:*) Read Grep Edit
+  version: "2026.11.21"
+allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(grep:*) Bash(node:*) Bash(curl:*) Bash(tar:*) Bash(mktemp:*) Read Grep Edit Write
 ---
 
 # track-upstream

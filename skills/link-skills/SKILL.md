@@ -1,11 +1,11 @@
 ---
 name: link-skills
-description: Link skills from skills/ into .claude/skills/ so Claude Code discovers them. Use when a new skill is added, after "link skills", "register skills", or "sync skills".
+description: Link skills from skills/ into .claude/skills/ so Claude Code discovers them. Use when a new skill is added, or after "link skills" or "register skills".
 license: Apache-2.0
 compatibility: Requires a git repository with skills defined under skills/<skill-id>/SKILL.md.
 metadata:
   author: tada5hi
-  version: "2026.03.18"
+  version: "2026.11.21"
 allowed-tools: Bash Glob Read
 ---
 
@@ -32,7 +32,7 @@ This will:
 3. **Link** each skill using the appropriate method for the platform:
    - **Windows**: NTFS junctions (no admin rights needed)
    - **Unix/macOS**: relative symlinks
-4. **Skip** skills that are already correctly linked.
+4. **Skip** skills whose target in `.claude/skills/` already contains a `SKILL.md`, whether it is a link or a copied directory.
 5. **Report** a summary of what was linked or skipped.
 
 ## Notes

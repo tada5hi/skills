@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires git repository with gh CLI authenticated and a PR on the current branch.
 metadata:
   author: tada5hi
-  version: "2026.06.10"
-allowed-tools: Bash(gh:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
+  version: "2026.11.21"
+allowed-tools: Bash(gh:*) Bash(node:*) Bash(npx:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
 # investigate-pr-comments

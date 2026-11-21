@@ -3,6 +3,7 @@
     section that does not apply, and keep the section order.
 
     Publish with: gh release edit {{tag}} --notes-file <this file>
+    (or gh release create {{tag}} --notes-file <this file> when the release does not exist yet)
 -->
 
 > {{tag}} is {{what this release is}}. {{If it closes a prerelease cycle: it contains everything from the N `{{tag}}-beta.*` tags, so this note covers the whole cycle since {{last stable}}.}}

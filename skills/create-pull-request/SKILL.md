@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires a git repository with a GitHub remote and the `gh` CLI authenticated.
 metadata:
   author: tada5hi
-  version: "2026.11.03"
-allowed-tools: Bash(git:*) Bash(gh:*) Bash(sleep:*) Read Write Glob Grep Skill
+  version: "2026.11.21"
+allowed-tools: Bash(git:*) Bash(gh:*) Bash(sleep:*) Bash(seq:*) Bash(npm:*) Bash(npx:*) Read Write Glob Grep Skill
 ---
 
 # create-pull-request

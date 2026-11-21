@@ -1,12 +1,12 @@
 ---
 name: query-api
-description: Query a live HTTP API given a base URL plus credentials (username/password, OAuth2 client id/secret, or bearer token) — authenticate, discover endpoints via the OpenAPI/Swagger document or rapiq/JSON-API conventions, then run GET/POST/PATCH requests autonomously to answer data questions (e.g. "get me all roles with their permission bindings"). Use when the user hands over an API URL with credentials and asks to query, list, fetch, create, or update resources on it.
+description: Query a live HTTP API given a base URL plus credentials (username/password, OAuth2 client id/secret, or bearer token) — authenticate, discover endpoints via the OpenAPI/Swagger document or rapiq/JSON-API conventions, then run GET requests autonomously to answer data questions (e.g. "get me all roles with their permission bindings") and POST/PATCH requests when the user asks for a change. Use when the user hands over an API URL with credentials and asks to query, list, fetch, create, or update resources on it.
 license: Apache-2.0
 compatibility: Requires curl and jq, plus network access to the target API.
 metadata:
   author: tada5hi
-  version: "2026.07.15"
-allowed-tools: Bash(curl:*) Bash(jq:*) Read Write AskUserQuestion
+  version: "2026.11.21"
+allowed-tools: Bash(curl:*) Bash(jq:*) Bash(mkdir:*) Bash(chmod:*) Read Write AskUserQuestion
 ---
 
 # query-api

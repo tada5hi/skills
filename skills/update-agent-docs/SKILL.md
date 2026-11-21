@@ -2,10 +2,10 @@
 name: update-agent-docs
 description: Propose template improvements to the init-agent-docs skill via pull request to tada5hi/skills. Use when the user asks to "update skill templates", "contribute back to skills", or when a project's agent docs have patterns worth upstreaming.
 license: Apache-2.0
-compatibility: Requires git and gh CLI authenticated with permissions to fork/push to tada5hi/skills.
+compatibility: Requires git and gh CLI authenticated, with push access to tada5hi/skills or a fork of it.
 metadata:
   author: tada5hi
-  version: "2026.06.10"
+  version: "2026.11.21"
 allowed-tools: Read Write Bash(git:*) Bash(gh:*) Bash(ls:*) Bash(mkdir:*) Bash(cp:*) Glob Grep
 ---
 
@@ -41,6 +41,7 @@ Read the current project's agent documentation and the current skill templates s
 - `{{skills_repo_path}}/skills/init-agent-docs/templates/.agents/architecture.md`
 - `{{skills_repo_path}}/skills/init-agent-docs/templates/.agents/testing.md`
 - `{{skills_repo_path}}/skills/init-agent-docs/templates/.agents/conventions.md`
+- `{{skills_repo_path}}/skills/init-agent-docs/templates/scripts/lint-agent-docs.mjs`
 
 The skills repository is located at one of:
 - Local path: ask the user, or check for a sibling `skills` directory (e.g., `../skills` relative to the current project)
@@ -94,6 +95,8 @@ git commit -m "feat(init-agent-docs): update templates
 
 <description of what changed and why>"
 
+# without push access to tada5hi/skills, fork first (gh repo fork --remote --remote-name fork),
+# push to `fork` instead of `origin` and add `--head <your-login>:<branch>` to gh pr create
 git push -u origin update-init-agent-docs-templates-{{date}}
 
 gh pr create \

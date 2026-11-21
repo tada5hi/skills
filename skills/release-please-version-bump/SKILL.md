@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires a git repository using release-please (manifest config) and the `gh` CLI authenticated for it.
 metadata:
   author: tada5hi
-  version: "2026.10.25"
-allowed-tools: Bash(git:*) Bash(gh:*) Read Edit Glob Grep
+  version: "2026.11.21"
+allowed-tools: Bash(git:*) Bash(gh:*) Bash(awk:*) Bash(grep:*) Read Edit Glob Grep
 ---
 
 # release-please-version-bump

@@ -2,11 +2,11 @@
 name: query-package-list
 description: Look up the user's own published packages in their awesome-style package list (default tada5hi/awesome) before writing, porting or planning code, and audit a diff for code that duplicates one of them. Use when about to implement a generic helper (deep merge, nested path get/set, env parsing, config loading, DI container, HTTP client, validation, error classes, database locks or migrations, i18n, query parsing, Docker/Helm release tooling), when writing a plan or a subagent brief, when porting code from another repository, when adding a dependency, when reviewing a diff for reinvented helpers, or when the user asks "do I have a package for X", "is there one of my libs that…", "which of my packages…".
 license: Apache-2.0
-compatibility: Requires network access to GitHub; uses the `gh` CLI or curl to fetch the list.
+compatibility: Requires network access to GitHub (the `gh` CLI or curl fetches the list) and to the npm registry or PyPI to verify a package's API.
 metadata:
   author: tada5hi
-  version: "2026.11.19"
-allowed-tools: Bash(gh:*) Bash(curl:*) Bash(npm:*) Bash(pip:*) Bash(node:*) Bash(tar:*) Bash(mktemp:*) Bash(grep:*) Bash(rm:*) Read Grep
+  version: "2026.11.21"
+allowed-tools: Bash(gh:*) Bash(curl:*) Bash(npm:*) Bash(pip:*) Bash(node:*) Bash(tar:*) Bash(xargs:*) Bash(mktemp:*) Bash(grep:*) Bash(rm:*) Read Grep
 ---
 
 # query-package-list

@@ -5,8 +5,8 @@ license: Apache-2.0
 compatibility: Requires a project with plan files in .agents/plans/ or a specified path.
 metadata:
   author: tada5hi
-  version: "2026.03.26"
-allowed-tools: Bash(git:*) Read Edit Write Glob Grep Agent AskUserQuestion
+  version: "2026.11.21"
+allowed-tools: Bash(git:*) Bash(ls:*) Bash(npm:*) Read Edit Write Glob Grep Agent AskUserQuestion
 ---
 
 # plan-status

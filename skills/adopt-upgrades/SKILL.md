@@ -1,12 +1,12 @@
 ---
 name: adopt-upgrades
-description: Find what new versions of a project's dependencies let it simplify (a new export or option that replaces a local helper, workaround or hand-written check), record each concrete opportunity in one issue per package group (a scope with its root package), and adopt an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <name> features` issue, or when the user asks "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".
+description: 'Find what new versions of a project''s dependencies let it simplify (a new export or option that replaces a local helper, workaround or hand-written check), record each concrete opportunity in one issue per package group (a scope with its root package), and adopt an entry on request. Use after merging dependency bumps (Dependabot, Renovate) or upgrading a package by hand, at the start of a session on a project with a `chore: adopt <name> features` issue, or when the user asks "what can we use from the new <package>", "anything to adopt from the bumps", "check upgrades", "adopt the <package> entry".'
 license: Apache-2.0
 compatibility: Requires git, the `gh` CLI (authenticated), Node.js 22+ and npm registry access. The API diff covers npm packages; other ecosystems get the bump without a diff.
 metadata:
   author: tada5hi
   version: "2026.11.21"
-allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(node:*) Bash(grep:*) Read Grep Glob Edit
+allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(node:*) Bash(grep:*) Bash(wc:*) Read Grep Glob Edit Write
 ---
 
 # adopt-upgrades

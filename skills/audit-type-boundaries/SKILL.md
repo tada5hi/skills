@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires a TypeScript codebase.
 metadata:
   author: tada5hi
-  version: "2026.03.26"
+  version: "2026.11.21"
 allowed-tools: Bash(npx:*) Bash(npm:*) Bash(git:*) Read Edit Glob Grep Agent AskUserQuestion
 ---
 
@@ -19,7 +19,7 @@ Determine the scope of the audit from `$ARGUMENTS`:
 
 - If a path is provided, scope the audit to that directory or file.
 - If no path is provided, default to the current working directory.
-- Look for optional flags: `--strict` (report all casts, not just mismatches), `--fix` (suggest fixes inline).
+- Look for optional flags: `--strict` (report every cast, not just mismatches, and include test files), `--fix` (propose a fix per mismatch and apply it with Edit after confirmation; see Step 6).
 
 ## Step 2: Find type casts
 
@@ -49,7 +49,7 @@ Skip casts that are unlikely to hide mismatches:
 - `as unknown`, `as any`, `as never` — intentional escape hatches
 - `as const` — literal narrowing, not a boundary crossing
 - Casts inside `.d.ts` files — type declarations, not runtime boundaries
-- Test files (`*.spec.ts`, `*.test.ts`) — unless `--strict` is passed
+- Test files (`*.spec.ts`, `*.test.ts`) — unless `--strict` is passed (`--strict` keeps the other filters above)
 
 ## Step 3: Resolve types for each cast
 

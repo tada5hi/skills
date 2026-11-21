@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires a git repository with release tags and the `gh` CLI authenticated for the target repository.
 metadata:
   author: tada5hi
-  version: "2026.08.12"
+  version: "2026.11.21"
 allowed-tools: Bash(gh:*) Bash(git:*) Bash(curl:*) Read Write Edit Glob Grep
 ---
 
