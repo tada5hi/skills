@@ -26,8 +26,8 @@ One open issue per package group. The group is the bare root name: a scoped pack
 The body starts with two marker lines and the intro. The marker keeps the word `scope`; its value is the group name:
 
 ```markdown
-<!-- adopt-upgrades:issue scope=chamvi -->
-<!-- adopt-upgrades:checked @chamvi/app@0.9.0 @chamvi/ui@0.9.0 -->
+<!-- upstream-features-adopt:issue scope=chamvi -->
+<!-- upstream-features-adopt:checked @chamvi/app@0.9.0 @chamvi/ui@0.9.0 -->
 New versions of `@chamvi/*` ship features this repository can benefit from. Each entry names a feature, how the code would use it and where; each one waits for the owner's decision. A ticked box means adopted or declined. Close this issue when you are done with it; a later version opens a new one.
 ```
 
@@ -52,13 +52,13 @@ Each bump is one section, its heading linking the npmdiff of the range (the pack
 
     Find the rest: `git grep -nIF -e "withCause(" 9b8c7d6e5f4a`
   - Source: member of ValidationError, ValidationError.cause in dist/errors.d.mts
-  <!-- adopt-upgrades:entry key=9d54088d29cf -->
+  <!-- upstream-features-adopt:entry key=9d54088d29cf -->
 - [ ] **`jobs as components`** (improves): background jobs show in GET /components
   - Proposal: declare the sweep as a component, so GET /components shows whether it runs
   - Local (0 of 2):
     Find the rest: `git grep -nIF -e "setInterval(" 9b8c7d6e5f4a`
   - Source: [release notes 0.9.0](https://github.com/chamvi/chamvi/releases/tag/%40chamvi%2Fapp%400.9.0)
-  <!-- adopt-upgrades:entry key=380672b99d6e -->
+  <!-- upstream-features-adopt:entry key=380672b99d6e -->
 ```
 
 One entry per feature, its lines in this order:
@@ -69,16 +69,16 @@ One entry per feature, its lines in this order:
 - **Search** (optional): ``Find the rest: `git grep -nIF -e "<pattern>" <sha>` ``, `<sha>` the first 12 hex digits of the checked commit, after a blank line under the items (no blank line without items). Count its files with `git grep -lIF -e "<pattern>" <sha> | wc -l` (tracked files at that commit; if the clone lacks it, `git fetch --depth=1 origin <sha>` first); with no match, drop the search. The heading is `Local (<n> of <m>):` when the search matches more files (`m`) than items listed (`n`), else `Local:`; the agent writes `<m>+` when its listing was cut short. The pattern is 2 to 100 characters, no leading or trailing space, no control character, none of `` ` `` `"` `\` `$` `!`, does not start with `-`, and holds no `<!--` or `-->`.
 - **An entry needs at least one Local item or a matching search.** An opportunity with no local code to point at is not an entry.
 - **`Source`** starts with the evidence kind: `new export` (a name the diff added), `changed export` (a name whose declaration changed), `member of <Export>`, `new subpath`, or `release notes <to>` (a behavior change the types do not show). Optional detail follows after a comma (declaration file, the bump's pull request). For release notes, when the newest release in the range has a GitHub release page, the evidence is that link, once: `[release notes <to>](<release url>)`.
-- **Key line** closes the entry: the first 12 hex digits of the SHA-256 of `<package>|<api id>`, no path. The api id comes from the evidence, never prose: the export name (`stringbool`), `<Export>.<member>`, the subpath (`./runtime`), or `release:<to>`. A `release:<to>` id covers every feature of the release, so its key appends the feature: `<package>|release:<to>|<feature>`, the feature being the box line's code span text, lowercased, whitespace runs collapsed to one space (`@chamvi/app|release:0.9.0|jobs as components`). Compute: `node -e 'console.log(require("node:crypto").createHash("sha256").update(process.argv[1]).digest("hex").slice(0, 12))' '@chamvi/app|ValidationError.cause'`. A key already in the body (a key line, or the hidden `<!-- adopt-upgrades:done <key> ... -->` list of collapsed ticked entries) is never added again, ticked or not.
+- **Key line** closes the entry: the first 12 hex digits of the SHA-256 of `<package>|<api id>`, no path. The api id comes from the evidence, never prose: the export name (`stringbool`), `<Export>.<member>`, the subpath (`./runtime`), or `release:<to>`. A `release:<to>` id covers every feature of the release, so its key appends the feature: `<package>|release:<to>|<feature>`, the feature being the box line's code span text, lowercased, whitespace runs collapsed to one space (`@chamvi/app|release:0.9.0|jobs as components`). Compute: `node -e 'console.log(require("node:crypto").createHash("sha256").update(process.argv[1]).digest("hex").slice(0, 12))' '@chamvi/app|ValidationError.cause'`. A key already in the body (a key line, or the hidden `<!-- upstream-features-adopt:done <key> ... -->` list of collapsed ticked entries) is never added again, ticked or not.
 - **No mentions.** Write a package name only in a code span: GitHub reads `@scope/name` outside one, even in link text, as a team mention. No `#<n>`, links or HTML comments in model text other than those above.
 
 The end of the body is code-owned: the done line, then the stale block of open entries whose Local file no longer exists or no longer contains its symbol at the range end. A session keeps it, or re-renders it the same way:
 
 ```markdown
-<!-- adopt-upgrades:stale -->
+<!-- upstream-features-adopt:stale -->
 **Possibly done** (code changed since the entry was written):
 - `ValidationError.cause` (`@chamvi/app` 0.9.0): `packages/kit/src/helpers/errors.ts` no longer exists
-<!-- adopt-upgrades:stale-end -->
+<!-- upstream-features-adopt:stale-end -->
 ```
 
 The reason reads `` `<path>` no longer exists `` or `` `<path>` no longer contains `<symbol>` ``. The stale block never ticks or edits an entry.
@@ -150,7 +150,7 @@ Propose a feature only with the places it applies to (`Local`, or a search) and 
 
 Group the entries by group name; each bump is a section in its group's issue (`routup` and `@routup/basic` bumps are two sections of one issue).
 
-1. Find the group's issue: `gh issue list --state all --search "chore: adopt <name> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- adopt-upgrades:issue scope=<name> -->`, authored by the bot or the owner (search does not index HTML comments). Only an open one takes new sections; a closed one only supplies its `checked` marker.
+1. Find the group's issue: `gh issue list --state all --search "chore: adopt <name> features in:title" --json number,title,state,author,body`, and keep the one whose body starts with `<!-- upstream-features-adopt:issue scope=<name> -->`, authored by the bot or the owner (search does not index HTML comments). Only an open one takes new sections; a closed one only supplies its `checked` marker.
 2. Show the user the new sections and the new `checked` marker, and, before the first create in the repository, that the `upstream-features` label will be created if missing (`gh label list --search upstream-features --json name`). Write only after they say go:
    - Missing label: `gh label create upstream-features --description "Features a new dependency version offers" --color 2f6f4f`.
    - Open issue: read the current body, rewrite the marker lines and the intro (when unedited), keep everything after them byte for byte, append the sections, then the done line and the stale block; `gh issue edit <n> --body-file <file>`.
