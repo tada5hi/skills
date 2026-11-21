@@ -58,6 +58,8 @@ export const vendors: Record<string, IVendorSkillMeta> = {
             'productivity/grill-me': 'grill-me',
             // grill-me delegates to grilling
             'productivity/grilling': 'grilling',
+            'productivity/writing-for-agents': 'writing-for-agents',
+            'engineering/research': 'research',
         },
     },
     'dietrichgebert-ponytail': {

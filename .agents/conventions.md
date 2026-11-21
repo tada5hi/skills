@@ -72,6 +72,7 @@ chore: update dependencies
 
 - Use **ESM** and modern JavaScript/TypeScript conventions.
 - Before adding new code or templates, study existing skills for patterns and naming conventions.
+- When writing or editing a `SKILL.md`, `AGENTS.md` or `CLAUDE.md`, follow the `writing-for-agents` skill: descriptions are triggers, and every always-loaded line costs context.
 - Keep `AGENTS.md` under 200 lines — move details into `.agents/*.md` files.
 - Templates should include HTML comments explaining what to fill in for each placeholder.
 - Every template section must serve a purpose — omit sections that don't apply rather than leaving them empty.

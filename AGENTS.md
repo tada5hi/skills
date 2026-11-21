@@ -63,8 +63,10 @@ Each skill is a self-contained directory under `skills/` with a `SKILL.md` defin
 | [grilling](skills/grilling/) | Vendor | Relentlessly interview users about plans until decision trees are resolved |
 | [improve-codebase-architecture](skills/improve-codebase-architecture/) | Vendor | Find deepening opportunities and report them as HTML (manual only) |
 | [ponytail](skills/ponytail/) | Vendor | Force the laziest solution that actually works — YAGNI, stdlib-first, minimal code |
+| [research](skills/research/) | Vendor | Research a question against primary sources in a background agent, findings saved as Markdown |
 | [security-audit](skills/security-audit/) | Vendor | Source-first security audits with coverage-led hunting and independent validation |
 | [tdd](skills/tdd/) | Vendor | Test-driven development with red-green-refactor loops |
+| [writing-for-agents](skills/writing-for-agents/) | Vendor | Write skills, AGENTS.md and CLAUDE.md so agents follow them predictably |
 
 ## Detailed Guides
 

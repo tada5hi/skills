@@ -129,6 +129,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | [release-notes-write](skills/release-notes-write/) | Write highlights-first GitHub release notes above the generated changelog |
 | [commit-message-generate](skills/commit-message-generate/) | Generate a Conventional Commits message for uncommitted changes |
 | [vitepress-site-redesign](skills/vitepress-site-redesign/) | Turn a default-looking VitePress site into a hero-led site with design tokens, landing sections and restyled chrome |
+| [writing-for-agents](skills/writing-for-agents/) | Write skills, `AGENTS.md` and `CLAUDE.md` so agents reach and follow them predictably (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 
 ### Planning
 
@@ -141,6 +142,7 @@ Skills marked *vendor* are synced from another repository; the source is linked.
 | [grilling](skills/grilling/) | Get interviewed about a plan until every branch of the decision tree is resolved (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [grill-me](skills/grill-me/) | Start a `grilling` session on demand (*vendor*, *manual only*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 | [plan-status-report](skills/plan-status-report/) | Report progress on a plan file against the current codebase |
+| [research](skills/research/) | Research a question against primary sources in a background agent and save the cited findings as Markdown (*vendor*, [mattpocock/skills](https://github.com/mattpocock/skills)) |
 
 ### Development workflow
 
