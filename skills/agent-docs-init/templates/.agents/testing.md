@@ -36,10 +36,11 @@
 
 ## Test Scope
 
-<!-- Keep in a monorepo with per-package test directories; adapt the paths to the real layout. In a single-package repo keep only the second bullet. -->
+<!-- Adapt the paths to the real layout. In a single-package repo drop the last two bullets. -->
 
-- Tests in `{{package_test_dir}}` exercise only that package's `src/`, through its public API or relative `src` imports.
-- Repo infrastructure (`.github/`, root `package.json`, lint, tsconfig and release config) gets no tests from a package; CI running those files is their test. A repo-level check that is really needed goes in a CI step.
+- Tests in `{{package_test_dir}}` test that package's code. Besides its own `src/` they may import anything its `package.json` declares: workspace packages it depends on, test kits, the test runner and other libraries. Fixtures live under its test directory.
+- Tests assert on behavior, never on files: no checks that `AGENTS.md`, a `Dockerfile`, `.github/` workflows or a `package.json` exist or contain something. CI running those files is their test.
+- A test never imports an undeclared package, or one that depends on the package under test. Adding such a package as a devDependency to make a test pass reverses the dependency graph.
 - Other packages are imported by package name, never by a relative path into their directory.
 
 ## Test Helpers & Fixtures
