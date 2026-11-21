@@ -38,10 +38,10 @@
 
 <!-- Adapt the paths to the real layout. In a single-package repo drop the last two bullets. -->
 
-- The testing target of `{{package_test_dir}}` is that package's `src/` code. To test it, tests may import anything the package's `package.json` declares: workspace packages it depends on, test kits, the test runner and other libraries. Fixtures live under its test directory.
-- Tests assert on behavior, never on files: no checks that `AGENTS.md`, a `Dockerfile`, `.github/` workflows or a `package.json` exist or contain something. CI running those files is their test.
-- A test never imports an undeclared package, or one that depends on the package under test. Adding such a package as a devDependency to make a test pass reverses the dependency graph.
-- Other packages are imported by package name, never by a relative path into their directory.
+- The testing target of `{{package_test_dir}}` is that package's source code. To test it, tests may import anything the package declares as a dependency: other packages of the repo it depends on, test kits, the test runner and other libraries. Fixtures live under its test directory.
+- Tests assert on behavior, never on files: no checks that agent docs, a `Dockerfile`, CI workflows or a dependency manifest exist or contain something. CI running those files is their test.
+- A test never imports an undeclared package, or one that depends on the package under test. Declaring such a package as a test dependency to make a test pass reverses the dependency graph.
+- Other packages are imported by their package or module name, never by a relative path into their directory.
 
 ## Test Helpers & Fixtures
 
