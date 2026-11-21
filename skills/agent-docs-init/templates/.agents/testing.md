@@ -34,6 +34,14 @@
 
 {{integration_test_description}}
 
+## Test Scope
+
+<!-- Keep in a monorepo with per-package test directories; adapt the paths to the real layout. In a single-package repo keep only the second bullet. -->
+
+- Tests in `{{package_test_dir}}` exercise only that package's `src/`, through its public API or relative `src` imports.
+- Repo infrastructure (`.github/`, root `package.json`, lint, tsconfig and release config) gets no tests from a package; CI running those files is their test. A repo-level check that is really needed goes in a CI step.
+- Other packages are imported by package name, never by a relative path into their directory.
+
 ## Test Helpers & Fixtures
 
 <!-- Describe reusable test utilities, fake implementations, factories, fixture data. -->
