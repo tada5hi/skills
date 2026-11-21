@@ -15,6 +15,7 @@ Agent docs that grow by one paragraph per task end up loaded whole into every se
 | **Moving text** | Cut and paste sections by hand | Moves whole sections verbatim with a script that refuses unmatched, ambiguous or doubly claimed headings |
 | **What stays loaded** | Everything `CLAUDE.md` imports | A small core plus a "Cross-cutting Rules" section; detail goes to `.agents/topics/<name>.md`, read on demand |
 | **History in docs** | "used to", "no longer", plan numbers pile up | Lint flags history phrases; it removes plan citations and restates the facts in the present tense |
+| **New template rules** | Existing projects never get rules added to the templates later | Adds the missing rule sections, filled in for the project |
 | **Regrowth** | Docs creep back up | Sets lint limits just above the current size, to lower as the docs shrink |
 
 ## Installation
@@ -38,8 +39,9 @@ npx skills add tada5hi/skills --skill='agent-docs-migrate'
 - "adopt the agent docs budgets"
 - "CLAUDE.md loads too much"
 - "fix the old skill names in our agent docs"
+- "sync agent docs with the templates"
 
-The agent may also use it when your agent docs have grown large, or when they name skills by their old verb-first names.
+The agent may also use it when your agent docs have grown large, when they name skills by their old verb-first names, or when they lack rules that newer agent-docs-init templates carry.
 
 **Invoke it directly.** Type `/agent-docs-migrate` (installed with the skills CLI) or `/skills:agent-docs-migrate` (Claude Code plugin).
 
@@ -50,8 +52,9 @@ The agent may also use it when your agent docs have grown large, or when they na
 3. Runs [`scripts/split-agent-docs.mjs`](./scripts/split-agent-docs.mjs) as a dry run, then with `--write`, to move the sections into `.agents/topics/`.
 4. Writes the core by hand: "Cross-cutting Rules" and a "Topic Files" table in `architecture.md`, a "Read before changing ..." first line per topic, and the "Writing agent docs" section in `AGENTS.md`.
 5. Fixes what lint and the move broke: history phrases, in-page anchors, relative links from `.agents/topics/`, and skills named by their old verb-first names (the map is in [references/renamed-skills.md](references/renamed-skills.md)).
-6. Sets `agentDocs` limits in `eslint.config.js` where the core still exceeds a default, and runs the project's full lint.
-7. Opens the pull request with a before/after size table and the commands run; condensing the moved text is a separate follow-up.
+6. Adds the rule sections of the agent-docs-init templates the docs lack (such as "Test Scope" in `testing.md`), filled in for the project; the pull request lists any it left out and why.
+7. Sets `agentDocs` limits in `eslint.config.js` where the core still exceeds a default, and runs the project's full lint.
+8. Opens the pull request with a before/after size table and the commands run; condensing the moved text is a separate follow-up.
 
 ## Requirements
 
@@ -73,7 +76,7 @@ A pull request with new `.agents/topics/*.md`, trimmed `.agents/*.md`, updated `
 
 ## Notes
 
-- **Moving, not rewriting.** The script moves text verbatim; the pull request says so. Condensing and checking claims against the code is step 8, in a separate pull request.
+- **Moving, not rewriting.** The script moves text verbatim; the pull request says so. Condensing and checking claims against the code is step 9, in a separate pull request.
 - **Topic files are never imported.** Not even one; the core's Cross-cutting Rules carry what every session needs.
 - **Limits do not go up to fit text.** New detail goes into a topic file instead.
 - **Headings stay.** Condensing keeps headings so `architecture.md → Section` pointers still resolve.

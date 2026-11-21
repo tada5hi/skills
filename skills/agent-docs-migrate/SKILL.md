@@ -1,6 +1,6 @@
 ---
 name: agent-docs-migrate
-description: Migrate an existing project's oversized agent docs (CLAUDE.md, AGENTS.md, .agents/*.md) to the agent-docs-init layout - a small always-loaded core, on-demand topic files and lint-enforced size and history limits. Use when agent docs have grown large, when "CLAUDE.md loads too much", when the docs name tada5hi/skills skills by their old verb-first names (init-agent-docs, create-pull-request, query-package-list, …), or when asked to "migrate agent docs", "split agent docs", "shrink architecture.md" or "adopt the agent docs budgets".
+description: Migrate an existing project's oversized agent docs (CLAUDE.md, AGENTS.md, .agents/*.md) to the agent-docs-init layout - a small always-loaded core, on-demand topic files and lint-enforced size and history limits. Use when agent docs have grown large, when "CLAUDE.md loads too much", when the docs name tada5hi/skills skills by their old verb-first names (init-agent-docs, create-pull-request, query-package-list, …), when they lack rules that newer agent-docs-init templates carry (e.g. the testing "Test Scope" section), or when asked to "migrate agent docs", "sync agent docs with the templates", "split agent docs", "shrink architecture.md" or "adopt the agent docs budgets".
 license: Apache-2.0
 compatibility: Requires a git repository that already has CLAUDE.md/AGENTS.md and .agents/*.md, and Node.js for the split script.
 metadata:
@@ -19,6 +19,7 @@ allowed-tools: Read Write Edit Glob Grep Bash(node:*) Bash(npx eslint:*) Bash(np
 
 - A small always-loaded core: `AGENTS.md` and the `.agents/*.md` guides `CLAUDE.md` imports.
 - `.agents/topics/<name>.md`: per-subsystem detail and module maps, read on demand, never imported by `CLAUDE.md`.
+- The rule sections of the current agent-docs-init templates, such as the "Test Scope" section in `testing.md`.
 - The "Writing agent docs" rule in `AGENTS.md`, enforced by the `agentDocs` checks of `@tada5hi/eslint-config` 3.3.1+ or the fallback ratchet script.
 
 Moving (mechanical, reviewable as "nothing lost") and condensing (judgement, reading the code) are separate steps, ideally separate pull requests.
@@ -38,9 +39,10 @@ Moving (mechanical, reviewable as "nothing lost") and condensing (judgement, rea
    - Links: an in-page anchor in moved text (`(#channels)`) now points into another file, and a relative link from `.agents/` needs `../` from `.agents/topics/`. Check every relative Markdown link resolves.
    - Skill names: the docs may name skills by their old verb-first names (`query-package-list`, `create-pull-request`). Find them with the command in [references/renamed-skills.md](references/renamed-skills.md) (replace `<skill-dir>` with this skill's directory) and replace each with its new name.
    - The lint script must reach the docs: `eslint .` does, a script listing directories needs `CLAUDE.md AGENTS.md .agents` added.
-6. **Lock it in.** When the core still exceeds a default, set `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` just above the current size, with a comment to lower it as the docs shrink (fallback: run the ratchet once with `--init`). Run the project's full lint.
-7. **Open the pull request** with [pr-create](../pr-create/SKILL.md) (it branches, commits and asks first), with a before/after size table (loaded every session, each core file, topic files) and the commands run. Say that text was moved, not condensed or re-checked.
-8. **Condense and verify (follow-up).** Per file, keep invariants, silent traps and rejected alternatives (verdict plus one-line reason); cut history, before/after narration, spec lists, measurements and walkthroughs of what the code shows. Check each kept claim against the code: stale symbol names and misattributed checks are common. Lower the lint limits afterwards.
+6. **Add missing template rules.** Compare each guide with its [agent-docs-init template](../agent-docs-init/templates/) (`AGENTS.md` and each `.agents/*.md`) and list the rule sections the project lacks, such as "Test Scope" in `testing.md`. A rule section states how agents must work; sections that record project facts (setup, commands, layout tables) stay as the project has them. Add each missing rule whose HTML comment condition holds for the project, with its placeholders filled from the code and the comment left out. Done when every rule section of every matching template is in the docs or listed in the pull request description with the reason it does not apply.
+7. **Lock it in.** When the core still exceeds a default, set `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` just above the current size, with a comment to lower it as the docs shrink (fallback: run the ratchet once with `--init`). Run the project's full lint.
+8. **Open the pull request** with [pr-create](../pr-create/SKILL.md) (it branches, commits and asks first), with a before/after size table (loaded every session, each core file, topic files) and the commands run. Say that text was moved, not condensed or re-checked.
+9. **Condense and verify (follow-up).** Per file, keep invariants, silent traps and rejected alternatives (verdict plus one-line reason); cut history, before/after narration, spec lists, measurements and walkthroughs of what the code shows. Check each kept claim against the code: stale symbol names and misattributed checks are common. Lower the lint limits afterwards.
 
 ## Guidelines
 
@@ -48,5 +50,5 @@ Moving (mechanical, reviewable as "nothing lost") and condensing (judgement, rea
 - **Keep headings when condensing**, so `architecture.md → *Section*` pointers keep resolving.
 - **Do not raise a limit to fit new text.** Move the detail into a topic file instead; raising a limit is a policy change for the PR description.
 - **Topic files are not imported**, not even one "important" one: the core's Cross-cutting Rules carry what every session needs.
-- **One pull request per repository.** Several repositories can be moved in parallel (steps 1 to 7 per repository); review step 8 separately per repository.
+- **One pull request per repository.** Several repositories can be moved in parallel (steps 1 to 8 per repository); review step 9 separately per repository.
 - When the migration finds a template gap, propose it upstream with [agent-docs-update](../agent-docs-update/SKILL.md).
