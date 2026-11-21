@@ -286,7 +286,7 @@ skills/
 - **Vendor skills are overwritten on every sync.** `skills:sync` deletes and re-copies each declared vendor skill directory. Local edits to a vendor skill are lost; change it upstream or turn it into a manual skill.
 - **`skills:cleanup` deletes.** Any directory under `skills/` that is not declared in `src/meta.ts` is removed, together with undeclared submodules. Register a new skill before running it.
 - **`skills:link` skips existing entries.** A `.claude/skills/<name>` that already contains a `SKILL.md` is left as it is, even when it is a copy rather than a link.
-- **Skill names are noun-first.** Related skills share a prefix (`agent-docs-*`, `package-list-*`, `upstream-*`, `pr-*`, `prd-*`). Earlier versions used verb-first names: `init-agent-docs` is now `agent-docs-init`, `create-pull-request` is now `pr-create`, `adopt-upgrades` is now `upstream-features-adopt`, `track-upstream` is now `upstream-fixes-track`.
+- **Skill names are noun-first.** Related skills share a prefix (`agent-docs-*`, `package-list-*`, `upstream-*`, `pr-*`, `prd-*`). Earlier versions used verb-first names: `init-agent-docs` is now `agent-docs-init`, `create-pull-request` is now `pr-create`, `adopt-upgrades` is now `upstream-features-adopt`, `track-upstream` is now `upstream-fixes-track`. [agent-docs-migrate](skills/agent-docs-migrate/) finds and replaces the old names in a project's agent docs, using [its rename map](skills/agent-docs-migrate/references/renamed-skills.md).
 - **The plugin tracks `master`.** It has no pinned version, so an update brings in whatever `master` holds, including skill changes you have not reviewed.
 
 ## License

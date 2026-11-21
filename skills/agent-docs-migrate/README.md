@@ -37,8 +37,9 @@ npx skills add tada5hi/skills --skill='agent-docs-migrate'
 - "shrink architecture.md"
 - "adopt the agent docs budgets"
 - "CLAUDE.md loads too much"
+- "fix the old skill names in our agent docs"
 
-The agent may also use it when your agent docs have grown large.
+The agent may also use it when your agent docs have grown large, or when they name skills by their old verb-first names.
 
 **Invoke it directly.** Type `/agent-docs-migrate` (installed with the skills CLI) or `/skills:agent-docs-migrate` (Claude Code plugin).
 
@@ -48,7 +49,7 @@ The agent may also use it when your agent docs have grown large.
 2. Plans one topic per subsystem or package, each under 40000 bytes, and writes the plan as a JSON map.
 3. Runs [`scripts/split-agent-docs.mjs`](./scripts/split-agent-docs.mjs) as a dry run, then with `--write`, to move the sections into `.agents/topics/`.
 4. Writes the core by hand: "Cross-cutting Rules" and a "Topic Files" table in `architecture.md`, a "Read before changing ..." first line per topic, and the "Writing agent docs" section in `AGENTS.md`.
-5. Fixes what lint and the move broke: history phrases, in-page anchors and relative links from `.agents/topics/`.
+5. Fixes what lint and the move broke: history phrases, in-page anchors, relative links from `.agents/topics/`, and skills named by their old verb-first names (the map is in [references/renamed-skills.md](references/renamed-skills.md)).
 6. Sets `agentDocs` limits in `eslint.config.js` where the core still exceeds a default, and runs the project's full lint.
 7. Opens the pull request with a before/after size table and the commands run; condensing the moved text is a separate follow-up.
 

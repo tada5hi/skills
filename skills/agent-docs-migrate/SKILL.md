@@ -1,6 +1,6 @@
 ---
 name: agent-docs-migrate
-description: Migrate an existing project's oversized agent docs (CLAUDE.md, AGENTS.md, .agents/*.md) to the agent-docs-init layout - a small always-loaded core, on-demand topic files and lint-enforced size and history limits. Use when agent docs have grown large, when "CLAUDE.md loads too much", or when asked to "migrate agent docs", "split agent docs", "shrink architecture.md" or "adopt the agent docs budgets".
+description: Migrate an existing project's oversized agent docs (CLAUDE.md, AGENTS.md, .agents/*.md) to the agent-docs-init layout - a small always-loaded core, on-demand topic files and lint-enforced size and history limits. Use when agent docs have grown large, when "CLAUDE.md loads too much", when the docs name tada5hi/skills skills by their old verb-first names (init-agent-docs, create-pull-request, query-package-list, …), or when asked to "migrate agent docs", "split agent docs", "shrink architecture.md" or "adopt the agent docs budgets".
 license: Apache-2.0
 compatibility: Requires a git repository that already has CLAUDE.md/AGENTS.md and .agents/*.md, and Node.js for the split script.
 metadata:
@@ -36,6 +36,7 @@ Moving and rewriting are separate steps, ideally separate pull requests. The mov
 5. **Fix what lint and the move broke.**
    - History phrases: delete `(plan NNN)` citations (or replace them with the issue or PR number) and state "no longer" facts in the present tense.
    - Links: an in-page anchor in moved text (`(#channels)`) now points into another file, and a relative link from `.agents/` needs `../` from `.agents/topics/`. Check every relative Markdown link resolves.
+   - Skill names: the docs may name skills by their old verb-first names (`query-package-list`, `create-pull-request`). Search for them with the command in [references/renamed-skills.md](references/renamed-skills.md) and replace each with its new name.
    - The lint script must reach the docs: `eslint .` does, a script listing directories needs `CLAUDE.md AGENTS.md .agents` added.
 6. **Lock it in.** When the core still exceeds a default, set `agentDocs: { maxBytes, importMaxBytes }` in `eslint.config.js` just above the current size, with a comment to lower it as the docs shrink (fallback: run the ratchet once with `--init`). Run the project's full lint.
 7. **Open the pull request** with a before/after size table (loaded every session, each core file, topic files) and the commands run. Say that text was moved, not condensed or re-checked.
