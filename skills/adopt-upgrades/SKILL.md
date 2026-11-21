@@ -45,18 +45,24 @@ New versions of `@chamvi` ship features that can replace local code in this repo
     - `withCause` in [`packages/kit/src/helpers/errors.ts`](https://github.com/o/r/blob/9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c/packages/kit/src/helpers/errors.ts)
     - [`packages/developer/src/tools/workspace.ts`](https://github.com/o/r/blob/9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c/packages/developer/src/tools/workspace.ts)
 
-    Find the rest: `grep -rnF "withCause(" .`
-  - Source: member of ValidationError, ValidationError.cause in dist/errors.d.mts; [release notes 0.9.0](https://github.com/chamvi/chamvi/releases/tag/%40chamvi%2Fapp%400.9.0)
+    Find the rest: `grep -rnIF --exclude-dir=.git --exclude-dir=node_modules -- "withCause(" .`
+  - Source: member of ValidationError, ValidationError.cause in dist/errors.d.mts
   <!-- adopt-upgrades:entry key=9d54088d29cf -->
+- [ ] **`jobs as components`**: background jobs show in GET /components
+  - Proposal: declare the sweep as a component
+  - Local (0 of 2):
+    Find the rest: `grep -rnIF --exclude-dir=.git --exclude-dir=node_modules -- "setInterval(" .`
+  - Source: [release notes 0.9.0](https://github.com/chamvi/chamvi/releases/tag/%40chamvi%2Fapp%400.9.0)
+  <!-- adopt-upgrades:entry key=8653bf17ce8c -->
 ```
 
 One entry per feature, in this order:
 - **The box line:** `` - [ ] **`<API>`**: <summary> ``, the API in a code span, a few words on what it does.
 - **`Proposal` is required:** how to use the feature here. When the search finds more places than `Local` lists, describe the change in general terms, not file by file.
-- **`Local`** names up to 5 places, each a path from the repository root that exists at the checked commit, linked at that commit's full SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>`), with the symbol in a code span before it when there is one: `` `<symbol>` in [`<path>`](<link>) ``.
-- **The optional search** is a fixed string the owner runs to find every place: ``Find the rest: `grep -rnF "<pattern>" .` ``, after a blank line under the items. Count the matching files with `grep -rlF --exclude-dir=.git --exclude-dir=node_modules -- "<pattern>" . | wc -l`; with none, drop the search. The heading reads `Local (<n> of <m>):` when the search matches more files (`m`) than the items listed (`n`), else `Local:`. The pattern is 1 to 100 characters, has no control character, none of `` ` ``, `"`, `\`, `$`, `!`, does not start with `-`, and holds no `<!--` or `-->`.
+- **`Local`** names up to 5 places, each a file path from the repository root (no leading `/`, no `.` or `..` segment, no directory) that exists at the checked commit, linked at that commit's full SHA (`https://github.com/<owner>/<repo>/blob/<sha>/<path>`), with the symbol in a code span before it when there is one: `` `<symbol>` in [`<path>`](<link>) ``. Name a symbol only as text the file contains verbatim, so the stale block can find it; leave it out otherwise.
+- **The optional search** is a fixed string the owner runs to find every place: ``Find the rest: `grep -rnIF --exclude-dir=.git --exclude-dir=node_modules -- "<pattern>" .` ``, after a blank line under the items (none with no items). Count the matching files with the same search listing files: `grep -rlIF --exclude-dir=.git --exclude-dir=node_modules -- "<pattern>" . | wc -l`; with none, drop the search. The heading reads `Local (<n> of <m>):` when the search matches more files (`m`) than the items listed (`n`), else `Local:`; the agent writes `<m>+` when its listing was cut short. The pattern is 2 to 100 characters with no leading or trailing space, has no control character, none of `` ` ``, `"`, `\`, `$`, `!`, does not start with `-`, and holds no `<!--` or `-->`.
 - **An entry needs at least one Local item or a search that matches.** An opportunity with no local code to point at is not an entry: this is the rule that keeps the issue from filling up with noise.
-- **`Source`** starts with the evidence kind: `new export` (a name the diff added), `changed export` (a name whose declaration changed), `member of <Export>`, `new subpath` or `release notes <to>` (a behavior change the types do not show). Then optional detail after a comma (declaration file, the bump's pull request), then `; [release notes <to>](<release url>)` when there is a release page.
+- **`Source`** starts with the evidence kind: `new export` (a name the diff added), `changed export` (a name whose declaration changed), `member of <Export>`, `new subpath` or `release notes <to>` (a behavior change the types do not show; api id `release:<to>`). Then optional detail after a comma (declaration file, the bump's pull request). When the evidence is the release notes and the package has a GitHub release page for the newest release in the range, the evidence itself is the link, named once: `[release notes <to>](<release url>)`.
 - **The key line** closes the entry: the first 12 hex digits of the SHA-256 of `<package>|<api id>`, one key per feature, no path. The api id is fixed by the evidence, never prose: the export name (`stringbool`), `<Export>.<member>`, the subpath (`./runtime`), or `release:<to version>`. Compute it with `node -e 'console.log(require("node:crypto").createHash("sha256").update(process.argv[1]).digest("hex").slice(0, 12))' '@chamvi/app|ValidationError.cause'`. An entry whose key is already in the body (a key line, or the hidden `<!-- adopt-upgrades:done <key> ... -->` list of collapsed ticked entries) is never added again, ticked or not.
 - **No mentions.** Write a package name only in a code span: GitHub reads `@scope/name` outside one, even in link text, as a team mention. Keep `#<n>`, links and HTML comments out of model text other than the ones above.
 
