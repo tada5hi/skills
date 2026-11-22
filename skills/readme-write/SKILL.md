@@ -1,11 +1,11 @@
 ---
 name: readme-write
-description: Write or overhaul a project README in a hero-led style — centered logo, one-line pitch, a few meaningful badges, a "Why <project>?" section with a comparison table, theme-aware SVG diagrams, and reference sections (usage, options, API, notes) verified against the source. Use when asked to write, rewrite, improve or "make beautiful" a README, when a README is just a heading, an install line and an API dump, when a rename, monorepo split or API overhaul left READMEs stale, when a package needs its first real README, or when asked for a project logo, diagrams or a "Why …?" section. Geared to npm packages and monorepos.
+description: Write or overhaul a project README in a hero-led style — centered logo or wordmark, one-line pitch, a few meaningful badges, a "Why <project>?" section with a comparison table, theme-aware SVG diagrams, and reference sections (usage, options, API, notes) verified against the source. Use when asked to write, rewrite, improve or "make beautiful" a README, when a README is just a heading, an install line and an API dump, when a rename, monorepo split or API overhaul left READMEs stale, when a package needs its first real README, or when asked for a project logo, diagrams or a "Why …?" section. Geared to npm packages and monorepos.
 license: Apache-2.0
 compatibility: Previews SVGs with headless Chrome or Chromium (perl for the settled renders of animated SVGs, xmllint for the well-formedness check). Type-checking samples needs the project's TypeScript toolchain.
 metadata:
   author: tada5hi
-  version: "2026.11.21"
+  version: "2026.11.22"
 allowed-tools: Bash(bash:*) Bash(npx:*) Bash(npm:*) Bash(node:*) Bash(git:*) Bash(curl:*) Read Write Edit Glob Grep
 ---
 
@@ -33,7 +33,7 @@ Copy `templates/readme.md` and fill in its `{{placeholders}}`, in this order:
 
 | Section | Content |
 |---------|---------|
-| Hero | Centered logo, `<h1>`, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a badge row, a nav row linking the main sections, then `---` |
+| Hero | Centered logo and `<h1>` (or one wordmark SVG when the logo repeats the name), then left-aligned: a badge row, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a nav row linking the main sections, then `---`. Keep the existing README's alignment and order when it has one |
 | `## Why <project>?` | The problem in the reader's words, a **Concern / Without it / With it** table, and a short side-by-side or "same thing, three ways" sample |
 | Diagram | One SVG that shows the mechanism (data flow, resolution order, retry loop), where the text needs it |
 | `**Table of Contents**` | Only for a long README. Bold label, nested list, not a `##` heading (GitHub has an outline button; npm has none) |
