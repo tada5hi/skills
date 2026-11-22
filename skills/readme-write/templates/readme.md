@@ -29,6 +29,11 @@ wordmark SVG with alt="{{project}}" in place of logo + <h1>.
 
 [Installation](#installation) · [Usage](#usage) · [Options](#options) · [API](#api) · [Notes](#notes)
 
+<!-- The smallest working program, about ten lines: import from the package name, the one call that matters. -->
+```typescript
+{{sample}}
+```
+
 ---
 
 ## Why {{project}}?
@@ -41,11 +46,6 @@ wordmark SVG with alt="{{project}}" in place of logo + <h1>.
 | Concern | {{Without it}} | {{project}} |
 |---|---|---|
 | **{{Concern}}** | {{What you do today, and its failure mode}} | {{What the project does instead}} |
-
-{{A short sample: the same thing before and after, or done two or three ways.}}
-
-```typescript
-```
 
 <p align="center">
     <!-- The alt text is all a screen reader gets: state the whole flow, like the SVG's <desc>. -->

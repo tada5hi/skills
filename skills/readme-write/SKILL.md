@@ -33,8 +33,8 @@ Copy `templates/readme.md` and fill in its `{{placeholders}}`, in this order:
 
 | Section | Content |
 |---------|---------|
-| Hero | Centered logo and `<h1>` (or one wordmark SVG when the logo repeats the name), then left-aligned: a badge row, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a nav row linking the main sections, then `---`. Keep the existing README's alignment and order when it has one |
-| `## Why <project>?` | The problem in the reader's words, a **Concern / Without it / With it** table, and a short side-by-side or "same thing, three ways" sample |
+| Hero | Centered logo and `<h1>` (or one wordmark SVG when the logo repeats the name), then left-aligned: a badge row, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a nav row linking the main sections, a short sample (the smallest working program, about ten lines), then `---`. Keep the existing README's alignment and order when it has one |
+| `## Why <project>?` | The problem in the reader's words and a **Concern / Without it / With it** table; the hero sample already shows the code |
 | Diagram | One SVG that shows the mechanism (data flow, resolution order, retry loop), where the text needs it |
 | `**Table of Contents**` | Only for a long README. Bold label, nested list, not a `##` heading (GitHub has an outline button; npm has none) |
 | `## Installation` | Install command, module format, Node range, notable peer dependencies |
@@ -62,7 +62,7 @@ Answer in the reader's terms:
 
 1. What do they write today without this project? That is the "Without it" column.
 2. What does the project take off their hands? One row per concern: lifecycle, retries, testing, observability, shutdown, typing.
-3. What is the shortest sample that shows the difference? Prefer the same thing done two or three ways over a feature tour.
+3. What is the smallest working program? It closes the hero, above the `Why` heading: import from the package, the one call that matters, no feature tour.
 
 Be concrete: "re-published after an exponential backoff, dropped after `maxAttempts`", not "robust retry handling". Compare capabilities, not adjectives, and describe the alternative fairly. Leave out numbers that go stale (benchmarks, bundle sizes, star counts) unless they link to a live source.
 
