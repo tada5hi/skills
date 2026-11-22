@@ -6,8 +6,8 @@ Package READMEs on npm: image paths resolve against the default branch, so pin t
 <!--
 Only the logo block is centered. The pitch, badges and nav row stay left-aligned unless the
 project's existing README centers them; keep its alignment.
-When the logo pictogram repeats the name (a letter mark above an <h1> of the same name), use a
-wordmark SVG with alt="{{project}}" in place of logo + <h1>.
+Logo + <h1> is the default. A wordmark SVG (alt="{{project}}") in place of both is an option
+to offer the owner, e.g. when the logo is only a letter mark of the name; never switch on your own.
 -->
 <div align="center">
 
