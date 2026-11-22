@@ -29,7 +29,7 @@ wordmark SVG with alt="{{project}}" in place of logo + <h1>.
 
 [Installation](#installation) · [Usage](#usage) · [Options](#options) · [API](#api) · [Notes](#notes)
 
-<!-- The smallest working program, about ten lines: import from the package name, the one call that matters. -->
+<!-- Optional: only when one short program (about ten lines) expresses the library. Drop it for a service, platform or monorepo landing page. -->
 ```typescript
 {{sample}}
 ```
