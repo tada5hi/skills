@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires the `gh` CLI (authenticated) and npm registry access.
 metadata:
   author: tada5hi
-  version: "2026.11.21"
+  version: "2026.11.23"
 allowed-tools: Bash(gh:*) Bash(npm:*) Bash(git:*) Bash(grep:*) Bash(node:*) Bash(curl:*) Bash(tar:*) Bash(mktemp:*) Read Grep Edit Write
 ---
 
@@ -76,6 +76,7 @@ Only when the user agrees, never as a side effect of a check: it deletes code. B
 
 | Mistake | Instead |
 |---|---|
+| Filing the upstream issue and stopping there | Every filed upstream issue gets its tracking entry and its `Upstream:` comment in the same pass, also when many are filed at once or another tracker (another project's) lists them |
 | A second tracking issue for another library | Extend the one tracking issue; widen its title |
 | "Closed, so adoptable" | Find the tag and the npm version |
 | "Released, so adoptable" without opening the package | Follow the import from `exports` to the name, and import it at runtime |
