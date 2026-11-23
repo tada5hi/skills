@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Requires network access to GitHub (the `gh` CLI or curl fetches the list) and to the npm registry or PyPI to verify a package's API.
 metadata:
   author: tada5hi
-  version: "2026.11.21"
+  version: "2026.11.23"
 allowed-tools: Bash(gh:*) Bash(curl:*) Bash(npm:*) Bash(pip:*) Bash(node:*) Bash(tar:*) Bash(unzip:*) Bash(xargs:*) Bash(mktemp:*) Bash(grep:*) Bash(rm:*) Read Grep
 ---
 
@@ -79,6 +79,6 @@ Run the lookup at the first of these moments:
 ## Rules
 
 - Never add a dependency without the user's go-ahead; suggest it and wait (step 4's exceptions apply).
-- A partial fit is worth naming ("smob merges, but not with array dedupe"); let the user decide. If the package lacks a small piece, propose adding it to the package instead of copying the rest.
+- A partial fit is worth naming ("smob merges, but not with array dedupe"); let the user decide. If the package lacks a small piece, propose adding it to the package instead of copying the rest. When a local workaround is written anyway, record it with upstream-fixes-track: the upstream issue, its entry in the project's one tracking issue and the `Upstream:` comment belong together.
 - When the list line or README misses a capability you found in the exports, mention it so the list can be refreshed (package-list-refresh).
 - The list only covers the user's own packages. It is not a substitute for well-known libraries the project already uses.
