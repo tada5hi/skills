@@ -4,8 +4,8 @@ For an existing README, preserve its capability explanations and examples while 
 Package READMEs on npm: image paths resolve against the default branch, so pin them (see references/rendering.md).
 -->
 <!--
-Only the logo block is centered. The pitch, badges and nav row stay left-aligned unless the
-project's existing README centers them; keep its alignment.
+Always center the logo and <h1> together; always left-align the badges, pitch, nav row and
+everything after, even when the existing README aligns them differently.
 Logo + <h1> is the default. A wordmark SVG (alt="{{project}}") in place of both is an option
 to offer the owner, e.g. when the logo is only a letter mark of the name; never switch on your own.
 -->
