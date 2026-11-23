@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Previews SVGs with headless Chrome or Chromium (perl for the settled renders of animated SVGs, xmllint for the well-formedness check). Type-checking samples needs the project's TypeScript toolchain.
 metadata:
   author: tada5hi
-  version: "2026.11.21"
+  version: "2026.11.23"
 allowed-tools: Bash(bash:*) Bash(npx:*) Bash(npm:*) Bash(node:*) Bash(git:*) Bash(curl:*) Read Write Edit Glob Grep
 ---
 
@@ -33,8 +33,8 @@ Copy `templates/readme.md` and fill in its `{{placeholders}}`, in this order:
 
 | Section | Content |
 |---------|---------|
-| Hero | Centered logo, `<h1>`, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a badge row, a nav row linking the main sections, then `---` |
-| `## Why <project>?` | The problem in the reader's words, a **Concern / Without it / With it** table, and a short side-by-side or "same thing, three ways" sample |
+| Hero | Centered logo and `<h1>` (a wordmark SVG in their place is an option the owner picks, e.g. when the logo is only a letter mark of the name), then left-aligned: a badge row, the pitch (bold, under 120 characters, same sentence as the `package.json` description) plus one or two lines on what the reader stops writing, a nav row linking the main sections, then `---`. Close the hero with a short sample (about ten lines) only when one program expresses the library; leave it out for a service or platform, a monorepo landing page, or a library no single snippet represents. This alignment holds for every README, including an existing one that aligns differently; keep the existing order |
+| `## Why <project>?` | The problem in the reader's words and a **Concern / Without it / With it** table. Add a short sample here only when the hero has none and one helps |
 | Diagram | One SVG that shows the mechanism (data flow, resolution order, retry loop), where the text needs it |
 | `**Table of Contents**` | Only for a long README. Bold label, nested list, not a `##` heading (GitHub has an outline button; npm has none) |
 | `## Installation` | Install command, module format, Node range, notable peer dependencies |
@@ -62,7 +62,7 @@ Answer in the reader's terms:
 
 1. What do they write today without this project? That is the "Without it" column.
 2. What does the project take off their hands? One row per concern: lifecycle, retries, testing, observability, shutdown, typing.
-3. What is the shortest sample that shows the difference? Prefer the same thing done two or three ways over a feature tour.
+3. Is there one short program that shows what the project is for? If so, it closes the hero, above the `Why` heading: import from the package, the one call that matters, no feature tour. If the project is a service, a platform or a set of packages, skip it; no sample beats a misleading one.
 
 Be concrete: "re-published after an exponential backoff, dropped after `maxAttempts`", not "robust retry handling". Compare capabilities, not adjectives, and describe the alternative fairly. Leave out numbers that go stale (benchmarks, bundle sizes, star counts) unless they link to a live source.
 
