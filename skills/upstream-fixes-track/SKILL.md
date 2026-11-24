@@ -25,9 +25,11 @@ The user's libraries are the owners and repos in their package list (default `ta
 
 ## Mode 1: file (a workaround was just written)
 
+Mode 1 is one pass with three outputs: the upstream issue, its entry in the project's tracking issue, and the `Upstream:` comment. It is not done while any of them is missing, also when the user only asked to "file the upstream issue": the tracking entry is created or extended in the same pass, never left for later.
+
 1. **Search before filing:** `gh issue list -R <owner>/<repo> --state all --search "<keywords>"`. Reuse an existing issue, open or closed; a closed one whose fix is unreleased is tracked like an open one.
 2. **Draft the upstream issue** when none exists: a Conventional Commit title (`feat(<pkg>): …` / `fix(<pkg>): …`), the gap, a proposed API (signature and a short example), the consumer file as context. Show the draft and create it only on the user's go-ahead: it is visible to others.
-3. **Find the project's tracking issue.** Its title need not say "upstream" (`chore: adopt authup fixes`), so search titles and bodies: `gh issue list --state open --search "Upstream in:title,body"`, then `gh issue list --state open --search "<library or owner/repo> in:title,body"` per library involved, and read the candidates. With few open issues, read them all (`gh issue list --state open --limit 200 --json number,title,body`). There is exactly one per project: if one tracks only some libraries, extend it and widen its title (`chore: adopt upstream fixes`). Create one only when these searches find none, with the intro below.
+3. **Find the project's tracking issue.** Its title need not say "upstream" (`chore: adopt authup fixes`), so search titles and bodies: `gh issue list --state open --search "Upstream in:title,body"`, then `gh issue list --state open --search "<library or owner/repo> in:title,body"` per library involved, and read the candidates. With few open issues, read them all (`gh issue list --state open --limit 200 --json number,title,body`). There is exactly one per project: if one tracks only some libraries, or a single-fix adoption issue (`Adopt the locter fix for …`) is the only candidate, extend it into the tracker: keep its content as the first entry and widen its title (`chore: adopt upstream fixes`). Create one only when these searches find none, with the intro below.
 4. **Add the entry** with `gh issue edit <n> --body-file <file>`, after reading the current body so nothing is lost:
 
    ```markdown
@@ -39,6 +41,7 @@ The user's libraries are the owners and repos in their package list (default `ta
 
    `Local` names every file and caller. `Adopt` names the bump, every local thing to delete, and known signature differences.
 5. **Mark the code.** First line of each local copy: `// Upstream: tada5hi/rapiq#997 (local copy until @rapiq/core ships it)`. If the project keeps a plan or adoption file, add the same entry there.
+6. **Report all three.** The reply names the upstream issue's link, the tracking issue's link (and whether it was created, extended or retitled) and the file carrying the `Upstream:` comment. A reply with only the upstream link means steps 3 to 5 were skipped.
 
 Intro of a new tracking issue:
 
