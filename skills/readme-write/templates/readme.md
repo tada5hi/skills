@@ -4,8 +4,8 @@ For an existing README, preserve its capability explanations and examples while 
 Package READMEs on npm: image paths resolve against the default branch, so pin them (see references/rendering.md).
 -->
 <!--
-Always center the logo and <h1> together; always left-align the badges, pitch, nav row and
-everything after, even when the existing README aligns them differently.
+Center the whole hero as one block: logo, <h1>, badges, pitch and nav row, even when the
+existing README aligns them differently. The optional sample and everything after are left-aligned.
 Logo + <h1> is the default. A wordmark SVG (alt="{{project}}") in place of both is an option
 to offer the owner, e.g. when the logo is only a letter mark of the name; never switch on your own.
 -->
@@ -14,8 +14,6 @@ to offer the owner, e.g. when the logo is only a letter mark of the name; never 
 <img src="./.github/assets/logo.svg" alt="{{project}}" width="128" height="128" />
 
 <h1>{{project}}</h1>
-
-</div>
 
 <!-- Three or four badges that measure something: version, CI, coverage. No decorative badges. -->
 [![npm version](https://img.shields.io/npm/v/{{package}})](https://www.npmjs.com/package/{{package}})
@@ -29,6 +27,8 @@ to offer the owner, e.g. when the logo is only a letter mark of the name; never 
 
 [Installation](#installation) · [Usage](#usage) · [Options](#options) · [API](#api) · [Notes](#notes)
 
+</div>
+
 <!-- Optional: only when one short program (about ten lines) expresses the library. Drop it for a service, platform or monorepo landing page. -->
 ```typescript
 {{sample}}
@@ -38,7 +38,7 @@ to offer the owner, e.g. when the logo is only a letter mark of the name; never 
 
 ## Why {{project}}?
 
-{{The problem: what every project ends up writing by hand, and where that goes wrong.}}
+{{The problem: what every project ends up writing by hand, and where that goes wrong. New text: the hero's pitch and lines stay in the hero.}}
 
 {{project}} is that layer, written once:
 
